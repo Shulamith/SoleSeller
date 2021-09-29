@@ -8,9 +8,9 @@ Backend will use Node JS code
 
 when react is set up for frontend it uses 3000 port, for backend it needs to be routed differently so we use 4000. Ports can use any number.
 
-**npm run server** will run nodemon index.js using script found in package.json
-**npm run client** will run front end using script found in package.json
-**npm run build** will kill all other process and run server and client concurrently
+- **npm run server** will run nodemon index.js using script found in package.json.
+- **npm run client** will run front end using script found in package.json.
+- **npm run build** will kill all other process and run server and client concurrently.
 
 "scripts": {
     "server": "nodemon index.js", 
