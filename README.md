@@ -19,7 +19,9 @@ when react is set up for frontend it uses 3000 port, for backend it needs to be 
   },
 
 ## Video Walkthrough
+Version 1.0:
 ![Version 1.0](./images/Inital_Layout.gif)
 
 Resources:
+
 https://www.youtube.com/watch?v=3isCTSUdXaQ
