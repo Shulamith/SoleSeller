@@ -11,6 +11,8 @@ when react is set up for frontend it uses 3000 port, for backend it needs to be 
 - **npm run server** will run nodemon index.js using script found in package.json. (USE TO RUN BACKEND)
 - **npm run client** will run front end using script found in package.json.(USE TO RUN FRONTEND)
 - **npm run build** will kill all other process and run server and client concurrently. (USE TO RUN BACKEND AND FRONTEND CONCURRENTLY)
+
+
 "scripts": {
     "server": "nodemon index.js", 
     "client": "npm runt start --prefix ../frontend",
