@@ -1,21 +1,27 @@
 import React from 'react'; // ES6 js
-import {Link} from 'react-router-dom' // import to use Link syntax, must install 'react-router-dom' as dependencie using npm install react-router-domn
-// we use this by pulling link class and create links using it
 
 function Nav() {
     return (
         // HTML code using Bootstrap for simple navigation that has two lings
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark top">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navMainMenu" aria-controls="navMainMenu" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div id="navMainMenu" class="navbar-collapse collapse">
-                <div class="navbar-nav ml-auto">
-                    <Link to='/' className="nav-item nav-link active">Home</Link>
-                    <Link to='/inventory' className="nav-item nav-link">Inventory</Link>
-                </div>
-            </div>
-        </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarText">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/inventory">Inventory</a>
+            </li>
+          </ul>
+          <button type="button" class="btn btn-primary navbar-btn">
+            <span class="glyphicon glyphicon-plus"></span> 
+            <a class="nav-link" href="/login">Login</a>
+          </button>
+        </div>
+      </nav>
     );
 
 }
