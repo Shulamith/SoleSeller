@@ -17,7 +17,6 @@ function Nav() {
             </li>
           </ul>
           <button type="button" class="btn btn-primary navbar-btn">
-            <span class="glyphicon glyphicon-plus"></span> 
             <a class="nav-link" href="/login">Login</a>
           </button>
         </div>
