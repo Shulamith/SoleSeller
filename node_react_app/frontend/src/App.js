@@ -13,10 +13,11 @@ function App() {
    <Router>
     <div className="App">
       <header className="App-header">
-        <Nav /> 
+        <Nav />
         <Switch>
-          <Route path="/" exact component = {Home} /> 
+          <Route path="/" exact component = {Home} />
           <Route path="/inventory" exact component = {Inventory} />
+          <Route path="/ebayauth" />
         </Switch>
       </header>
     </div>

@@ -13,6 +13,7 @@ function Nav() {
                 <div class="navbar-nav ml-auto">
                     <Link to='/' className="nav-item nav-link active">Home</Link>
                     <Link to='/inventory' className="nav-item nav-link">Inventory</Link>
+                    <Link to='/EbayAuth' className="nav-item nav-link auth"> EbayAuth</Link>
                 </div>
             </div>
         </nav>
@@ -20,4 +21,4 @@ function Nav() {
 
 }
 
-export default Nav; 
+export default Nav;
