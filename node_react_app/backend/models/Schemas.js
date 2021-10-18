@@ -20,7 +20,7 @@ const channelSchema = new Schema({
 const itemSchema = new Schema ({
     item: {type: String, required: true},
     price: {type: String, required: true},
-    channel: {type: String, required: true},
+    channel: {type: String, required: false},
     user:{type: Schema.Types.ObjectId, ref: 'users'} // references user table tru id
 });
 
