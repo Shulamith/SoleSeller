@@ -39,7 +39,7 @@ export default function Login() {
         <Button block size="lg" type="submit" disabled={!validateForm()}>
           Login
         </Button>
-        <Link to="/Register">Don't have a login?</Link>
+        <Link to="/Register" style={{ color: '#FFF' }}>Don't have a login?</Link>
       </Form>
     </div>
   );
