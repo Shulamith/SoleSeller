@@ -6,6 +6,7 @@ import Home from './components/Home';
 import Inventory from './components/Inventory';
 import Login from './components/login';
 import Register from './components/register';
+import Profile from './components/profile';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/inventory" exact component = {Inventory} />
           <Route path="/register" exact component = {Register} />
           <Route path="/login" exact component = {Login} />
+          <Route path="/profile" exact component = {Profile} />
         </Switch>
       </header>
     </div>
