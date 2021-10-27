@@ -1,5 +1,7 @@
 const express = require('express');
 const router = express.Router();
+const bcrypt = require('bcrypt');
+router.use(express.urlencoded({ extended: false }));
 
 
 /* ------------ GET METHODS ------------ */
@@ -20,5 +22,16 @@ router.get('/inventory', (req, res) => {
 router.post('/addProduct', (req, res) => {
     res.end('NA');
 });
+
+
+router.post('/login', (req, res) => {
+    
+});
+
+
+router.post('/register', (req, res) => {
+    
+});
+
 
 module.exports = router;
