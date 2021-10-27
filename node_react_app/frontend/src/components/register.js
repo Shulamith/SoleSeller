@@ -14,7 +14,7 @@ export default function Register() {
     }
   
     function handleSubmit(event) {
-      event.preventDefault();
+        event.preventDefault();
     }
 
     return (
@@ -47,9 +47,7 @@ export default function Register() {
               />
             </Form.Group>
             <Button block size="lg" type="submit" disabled={!validateForm()}>
-              <Link to ="/Login">
                 Register
-              </Link>
             </Button>
           </Form>
         </div>
