@@ -5,6 +5,8 @@ const Schemas = require('../models/Schemas.js');
 
 router.use(express.urlencoded({ extended: false }));
 
+const users = []
+
 //GO http://localhost:4000/addUser TO ADD NEW USER WITH THIS CODE
 router.get('/addUser', async (req, res) => {
     const user = { username: 'superman', fullname: 'clark kent' };
@@ -106,18 +108,18 @@ router.post('/login', (req, res) => {
 
 router.post('/Register', (req, res) => {
     try {
-        const hashedPassword = await (bcrypt.hash(req.body.password, 10));
-        const newUser = schemas.Users;
-        newUser.push({
-            username: req.form.group('Name').control.value,
-            email: req.form.getElementById("email"),
+        const hashedPassword = async () => { await bcrypt.hash(req.form.password.value, 10) };
+        //const newUser = schemas.Users;
+        users.push({
+            username: req.form.Name.value,
+            email: req.form.email.value,
             password: hashedPassword
         });
         res.redirect('/login');
     } catch {
         res.redirect('/Register');
     }
-    console.log(newUser);
+    console.log(users);
 });
 
 

@@ -4,6 +4,7 @@ import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
 import "./register.css";
 
+
 export default function Register() {
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
@@ -15,6 +16,10 @@ export default function Register() {
   
     function handleSubmit(event) {
         event.preventDefault();
+
+        console.log(event.target.Name.value);
+        console.log(event.target.email.value);
+        console.log(event.target.password.value);
     }
 
     return (
@@ -23,16 +28,15 @@ export default function Register() {
             <Form.Group size="lg" controlId="Name">
                 <Form.Label>Name</Form.Label>
                 <Form.Control
-                    autoFocus
-                    type="name"
-                    value={name}
-                    onChange={(e)=>setName(e.target.value)}
-                    />
+                autoFocus
+                type="name"
+                value={name}
+                onChange={(e)=>setName(e.target.value)}
+               />
             </Form.Group>
             <Form.Group size="lg" controlId="email">
               <Form.Label>Email</Form.Label>
               <Form.Control
-                autoFocus
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -46,9 +50,9 @@ export default function Register() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Form.Group>
-            <Button block size="lg" type="submit" disabled={!validateForm()}>
-                Register
-            </Button>
+                <Button block size="lg" type="submit" disabled={!validateForm()}>
+                    Register
+                </Button>
           </Form>
         </div>
       );
