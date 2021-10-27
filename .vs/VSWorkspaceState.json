@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\node_react_app",
+    "\\node_react_app\\backend",
+    "\\node_react_app\\backend\\routes",
+    "\\node_react_app\\frontend",
+    "\\node_react_app\\frontend\\src",
+    "\\node_react_app\\frontend\\src\\components"
+  ],
+  "SelectedNode": "\\node_react_app\\backend\\index.js",
+  "PreviewInSolutionExplorer": false
+}

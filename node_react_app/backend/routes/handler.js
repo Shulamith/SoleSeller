@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
+
+/* ------------ GET METHODS ------------ */
+
 router.get('/inventory', (req, res) => {
     const str = [{
         "product": "Nintendo Gameboy Advance",
@@ -9,6 +12,10 @@ router.get('/inventory', (req, res) => {
     }];
     res.end(JSON.stringify(str));
 });
+
+
+
+/* ------------ POST METHODS ------------ */
 
 router.post('/addProduct', (req, res) => {
     res.end('NA');
