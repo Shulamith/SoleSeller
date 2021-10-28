@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
+import "./Inventory.css";
 
 function Inventory() {
 
@@ -19,13 +20,37 @@ function Inventory() {
     return(
         <section>
             {
-                items.map(item => (
+                <div class="container">
+                    <div class="row row-cols-2">
+                        <div class="col">
+                            <p>Product 1</p>
+                            <p>Price</p>
+                            <p>Ebay</p>
+                        </div>
+                        <div class="col">
+                            Product 1
+                            Price
+                            Etsy
+                        </div>
+                        <div class="col">
+                            Product 2
+                            Price
+                            Ebay
+                        </div>
+                        <div class="col">
+                            Product 2
+                            Price
+                            Etsy
+                        </div>
+                    </div>
+                </div>
+                /*items.map(item => (
                     <div>
                         <p>{item.product}</p>
                         <p>{item.channel}</p>
                         <p>{item.username}</p>
                     </div>
-                ))
+                ))*/
             }
         </section>
         
