@@ -1,25 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
+import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import { Link } from 'react-router-dom';
+import ebay from "./ebay.png";
+import etsy from "./etsy.jpg";
 import "./profile.css";
-import ebay from "./eBay.png";
-import etsy from "./etsy.jpg"
 
 export default function Profile() {
     return(
         <section> 
-            <div class = "container-fluid">
-                <p>Welcome user</p>
+            <div class = "row-img-bg">
+                <p>Welcome User</p>
             </div>
-            <Button id="ebay" block size="sm" type="link">  <img src={ebay} height = {25} width = {50}/>
-                <a href="http://ebay.com">
-                Connect to Ebay
-                </a>
-            </Button>
-            <Button id="etsy" block size="sm" type="link" > <img src={etsy} height = {25} width = {50}/>
-                <a href="http://etsy.com"> 
-                Connect to Etsy
-                </a>
-            </Button>
+            <div class = "buttons">
+                <Button id="ebay" block size="sm" type="link">
+                    <a href="http://signin.ebay.com">
+                        <img src={ebay} height = {25} width = {50}/>
+                        Connect to Ebay
+                    </a>
+                </Button>
+                &nbsp;
+                <Button id="etsy" block size="sm" type="link" >
+                    <a href="https://www.etsy.com/signin">
+                        <img src={etsy} height = {25} width = {50}/>
+                        Connect to Etsy
+                    </a>
+                </Button>
+            </div>
         </section>
     );
 }
