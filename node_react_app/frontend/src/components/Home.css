@@ -1,0 +1,21 @@
+.mt-5 {
+    text-align:center;
+    align-items: center;
+    padding: 30px;
+}
+
+.row-one {
+    align-items:center;
+    text-align:center;
+}
+
+
+img {
+    display: block;
+    border-radius: 8px;
+    /*align-items:center;*/
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    height: auto;
+}

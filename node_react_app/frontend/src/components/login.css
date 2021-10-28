@@ -1,13 +1,17 @@
 @media all and (min-width: 480px) {
-    .Login {
-      padding: 60px 0;
-    }
-  
-    .Login form {
-      margin: 0 auto;
-      max-width: 320px;
-    }
-    a {
-      color : #00F;
-    }
+  .Login {
+    padding: 120px 0;
   }
+
+  .Login form {
+    margin: 0 auto;
+    max-width: 320px;
+  }
+  a {
+    color : #00F;
+  }
+}
+
+#login {
+  background-color: white;
+}
