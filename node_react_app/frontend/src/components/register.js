@@ -53,6 +53,7 @@ export default function Register() {
                 <Button block size="lg" type="submit" disabled={!validateForm()}>
                     Register
                 </Button>
+                <Link to="/login" style={{ color: '#FFF' }}>Already have an account?</Link>
           </Form>
         </div>
       );
