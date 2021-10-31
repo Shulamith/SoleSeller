@@ -9,7 +9,7 @@ function Home() {
             <div class="container">
                 <img src={cartoon} />
                 <h1 class="mt-5">Welcome to Sole Seller</h1>
-                <h3 class="mt-5">The Market Place Sellers App</h3>
+                <h3 class="mt-5">The Market Place Seller's App</h3>
                 <h5 class="mt-5">Please <Link to="/login">login</Link> to use the website</h5>
             </div>
         </section>

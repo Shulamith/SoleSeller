@@ -9,6 +9,6 @@
     "\\node_react_app\\frontend\\src",
     "\\node_react_app\\frontend\\src\\components"
   ],
-  "SelectedNode": "\\node_react_app\\backend\\package-lock.json",
+  "SelectedNode": "\\node_react_app\\frontend\\src\\components\\register.css",
   "PreviewInSolutionExplorer": false
 }
