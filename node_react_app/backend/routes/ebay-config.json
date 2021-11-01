@@ -4,7 +4,7 @@
         "clientSecret": "SBX-1b09fbb04f30-3350-48e2-8c2b-9c76",
         "devid": "2b0a945f-bb12-4a36-95aa-d22331c35475",
         "redirectUri": "Shulamith_Dashe-Shulamit-SoulSe-wljldfhx",
-        "baseUrl": "api.sandbox.ebay.com"
+        "baseUrl": "https://api.sandbox.ebay.com"
     },
     "PRODUCTION": {
         "clientId": "---Client Id---",
