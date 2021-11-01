@@ -1,0 +1,82 @@
+inventoryItems": [
+        {
+            "sku": "G********1",
+            "availability": {
+                "shipToLocationAvailability": {
+                    "quantity": 50
+                }
+            },
+            "condition": "NEW",
+            "product": {
+                "title": "GoPro Hero4 Helmet Cam",
+                "description": "New GoPro Hero4 Helmet Cam. Unopened box.",
+                "aspects": {
+                    "Brand": [
+                        "GoPro"
+                    ],
+                    "Type": [
+                        "Helmet/Action"
+                    ],
+                    "Storage Type": [
+                        "Removable"
+                    ],
+                    "Recording Definition": [
+                        "High Definition"
+                    ],
+                    "Media Format": [
+                        "Flash Drive (SSD)"
+                    ],
+                    "Optical Zoom": [
+                        "10x"
+                    ]
+                },
+                "imageUrls": [
+                    "https://i*****g.com/*****/**********/**********0.jpg",
+                    "https://i*****g.com/*****/**********/**********1.jpg",
+                    "https://i*****g.com/*****/**********/**********2.jpg"
+                ]
+            }
+        },
+        {
+            "sku": "G********2",
+            "availability": {
+                "shipToLocationAvailability": {
+                    "quantity": 50
+                }
+            },
+            "condition": "NEW",
+            "product": {
+                "title": "GoPro Hero3 Helmet Cam",
+                "description": "New GoPro Hero3 Helmet Cam. Unopened box.",
+                "aspects": {
+                    "Brand": [
+                        "GoPro"
+                    ],
+                    "Type": [
+                        "Helmet/Action"
+                    ],
+                    "Storage Type": [
+                        "Removable"
+                    ],
+                    "Recording Definition": [
+                        "High Definition"
+                    ],
+                    "Media Format": [
+                        "Flash Drive (SSD)"
+                    ],
+                    "Optical Zoom": [
+                        "5x"
+                    ]
+                },
+                "imageUrls": [
+                    "https://i*****g.com/*****/**********/**********3.jpg",
+                    "https://i*****g.com/*****/**********/**********4.jpg",
+                    "https://i*****g.com/*****/**********/**********5.jpg"
+                ]
+            }
+        }
+    ],
+    "next": "/?offset=2&limit=2",
+    "size": 50,
+    "total": 100
+}
