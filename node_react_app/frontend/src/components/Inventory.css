@@ -1,0 +1,19 @@
+.container-fluid {
+    padding-top: 20px;
+}
+
+.container {
+    padding: 120px;
+}
+
+.input-group-prepend {
+    padding-top: 30px;
+}
+
+.col {
+    border: solid 2px white;
+}
+
+.buttons {
+    align-items:center;
+}
