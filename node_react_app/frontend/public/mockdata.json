@@ -8,30 +8,18 @@ inventoryItems": [
             },
             "condition": "NEW",
             "product": {
-                "title": "GoPro Hero4 Helmet Cam",
-                "description": "New GoPro Hero4 Helmet Cam. Unopened box.",
+                "title": "Louis Vuitton Duck Bag",
+                "description": "New Louis Vuitton Special Edition Bag.",
                 "aspects": {
                     "Brand": [
-                        "GoPro"
+                        "Louis Vuitton"
                     ],
                     "Type": [
-                        "Helmet/Action"
-                    ],
-                    "Storage Type": [
-                        "Removable"
-                    ],
-                    "Recording Definition": [
-                        "High Definition"
-                    ],
-                    "Media Format": [
-                        "Flash Drive (SSD)"
-                    ],
-                    "Optical Zoom": [
-                        "10x"
+                        "Purse"
                     ]
                 },
                 "imageUrls": [
-                    "https://i*****g.com/*****/**********/**********0.jpg",
+                    "https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2021%2F09%2Flouis-vuitton-nigo-2-mallard-duck-bag-revealed-0001.jpg?q=75&w=800&cbr=1&fit=max",
                     "https://i*****g.com/*****/**********/**********1.jpg",
                     "https://i*****g.com/*****/**********/**********2.jpg"
                 ]
@@ -46,37 +34,22 @@ inventoryItems": [
             },
             "condition": "NEW",
             "product": {
-                "title": "GoPro Hero3 Helmet Cam",
-                "description": "New GoPro Hero3 Helmet Cam. Unopened box.",
+                "title": "RED NIKE SHOES",
+                "description": "Red nike shoes. Unopened Box. ",
                 "aspects": {
                     "Brand": [
-                        "GoPro"
+                        "Nike"
                     ],
                     "Type": [
-                        "Helmet/Action"
-                    ],
-                    "Storage Type": [
-                        "Removable"
-                    ],
-                    "Recording Definition": [
-                        "High Definition"
-                    ],
-                    "Media Format": [
-                        "Flash Drive (SSD)"
-                    ],
-                    "Optical Zoom": [
-                        "5x"
+                        "Shoes"
                     ]
                 },
                 "imageUrls": [
-                    "https://i*****g.com/*****/**********/**********3.jpg",
+                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1170&q=80.jpg",
                     "https://i*****g.com/*****/**********/**********4.jpg",
                     "https://i*****g.com/*****/**********/**********5.jpg"
                 ]
             }
         }
-    ],
-    "next": "/?offset=2&limit=2",
-    "size": 50,
-    "total": 100
+    ]
 }
