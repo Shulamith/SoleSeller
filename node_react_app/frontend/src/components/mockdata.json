@@ -1,4 +1,4 @@
-inventoryItems": [
+[
         {
             "sku": "G********1",
             "availability": {
@@ -19,7 +19,7 @@ inventoryItems": [
                     ]
                 },
                 "imageUrls": [
-                    "https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2021%2F09%2Flouis-vuitton-nigo-2-mallard-duck-bag-revealed-0001.jpg?q=75&w=800&cbr=1&fit=max",
+                    "https://image-cdn.hypb.st/https%3A%2F%2Fhypebeast.com%2Fimage%2F2021%2F09%2Flouis-vuitton-nigo-2-mallard-duck-bag-revealed-0001.jpg?q=75&w=800&cbr=1&fit=max.jpg",
                     "https://i*****g.com/*****/**********/**********1.jpg",
                     "https://i*****g.com/*****/**********/**********2.jpg"
                 ]
@@ -52,4 +52,3 @@ inventoryItems": [
             }
         }
     ]
-}
