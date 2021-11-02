@@ -1,4 +1,5 @@
-import React, {useEffect, useState} from 'react';
+import React  from 'react';
+import Image from 'react-bootstrap/Image'
 import "./InventoryTwo.css";
 import inventoryData from "./mockdata.json";
 //TODO: check casing of variables in React
@@ -6,16 +7,17 @@ function InventoryTwo () {
 
     //some bootstrap to pretty things up
     return(
-        <section>
-            <div className="gallery">
+      <>
+          <div className = "container">
             { inventoryData.map((item, index) =>{
-              <div className = "pics" key ={index}>
-                  <img src = {item.product.imageUrls[0]} />
+              <div className="pics" key ={index}>
+                  <img src = {item.product.imageUrls[0]}/>
                   </div>
-            })}
-            </div>
-        </section>
+           })}
+           </div>
+           </>
     );
 }
+//{item.product.imageUrls[0]}
 
 export default InventoryTwo;

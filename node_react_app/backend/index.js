@@ -1,5 +1,4 @@
 const express = require('express');
-const express = require('express');
 const bodyParser = require('body-parser');
 const routesHandler = require('./routes/handler.js');
 const EbayAuthToken = require('ebay-oauth-nodejs-client');

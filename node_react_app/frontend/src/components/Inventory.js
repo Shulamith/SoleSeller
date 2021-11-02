@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Link} from 'react-router-dom';
-import "./Inventory.css";
+import ''./Inventory.css';
 
 function Inventory() {
 
@@ -20,7 +20,7 @@ function Inventory() {
     //some bootstrap to pretty things up
     return(
         <section>
-            
+
             <div class="container-fluid">
                 <h1 class="mt-5">Items</h1>
                 <form method="POST" action="/addItem">
@@ -31,7 +31,7 @@ function Inventory() {
                                 <input type="submit" value="Send" class="btn btn-primary mb-2"/>
                             </div>
                     </div>
-                </form> 
+                </form>
 
                 {/* <form>
                     <div class="form-group">
@@ -80,7 +80,7 @@ function Inventory() {
             }
             </div>
         </section>
-        
+
 
     );
 }
