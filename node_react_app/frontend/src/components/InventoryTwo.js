@@ -7,15 +7,13 @@ function InventoryTwo () {
 
     //some bootstrap to pretty things up
     return(
-      <>
           <div className = "container">
             { inventoryData.map((item, index) =>{
               <div className="pics" key ={index}>
-                  <img src = {item.product.imageUrls[0]}/>
+                  <a> <img src = {item.product.imageUrls[0]} alt= "new"/> </a>
                   </div>
            })}
            </div>
-           </>
     );
 }
 //{item.product.imageUrls[0]}
