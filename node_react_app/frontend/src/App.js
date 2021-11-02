@@ -1,5 +1,5 @@
 // import logo from './logo.svg';
-import React from 'react';
+import React, {useState} from 'react';
 import './App.css';
 import Nav from './components/Nav'; // Nav was exported in Nav.js, so we can import it here and use it
 import Home from './components/Home';
@@ -11,6 +11,7 @@ import Profile from './components/profile';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token"));
   return (
     // Since Nav and links will direct us to different pages, it has to act as a URL router
     // Routes added for Home link and tweet Link
