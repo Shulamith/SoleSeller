@@ -7,7 +7,7 @@ const ebayAuthToken = new EbayAuthToken({
 const bcrypt = require('bcrypt');
 const Schemas = require('../models/Schemas.js');
 
-router.use(express.urlencoded({ extended: false }));
+//router.use(express.urlencoded({ extended: false }));
 
 const users = []
 
@@ -118,6 +118,13 @@ router.get('/ebayauth', (req, res) => {
   // // Authorization Code Auth Flow
   //res.header('Access-Control-Allow-Origin', '*');
   const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('SANDBOX', scopes);
+  const clientScope = 'https://api.ebay.com/oauth/api_scope';
+  // // Client Crendential Auth Flow
+  ebayAuthToken.getApplicationToken('SANDBOX', clientScope).then((data) => {
+      console.log(data);
+  }).catch((error) => {
+      console.log(`Error to get Access token :${JSON.stringify(error)}`);
+  });
   console.log(AuthUrl);
   return res.redirect(AuthUrl);
   //res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
