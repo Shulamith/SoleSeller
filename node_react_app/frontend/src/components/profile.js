@@ -9,10 +9,10 @@ import "./profile.css";
 export default function Profile() {
     return(
         <section>
-            <div class = "row-img-bg">
+            <div className = "row-img-bg">
                 <p>Welcome User</p>
             </div>
-            <div class = "buttons">
+            <div className = "buttons">
                 <Button id="ebay" block size="sm" type="link">
                     <a href="http://signin.ebay.com">
                         <img src={ebay} height = {25} width = {50}/>

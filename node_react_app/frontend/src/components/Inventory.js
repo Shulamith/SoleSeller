@@ -21,49 +21,49 @@ function Inventory() {
     return(
         <section>
 
-            <div class="container-fluid">
-                <h1 class="mt-5">Items</h1>
+            <div className="container-fluid">
+                <h1 className="mt-5">Items</h1>
                 <form method="POST" action="/addItem">
-                    <div class="input-group justify-content-center">
-                            <div class="input-group-prepend">
-                                <input type="text" name="itemInput" class="form-control" placeholder="Item Name"/>
-                                <input type="text" name ="itemPriceInput" class="form-control" placeholder="Item Price"/>
-                                <input type="submit" value="Send" class="btn btn-primary mb-2"/>
+                    <div className="input-group justify-content-center">
+                            <div className="input-group-prepend">
+                                <input type="text" name="itemInput" className="form-control" placeholder="Item Name"/>
+                                <input type="text" name ="itemPriceInput" className="form-control" placeholder="Item Price"/>
+                                <input type="submit" value="Send" className="btn btn-primary mb-2"/>
                             </div>
                     </div>
                 </form>
 
                 {/* <form>
-                    <div class="form-group">
+                    <div className="form-group">
                         <label for="exampleInputEmail1">Email address</label>
-                        <input type="email" class="form-control" placeholder="Enter email"/>
+                        <input type="email" className="form-control" placeholder="Enter email"/>
                     </div>
-                    <div class="form-group">
+                    <div className="form-group">
                         <label for="exampleInputPassword1">Password</label>
-                        <input type="password" class="form-control"  placeholder="Password"/>
+                        <input type="password" className="form-control"  placeholder="Password"/>
                     </div>
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" className="btn btn-primary">Submit</button>
                 </form> */}
 
             {
-                <div class="container">
-                    <div class="row row-cols-2">
-                        <div class="col">
+                <div className="container">
+                    <div className="row row-cols-2">
+                        <div className="col">
                             <p>Product 1</p>
                             <p>Price</p>
                             <p>Ebay</p>
                         </div>
-                        <div class="col">
+                        <div className="col">
                             Product 1
                             Price
                             Etsy
                         </div>
-                        <div class="col">
+                        <div className="col">
                             Product 2
                             Price
                             Ebay
                         </div>
-                        <div class="col">
+                        <div className="col">
                             Product 2
                             Price
                             Etsy
