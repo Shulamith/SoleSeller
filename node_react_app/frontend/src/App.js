@@ -4,6 +4,7 @@ import './App.css';
 import Nav from './components/Nav'; // Nav was exported in Nav.js, so we can import it here and use it
 import Home from './components/Home';
 import Inventory from './components/Inventory';
+import InventoryTwo from './components/InventoryTwo';
 import Login from './components/login';
 import Register from './components/register';
 import Profile from './components/profile';
@@ -18,10 +19,10 @@ function App() {
    <Router>
     <div className="App">
       <header className="App-header">
-        <Nav /> 
+        <Nav />
         <Switch>
-          <Route path="/" exact component = {Home} /> 
-          <Route path="/inventory" exact component = {Inventory} />
+          <Route path="/" exact component = {Home} />
+          <Route path="/inventory" exact component = {InventoryTwo} />
           <Route path="/register" exact component = {Register} />
           <Route path="/login" exact component = {Login} />
           <Route path="/profile" exact component={Profile} />
