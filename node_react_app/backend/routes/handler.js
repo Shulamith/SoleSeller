@@ -1,5 +1,9 @@
 const express = require('express');
 const router = express.Router();
+const EbayAuthToken = require('ebay-oauth-nodejs-client');
+const ebayAuthToken = new EbayAuthToken({
+    filePath: './routes/ebay-config.json' // input file path.
+})
 const bcrypt = require('bcrypt');
 const Schemas = require('../models/Schemas.js');
 
@@ -54,7 +58,7 @@ router.get('/inventory', async (req, res) => { // here we grab our items
 
     // this code will get all items and join the user table
     const userItems = await items.find({}).populate("user").exec((err, itemsData) => { // finds all items and automaticlly add user associated with item
-        if (err) throw err;                                                             // we want to be able to select all the items and find the user 
+        if (err) throw err;                                                             // we want to be able to select all the items and find the user
         if (itemsData) {
             res.end(JSON.stringify(itemsData));
         } else {
@@ -76,7 +80,7 @@ router.post('/addItem', async (req, res) => { // when user post items it gets se
     const userItem = req.body.itemInput; // get item input field, name of field = itemInput
     const userItemPrice = req.body.itemPriceInput;
     const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'tahmid198' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username 
+    const userId = await user.findOne({ username: 'tahmid198' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
@@ -99,10 +103,35 @@ router.post('/addItem', async (req, res) => { // when user post items it gets se
     }
 });
 
+router.get('/ebayauth', (req, res) => {
+  const scopes = ['https://api.ebay.com/oauth/api_scope',
+    'https://api.ebay.com/oauth/api_scope/sell.marketing.readonly',
+    'https://api.ebay.com/oauth/api_scope/sell.marketing',
+    'https://api.ebay.com/oauth/api_scope/sell.inventory.readonly',
+    'https://api.ebay.com/oauth/api_scope/sell.inventory',
+    'https://api.ebay.com/oauth/api_scope/sell.account.readonly',
+    'https://api.ebay.com/oauth/api_scope/sell.account',
+    'https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly',
+    'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
+];
+  console.log("TEST");
+  // // Authorization Code Auth Flow
+  //res.header('Access-Control-Allow-Origin', '*');
+  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('SANDBOX', scopes);
+  console.log(AuthUrl);
+  return res.redirect(AuthUrl);
+  //res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
+//  return res.end(JSON.stringify(AuthUrl));
+});
+
+router.post('/addProduct', (req, res) => {
+    res.end('NA');
+});
+
 
 
 router.post('/login', (req, res) => {
-    
+
 });
 
 

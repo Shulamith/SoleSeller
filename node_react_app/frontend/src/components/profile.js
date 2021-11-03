@@ -8,7 +8,7 @@ import "./profile.css";
 
 export default function Profile() {
     return(
-        <section> 
+        <section>
             <div class = "row-img-bg">
                 <p>Welcome User</p>
             </div>

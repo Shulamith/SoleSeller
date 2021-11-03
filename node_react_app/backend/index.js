@@ -1,14 +1,20 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const routesHandler = require('./routes/handler.js');
-const EbayAuthToken = require('ebay-oauth-nodejs-client');
+//const corsMiddleware = require('./cors')
 const mongoose = require('mongoose');
-require('dotenv/config')
 
 const app = express();
-app.use(bodyParser.urlencoded({extended:false}));
+
+//CORS Middleware below may not be necessary
+//app.use(corsMiddleware);
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended:false}));
 app.use('/', routesHandler);
+
+require('dotenv/config')
+
+
 
 // const clientScope = 'https://api.ebay.com/oauth/api_scope';
 // // // Client Crendential Auth Flow
@@ -49,6 +55,7 @@ mongoose.connect(process.env.DB_URI, {useNewUrlParser:true, useUnifiedTopology:t
 
 
 /*
+//WHAT IS THE CODE BELOW FOR????????
 // code for production
 if (process.env.NODE_ENV === 'production') {
     // Serve any static files
@@ -63,5 +70,5 @@ if (process.env.NODE_ENV === 'production') {
 // access port parameter set in env file or add 4000 to it
 const PORT = process.env.PORT || 4000; // backend routing port
 app.listen(PORT, () =>  {
-    console.log(`Server is running on port ${PORT}.`);
+  console.log(`Server is running on port ${PORT}.`);
 });

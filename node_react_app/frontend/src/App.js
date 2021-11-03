@@ -7,6 +7,7 @@ import Inventory from './components/Inventory';
 import InventoryTwo from './components/InventoryTwo';
 import Login from './components/login';
 import Register from './components/register';
+import EbayAuth from './components/EbayAuth';
 import Profile from './components/profile';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 
@@ -21,7 +22,8 @@ function App() {
         <Nav />
         <Switch>
           <Route path="/" exact component = {Home} />
-          <Route path="/inventory" exact component = {InventoryTwo} />
+          <Route path="/inventory" exact component = {Inventory} />
+          <Route path="/ebayauth" exact component = {EbayAuth} />
           <Route path="/register" exact component = {Register} />
           <Route path="/login" exact component = {Login} />
           <Route path="/profile" exact component = {Profile} />
