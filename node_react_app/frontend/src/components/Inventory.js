@@ -25,11 +25,11 @@ function Inventory() {
                 <h1 class="mt-5">Items</h1>
                 <form method="POST" action="/addItem">
                     <div class="input-group justify-content-center">
-                            <div class="input-group-prepend">
-                                <input type="text" name="itemInput" class="form-control" placeholder="Item Name"/>
-                                <input type="text" name ="itemPriceInput" class="form-control" placeholder="Item Price"/>
-                                <input type="submit" value="Send" class="btn btn-primary mb-2"/>
-                            </div>
+                        <div class="input-group-prepend">
+                            <input type="text" name="itemInput" class="form-control" placeholder="Item Name"/>
+                            <input type="text" name ="itemPriceInput" class="form-control" placeholder="Item Price"/>
+                            <input type="submit" value="Send" class="btn btn-primary mb-2"/>
+                        </div>
                     </div>
                 </form>
 
