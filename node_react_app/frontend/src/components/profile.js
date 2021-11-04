@@ -6,13 +6,21 @@ import ebay from "./ebay.png";
 import etsy from "./etsy.jpg";
 import "./profile.css";
 
+
 export default function Profile() {
+    /*function componentDidMount() {
+        const userLog = localStorage.getItem('userLog') === 'true';
+        const userReg = localStorage.getItem('userReg') === 'true';
+        const user = (userLog.JSON.parse("email") ? userReg.JSON.parse("email") && userLog.JSON.parse("password") ? userReg.JSON.parse("password") : '';
+        this.setState({ user, userLog });
+    }*/
+
     return(
-        <section> 
-            <div class = "row-img-bg">
+        <section>
+            <div className = "row-img-bg">
                 <p>Welcome User</p>
             </div>
-            <div class = "buttons">
+            <div className = "buttons">
                 <Button id="ebay" block size="sm" type="link">
                     <a href="http://signin.ebay.com">
                         <img src={ebay} height = {25} width = {50}/>
