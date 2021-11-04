@@ -21,7 +21,7 @@ function InventoryTwo() {
     return (
         <section>
             <div className="container">
-                <div className="pics">
+                <div>
                     <table id="itemList">
                         <tr>
                             <td> <img src={itemPics.get(inventoryData[0].product.title)} /> </td>
