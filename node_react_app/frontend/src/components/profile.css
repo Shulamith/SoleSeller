@@ -1,9 +1,10 @@
-.row-img-bg {
+section {
     padding:120px;
 }
 
-.buttons {
-    align-items:center;
+.mt-5 {
+    text-align:center;
+    align-items: center;
 }
 
 #ebay {
@@ -26,10 +27,17 @@
     margin: auto
 }
 
+#upload {
+    color: black;
+    background-color: white;
+    max-width: 320px;
+    display:flex;
+    align-items:center;
+    justify-content:center; 
+    margin: auto  
+}
+
 a {
     color : rgb(0, 0, 0);
   }
 
-.col {
-    border:solid 2px white;
-}
