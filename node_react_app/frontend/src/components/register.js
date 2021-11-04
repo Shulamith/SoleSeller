@@ -1,57 +1,98 @@
-import React, { useState } from "react";
+import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
 import "./register.css";
 
-export default function Register() {
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-  
-    function validateForm() {
-      return email.length > 0 && password.length > 0;
-    }
-  
-    function handleSubmit(event) {
-      event.preventDefault();
+export default class Register extends Component {
+    userData;
+
+    constructor(props) {
+        super(props);
+
+        this.onChangeName = this.onChangeName.bind(this);
+        this.onChangeEmail = this.onChangeEmail.bind(this);
+        this.onChangePassword = this.onChangePassword.bind(this);
+        this.onSubmit = this.onSubmit.bind(this);
+
+        this.state = {
+            name: '',
+            email: '',
+            password: ''
+        }
     }
 
-    return (
-        <div className="Register">
-          <Form onSubmit={handleSubmit}>
-            <Form.Group size="lg" controlId="Name">
-                <Form.Label>Name</Form.Label>
-                <Form.Control
-                    autoFocus
-                    type="name"
-                    value={name}
-                    onChange={(e)=>setName(e.target.value)}
-                    />
-            </Form.Group>
-            <Form.Group size="lg" controlId="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                autoFocus
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </Form.Group>
-            <Form.Group size="lg" controlId="password">
-              <Form.Label>Password</Form.Label>
-              <Form.Control
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </Form.Group>
-            <Button block size="lg" type="submit" disabled={!validateForm()}>
-              <Link to ="/Login">
-                Register
-              </Link>
-            </Button>
-          </Form>
-        </div>
-      );
+    // Form Events
+    onChangeName(e) {
+        this.setState({ name: e.target.value })
+    }
+
+    onChangeEmail(e) {
+        this.setState({ email: e.target.value })
+    }
+
+    onChangePassword(e) {
+        this.setState({ password: e.target.value })
+    }
+
+    onSubmit(e) {
+        e.preventDefault()
+
+        this.setState({
+            name: '',
+            email: '',
+            password: ''
+        })
+    }
+
+    // React Life Cycleu
+    componentDidMount() {
+        this.userData = JSON.parse(localStorage.getItem('userReg'));
+
+        if (localStorage.getItem('userReg')) {
+            this.setState({
+                name: this.userData.name,
+                email: this.userData.email,
+                password: this.userData.password
+            })
+        } else {
+            this.setState({
+                name: '',
+                email: '',
+                password: ''
+            })
+        }
+    }
+
+    componentWillUpdate(nextProps, nextState) {
+        localStorage.setItem('userReg', JSON.stringify(nextState));
+    }
+
+    render() {
+        const { name, email, password } = this.state;
+        const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
+        return (
+            <div className="Register">
+                <form onSubmit={this.onSubmit}>
+                    <div className="form-group">
+                        <label>Name</label>
+                        <input type="text" className="form-control" value={this.state.name} onChange={this.onChangeName} />
+                    </div>
+                    <div className="form-group">
+                        <label>Email</label>
+                        <input type="email" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
+                    </div>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input type="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
+                    </div>
+                    <button id="register" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
+                      <Link to ="/login">
+                        Register
+                      </Link>  
+                    </button>
+                </form>
+            </div>
+        )
+    }
 }
