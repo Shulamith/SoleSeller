@@ -1,28 +1,30 @@
-img {
-    display: block;
-    border-radius: 8px;
-    /*align-items:center;*/
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
-    height: auto;
-}
-.container-fluid {
-    padding-top: 20px;
+.InventoryTwo {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.container {
-    padding: 120px;
+table {
+    border: 2px solid black;
+    width: 800px;
+    height: 200px;
 }
 
-.input-group-prepend {
-    padding-top: 30px;
+th {
+    border-bottom: 1px solid black;
+    text-align: center;
 }
 
-.col {
-    border: solid 2px white;
+td {
+    text-align: center;
 }
 
-.buttons {
-    align-items:center;
+#dataTable tr {
+    border-bottom: 1px solid black;
+}
+
+#dataTable td {
+    border-left: 1px solid black;
 }
