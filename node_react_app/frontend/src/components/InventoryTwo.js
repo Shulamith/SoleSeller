@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
 import './InventoryTwo.css';
 
-
+console.log(inventoryData.length);
 function InventoryTwo() {
 
     return (
@@ -62,6 +62,16 @@ function InventoryTwo() {
                             </td>
                         )
                     })}
+                </tr>
+                <tr>
+                    <td colspan={ inventoryData.length } >
+                        <footer>
+                            <h3>Want to post a new listing?</h3>
+                            <Button block size="lg">
+                                <Link to="/upload">Click Here</Link>
+                            </Button>
+                        </footer>
+                    </td>
                 </tr>
             </table>
         </div>
