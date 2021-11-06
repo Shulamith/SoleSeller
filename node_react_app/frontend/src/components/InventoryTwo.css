@@ -7,13 +7,11 @@
 }
 
 table {
-    border: 2px solid black;
     width: 800px;
     height: 200px;
 }
 
 th {
-    border-bottom: 2px solid black;
     text-align: center;
 }
 
@@ -21,12 +19,8 @@ td {
     text-align: center;
 }
 
-#pics {
-    border-left: 2px solid black;
-}
-
-#itemName {
-    border-left: 2px solid black;
+#dataTable table {
+    border: 2px solid black;
 }
 
 #dataTable tr {
@@ -35,4 +29,8 @@ td {
 
 #dataTable td {
     border-left: 1px solid black;
+}
+
+#upload h3 {
+    text-align: center;
 }
