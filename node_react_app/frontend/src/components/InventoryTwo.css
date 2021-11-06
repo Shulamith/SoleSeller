@@ -13,12 +13,20 @@ table {
 }
 
 th {
-    border-bottom: 1px solid black;
+    border-bottom: 2px solid black;
     text-align: center;
 }
 
 td {
     text-align: center;
+}
+
+#pics {
+    border-left: 2px solid black;
+}
+
+#itemName {
+    border-left: 2px solid black;
 }
 
 #dataTable tr {

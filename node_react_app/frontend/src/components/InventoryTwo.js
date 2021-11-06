@@ -8,7 +8,7 @@ function InventoryTwo() {
 
     return (
         <div className="InventoryTwo">
-            <table>
+            <table id="display">
                 <tr>
                     {inventoryData.map((val, key) => {
                         return (
@@ -21,7 +21,7 @@ function InventoryTwo() {
                 <tr>
                     {inventoryData.map((val, key) => {
                         return (
-                            <th key={key}>
+                            <th key={key} id="itemName">
                                 {val.product.title}
                             </th>
                         )
@@ -31,30 +31,32 @@ function InventoryTwo() {
                     {inventoryData.map((val, key) => {
                         return (
                             <td key={key} id="dataTable">
-                                <tr>
-                                    <td></td>
-                                    <td>Etsy</td>
-                                    <td>eBay</td>
-                                    <td>Etc.</td>
-                                </tr>
-                                <tr>
-                                    <td>Selling Price</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Fees</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                                <tr>
-                                    <td>Total Earnings</td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
+                                <table>
+                                    <tr>
+                                        <td></td>
+                                        <td>Etsy</td>
+                                        <td>eBay</td>
+                                        <td>Etc.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Selling Price</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fees</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Earnings</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </table>
                             </td>
                         )
                     })}
