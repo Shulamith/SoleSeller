@@ -1,0 +1,22 @@
+@media all and (min-width: 480px) {
+  .Upload {
+    padding: 120px 0;
+  }
+
+  .Upload form {
+    margin: 0 auto;
+    max-width: 320px;
+  }
+
+  .picture {
+      
+  }
+
+  a {
+    color: #FFF;
+  }
+}
+
+#upload {
+    background-color: white;
+}
