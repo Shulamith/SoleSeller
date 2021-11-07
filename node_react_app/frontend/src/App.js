@@ -23,7 +23,7 @@ function App() {
         <Nav />
         <Switch>
           <Route path="/" exact component = {Home} />
-          <Route path="/inventory" exact component = {Inventory} />
+          <Route path="/inventory" exact component = {InventoryTwo} />
           <Route path="/ebayauth" exact component = {EbayAuth} />
           <Route path="/register" exact component = {Register} />
           <Route path="/login" exact component = {Login} />
