@@ -1,72 +1,106 @@
-import React, { useState } from "react";
+import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
 import "./upload.css";
 
-export default function Upload() {
-    const [picture, setPicture] = useState("");
-    const [itemName, setItemName] = useState("");
-    const [description, setDescription] = useState("");
-    const [ebayPrice, setEbayPrice] = useState("");
-    const [etsyPrice, setEtsyPrice] = useState("");
+class Upload extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      image: null,
+      itemName: '',
+      itemDescription: '',
+      EbayPrice: 0,
+      EtsyPrice: 0
+    };
 
-    function validateForm() {
-        return description.length > 0;
+    this.onImageChange = this.onImageChange.bind(this);
+    this.onItemChange = this.onItemChange.bind(this);
+    this.onDescriptionChange = this.onDescriptionChange.bind(this);
+    this.onEbayChange = this.onEbayChange.bind(this);
+    this.onEtsyChange = this.onEtsyChange.bind(this);
+  }
+
+  onImageChange(e) {
+      this.setState({ image: e.target.value })
+  }
+
+  onItemChange(e) {
+    this.setState({ itemName: e.target.value })
+  } 
+
+  onDescriptionChange(e) {
+    this.setState({ itemDescription: e.target.value })
+  }
+
+  onEbayChange(e) {
+    this.setState({ EbayPrice: e.target.value })
+  }
+
+  onEtsyChange(e) {
+    this.setState({ EtsyPrice: e.target.value })
+  }
+
+  componentDidMount() {
+    this.userData = JSON.parse(localStorage.getItem('form'));
+
+    if (localStorage.getItem('form')) {
+        this.setState({
+            image: this.userData.image,
+            itemName: this.userData.itemName,
+            itemDescription: this.userData.itemDescription,
+            EbayPrice: this.userData.EbayPrice,
+            EtsyPrice: this.userData.EtsyPrice
+        })
+    } else {
+        this.setState({
+            image: null,
+            itemName: '',
+            itemDescription: '',
+            EbayPrice: 0,
+            EtsyPrice: 0
+        })
+    }
     }
 
-    function handleSubmit(event) {
-        event.preventDefault();
+    componentWillUpdate(nextProps, nextState) {
+        localStorage.setItem('form', JSON.stringify(nextState));
     }
 
+  render() {
+    const { image, itemName, itemDescription, EbayPrice, EtsyPrice } = this.state;
+    const isEnabled = itemName.length > 0 && itemDescription.length > 0 && EbayPrice > 0 && EtsyPrice > 0;
     return (
-        <div className="Upload">
-            <Form onSubmit={handleSubmit}>
-                <Form.Group size="lg" controlId="picture">
-                    <Form.Label>Picture of item</Form.Label>
-                    <Form.Control
-                        type="picture"
-                        value={picture}
-                        onChange={(e) => setPicture(e.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group size="lg" controlId="itemName">
-                    <Form.Label>Item Name</Form.Label>
-                    <Form.Control
-                        autofFocus
-                        type="itemName"
-                        value={itemName}
-                        onChange={(e) => setItemName(e.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group size="lg" controlId="description">
-                    <Form.Label>Item Description</Form.Label>
-                    <Form.Control
-                        type="description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group size="lg" controlId="ebayPrice">
-                    <Form.Label>Price for eBay</Form.Label>
-                    <Form.Control
-                        type="ebayPrice"
-                        value={ebayPrice}
-                        onChange={(e) => setEbayPrice(e.target.value)}
-                    />
-                </Form.Group>
-                <Form.Group size="lg" controlId="etsyPrice">
-                    <Form.Label>Price for Etsy</Form.Label>
-                    <Form.Control
-                        type="etsyPrice"
-                        value={etsyPrice}
-                        onChange={(e) => setEtsyPrice(e.target.value)}
-                    />
-                </Form.Group>
-                <Button block size="lg" type="submit" disabled={!validateForm()}>
-                    Submit
-                </Button>
-            </Form>
-        </div>
+      <div className="Upload">
+        <form onSubmit={this.onSubmit}>
+            <div className="form-group">
+                <label>Select Image</label>
+                <input type="file" accept=".jpg, .jpeg, .png" name="myImage" onChange={this.onImageChange} />
+            </div>
+            <div className="form-group">
+                <label>Item Name</label>
+                <input type="text" minLength="1" maxLength="50" className="form-control" value={this.state.itemName} onChange={this.onItemChange} />
+            </div>
+            <div class="form-group">
+                <label>Item Description</label>
+                <textarea class="form-control rounded-0" id="exampleFormControlTextarea1" rows="10" input type="text" minLength="1" maxLength="300" className="form-control" value={this.state.itemDescription} onChange={this.onDescriptionChange} />
+            </div>
+            <div className="form-group">
+                <label>Ebay Price</label>
+                <input type="number" min="0" step="any" className="form-control" value={this.state.EbayPrice} onChange={this.onEbayChange} />
+            </div>
+            <div className="form-group">
+                <label>Etsy Price</label>
+                <input type="number" min="0" step="any" className="form-control" value={this.state.EtsyPrice} onChange={this.onEtsyChange} />
+            </div>
+            <button id="sumbit" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
+                Submit
+            </button>
+        </form>
+      </div>
     );
+  }
 }
+
+export default Upload;

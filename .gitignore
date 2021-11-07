@@ -1,2 +1,5 @@
-node_react_app/backend/node_modules/
-.vs
+################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/slnx.sqlite

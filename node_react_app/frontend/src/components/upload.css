@@ -17,6 +17,12 @@
   }
 }
 
-#upload {
+#browse {
     background-color: white;
+    color: black;
+}
+
+#submit {
+  background-color: white;
+  color: black;
 }

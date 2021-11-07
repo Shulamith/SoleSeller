@@ -6,7 +6,15 @@ import ebay from "./ebay.png";
 import etsy from "./etsy.jpg";
 import "./profile.css";
 
+
 export default function Profile() {
+    /*function componentDidMount() {
+        const userLog = localStorage.getItem('userLog') === 'true';
+        const userReg = localStorage.getItem('userReg') === 'true';
+        const user = (userLog.JSON.parse("email") ? userReg.JSON.parse("email") && userLog.JSON.parse("password") ? userReg.JSON.parse("password") : '';
+        this.setState({ user, userLog });
+    }*/
+
     return(
         <section>
             <div className = "row-img-bg">

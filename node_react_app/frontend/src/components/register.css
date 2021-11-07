@@ -1,18 +1,19 @@
 @media all and (min-width: 480px) {
-  .Register {
-    padding: 120px 0;
+    .Register {
+      padding: 120px 0;
+    }
+  
+    .Register form {
+      margin: 0 auto;
+      max-width: 320px;
+    }
+
+    a {
+      color : #FFF;
+    }
   }
 
-  .Register form {
-    margin: 0 auto;
-    max-width: 320px;
+  #register {
+    background-color: white;
   }
 
-  a {
-    color : #FFF;
-  }
-}
-
-#register {
-  background-color: white;
-}
