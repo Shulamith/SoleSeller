@@ -14,28 +14,6 @@ const users = []
 
 /* ------------------ BEGIN ETSY OAUTH ------------------ */
 
-// Send a JSON response to a default get request
-router.get('/ping', async (req, res) => {
-    const requestOptions = {
-        'method': 'GET',
-        'headers': {
-            'x-api-key': 'b397ddo9ov4lu91igrv1rjjc',
-        },
-    };
-
-    const response = await fetch(
-        'https://openapi.etsy.com/v3/application/openapi-ping',
-        requestOptions
-    );
-
-    if (response.ok) {
-        const data = await response.json();
-        res.send(data);
-    } else {
-        res.send("oops");
-    }
-});
-
 /**
 These variables contain our Etsy API Key, the state sent
 in the initial authorization request, and the client verifier compliment
@@ -75,6 +53,29 @@ router.get("/oauth/redirect", async (req, res) => {
         res.send("oops");
     }
 });
+
+// Send a JSON response to a default get request
+router.get('/ping', async (req, res) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'x-api-key': etsyClientID,
+        },
+    };
+
+    const response = await fetch(
+        'https://openapi.etsy.com/v3/application/openapi-ping',
+        requestOptions
+    );
+
+    if (response.ok) {
+        const data = await response.json();
+        res.send(data);
+    } else {
+        res.send("oops");
+    }
+});
+
 
 /* ------------------ END ETSY OAUTH ------------------ */
 

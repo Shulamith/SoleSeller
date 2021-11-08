@@ -7,7 +7,7 @@
 }
 
 table {
-    width: 800px;
+    width: 450px;
     height: 200px;
 }
 
@@ -29,6 +29,7 @@ td {
 
 #dataTable td {
     border-left: 1px solid black;
+    width: 50px;
 }
 
 #display h3 {
