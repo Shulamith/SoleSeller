@@ -4,13 +4,13 @@
         "clientSecret": "SBX-1b09fbb04f30-3350-48e2-8c2b-9c76",
         "devid": "2b0a945f-bb12-4a36-95aa-d22331c35475",
         "redirectUri": "Shulamith_Dashe-Shulamit-SoulSe-wljldfhx",
-        "baseUrl": "https://api.sandbox.ebay.com"
+        "baseUrl": "api.sandbox.ebay.com"
     },
     "PRODUCTION": {
-        "clientId": "---Client Id---",
-        "clientSecret": "--- client secret---",
-        "devid": "-- dev id ---",
-        "redirectUri": "-- redirect uri ---",
+        "clientId": "Shulamit-SoulSell-PRD-e1a11534d-e2a212a0",
+        "clientSecret": "PRD-1a11534d38c1-a4e1-468c-ac78-42da",
+        "devid": "2b0a945f-bb12-4a36-95aa-d22331c35475",
+        "redirectUri": "Shulamith_Dashe-Shulamit-SoulSe-sbvbnoyuy",
         "baseUrl": "api.ebay.com"
     }
 }

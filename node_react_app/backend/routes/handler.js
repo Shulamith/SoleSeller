@@ -6,7 +6,7 @@ const ebayAuthToken = new EbayAuthToken({
 })
 const bcrypt = require('bcrypt');
 const Schemas = require('../models/Schemas.js');
-
+const axios = require('axios');
 //router.use(express.urlencoded({ extended: false }));
 
 const users = []
@@ -115,24 +115,69 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
+  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
   // // Authorization Code Auth Flow
   //res.header('Access-Control-Allow-Origin', '*');
-  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('SANDBOX', scopes);
-  const clientScope = 'https://api.ebay.com/oauth/api_scope';
-  // // Client Crendential Auth Flow
-  ebayAuthToken.getApplicationToken('SANDBOX', clientScope).then((data) => {
-      console.log(data);
+  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
+
+  console.log(AuthUrl);
+  //console.log(res.redirect(AuthUrl));
+  return res.redirect(AuthUrl);
+  //console.log("RESPONSE QUERY", res.query)
+  //console.log(res.query);
+  //return ("authurl");
+//  return res.end(JSON.stringify(AuthUrl));
+})
+
+router.get('/ebayauth/callback', async (req, res) => {
+  //code = await res.code
+  console.log("CALLBACK");
+  //console.log(code)
+  // console.log(res);
+  //console.log(res.req.query.code);
+  const code = res.req.query.code;
+  console.log("CODE", code);
+  token = ""
+  // Exchange Code for Authorization token
+  const test = await ebayAuthToken.exchangeCodeForAccessToken('PRODUCTION', code).then((data) => { // eslint-disable-line no-undef
+      console.log("DATA", data);
+      console.log("TOKEN!!", JSON.parse(data).access_token);
+      token = JSON.parse(data).access_token;
   }).catch((error) => {
+      console.log(error);
       console.log(`Error to get Access token :${JSON.stringify(error)}`);
   });
-  console.log(AuthUrl);
-  return res.redirect(AuthUrl);
-  //res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
-//  return res.end(JSON.stringify(AuthUrl));
+  if (token) {
+    const inventoryData = await getInventory(token);
+    console.log("Token:", token);
+    console.log("inventoryData", inventoryData);
+  }
+  return res.redirect('http://localhost:3000/inventory');
 });
 
+
+async function getInventory (token) {
+  auth = 'Bearer ' + token;
+  axios.get('https://api.ebay.com/sell/inventory/v1/inventory_item?limit=2&offset=0',{
+    headers: {
+      'Authorization': auth,
+      'Accept': 'application/json',
+      'Content-Type':'application/json'
+    }})
+  .then(response => {
+    console.log(response.data);
+    console.log(response.data.url);
+    console.log(response.data.explanation);
+  })
+  .catch(error => {
+    console.log(error);
+  });
+  return "GET INVENTORY";
+};
+
+
 router.post('/addProduct', (req, res) => {
-    res.end('NA');
+    res.end('NA')
 });
 
 
