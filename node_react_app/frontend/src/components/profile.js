@@ -22,7 +22,7 @@ export default function Profile() {
             </div>
             <div className = "buttons">
                 <Button id="ebay" block size="sm" type="link">
-                    <a href="http://signin.ebay.com">
+                    <a href="https://localhost:4000/ebayauth">
                         <img src={ebay} height = {25} width = {50}/>
                         Connect to Ebay
                     </a>

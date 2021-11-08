@@ -11,7 +11,7 @@ function EbayAuth() {
   const [items, setItems] = useState([]);
 
   const fetchItems = async() => {
-      const data = await fetch('/ebayauth'); // Inventory url from port 4000, retriving data
+      const data = await fetch('https://localhost:4000/ebayauth'); // Inventory url from port 4000, retriving data
       const url = await data.json(); // set it into items as json data
       setItems(url);
   };
