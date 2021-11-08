@@ -43,7 +43,7 @@ to the code_challenge sent with the initial authorization request
 */
 const etsyClientID = 'b397ddo9ov4lu91igrv1rjjc';
 const etsyClientVerifier = 'dL5oT2IMlIV6zVXXRRaEk-OwbVGPKrlU0ids8Dg2ahk';
-const etsyRedirectUri = 'http://localhost:3000/oauth/redirect';
+const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 
 router.get("/oauth/redirect", async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
@@ -69,8 +69,8 @@ router.get("/oauth/redirect", async (req, res) => {
     // Extract the access token from the response access_token data field
     if (response.ok) {
         const tokenData = await response.json();
-        res.redirect('/inventory');
-        //res.redirect(`/inventory?access_token=${tokenData.access_token}`);
+        //res.redirect('/inventory');
+        res.redirect(`/inventory?access_token=${tokenData.access_token}`);
     } else {
         res.send("oops");
     }

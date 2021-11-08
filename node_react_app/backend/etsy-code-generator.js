@@ -23,4 +23,4 @@ const state = Math.random().toString(36).substring(7);
 console.log(`State: ${state}`);
 console.log(`Code challenge: ${codeChallenge}`);
 console.log(`Code verifier: ${codeVerifier}`);
-console.log(`Full URL: https://www.etsy.com/oauth/connect?response_type=code&redirect_uri=http://localhost:3000/oauth/redirect&scope=email_r&client_id=b397ddo9ov4lu91igrv1rjjc&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`)
+console.log(`Full URL: https://www.etsy.com/oauth/connect?response_type=code&redirect_uri=http://localhost:4000/oauth/redirect&scope=email_r&client_id=b397ddo9ov4lu91igrv1rjjc&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`)
