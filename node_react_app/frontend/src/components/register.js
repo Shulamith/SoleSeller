@@ -73,24 +73,27 @@ export default class Register extends Component {
         const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
         return (
             <div className="Register">
-                <form onSubmit={this.onSubmit}>
+                                <form method="POST" action="/addRegister">
+
+            <form onSubmit={this.onSubmit}>
                     <div className="form-group">
                         <label>Name</label>
-                        <input type="text" className="form-control" value={this.state.name} onChange={this.onChangeName} />
+                        <input type="text" name= "name "className="form-control" value={this.state.name} onChange={this.onChangeName} />
                     </div>
                     <div className="form-group">
                         <label>Email</label>
-                        <input type="email" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
+                        <input type="text" name= "email"className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
                     </div>
                     <div className="form-group">
                         <label>Password</label>
-                        <input type="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
+                        <input type="text" name ="password"className="form-control" value={this.state.password} onChange={this.onChangePassword} />
                     </div>
                     <button id="register" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
                       <Link to ="/login">
                         Register
                       </Link>  
                     </button>
+                </form>
                 </form>
             </div>
         )

@@ -19,10 +19,13 @@ when react is set up for frontend it uses 3000 port, for backend it needs to be 
     "build": "concurrently --kil-others-on-fail \"npm run server\" \"npm run client\""
   },
 
+Dependencies: 
+For login and registration purposes we need to install two packages
+- npm install bcryptjs jsonwebtoken
+
 ## Video Walkthrough
 Version 1.0:
 ![Version 1.0](./images/Inital_Layout.gif)
 
 Resources:
 
-<!--https://www.youtube.com/watch?v=3isCTSUdXaQ>

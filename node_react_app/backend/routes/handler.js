@@ -5,7 +5,8 @@ const ebayAuthToken = new EbayAuthToken({
     filePath: './routes/ebay-config.json' // input file path.
 });
 const fetch = require('cross-fetch');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
 
 router.use(express.urlencoded({ extended: false }));
@@ -81,7 +82,8 @@ router.get("/oauth/redirect", async (req, res) => {
 
 //GO http://localhost:4000/addUser TO ADD NEW USER WITH THIS CODE
 router.get('/addUser', async (req, res) => {
-    const user = { username: 'superman', fullname: 'clark kent' };
+    const userPassword = await bcrypt.hash('webslinger10!', 10);
+    const user = { username: 'spiderman',email:'parker@gmail.com', password: userPassword };
     const newUser = new Schemas.Users(user);
 
     try {
@@ -102,7 +104,7 @@ router.get('/addItem', async (req, res) => {
     const user = Schemas.Users; //define user
     const userId = await user.findOne({ username: 'tahmid198' }).exec();
 
-    const item = { item: 'Soul Eater, Volumes: 1-5', price: '15.49', channel: 'Amazon', user: userId }
+    const item = { item: 'Soul Eater, Volumes: 1-5',description:'A dope read', etsyPrice: '15.49', ebayPrice: '15.49', user: userId }
     const newItem = new Schemas.Items(item);
 
     try {
@@ -145,17 +147,21 @@ router.get('/inventory', async (req, res) => { // here we grab our items
 });
 
 router.post('/addItem', async (req, res) => { // when user post items it gets sent to router to be added
-    const userItem = req.body.itemInput; // get item input field, name of field = itemInput
-    const userItemPrice = req.body.itemPriceInput;
+    const itemName = req.body.itemName; // get item input field, name of field = itemInput
+    const itemDescription = req.body.itemDescription;
+    const ebayPrice = req.body.ebayPrice;
+    const etsyPrice = req.body.etsyPrice;
     const user = Schemas.Users; //define user
     const userId = await user.findOne({ username: 'tahmid198' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
     const newItem = new Schemas.Items({  // save the item
-        item: userItem,
+        item: itemName,
+        description: itemDescription,
+        etsyPrice: etsyPrice,
+        ebayPrice: ebayPrice,
         user: userId._id, // field to link user whose saving item
-        price: userItemPrice
     });
 
     try { // we try to add it now
@@ -170,6 +176,54 @@ router.post('/addItem', async (req, res) => { // when user post items it gets se
         res.end(); // end page
     }
 });
+
+router.get('/addRegister', function(req, res){
+    res.send("Hello from the root application URL");
+});
+
+router.post('/addRegister', async(req, res) => {
+    // const userName = req.body.name;
+    // const userEmail = req.body.email;
+    // const userPassword = bcrypt.hash(req.body.password, 10);
+
+    const userName = "Tahmid";
+    const userEmail = "LoverBoy1800@gmail.com";
+    const userPassword = await bcrypt.hash("12233455f", 10);
+
+    const newUser = new Schemas.Users ({
+        username: userName,
+        email: userEmail,
+        password: userPassword
+    });
+    try {
+        await newUser.save((err, newUserResults) => {
+            if (err) res.end('Error Saving.');
+            res.redirect('/login');
+            res.end();
+            });    
+        } catch (err) {
+            console.log(err)
+            res.redirect('/Register');
+             res.end();
+            
+        }      
+});
+// router.post('/Register', (req, res) => {
+//     try {
+//         const hashedPassword = async () => { await bcrypt.hash(req.form.password.value, 10) };
+//         //const newUser = schemas.Users;
+//         users.push({
+//             username: req.form.Name.value,
+//             email: req.form.email.value,
+//             password: hashedPassword
+//         });
+        
+//     res.redirect('/login');
+//     } catch {
+//         res.redirect('/Register');
+//     }
+//     console.log(users);
+// });
 
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
@@ -202,22 +256,5 @@ router.post('/login', (req, res) => {
 
 });
 
-
-router.post('/Register', (req, res) => {
-    try {
-        const hashedPassword = async () => { await bcrypt.hash(req.form.password.value, 10) };
-        //const newUser = schemas.Users;
-        users.push({
-            username: req.form.Name.value,
-            email: req.form.email.value,
-            password: hashedPassword
-        });
-        res.redirect('/login');
-    } catch {
-        res.redirect('/Register');
-    }
-    console.log(users);
-});
-
-
 module.exports = router;
+

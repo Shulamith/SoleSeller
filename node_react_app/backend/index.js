@@ -1,4 +1,5 @@
 const express = require('express');
+const router = express.Router();  
 const bodyParser = require('body-parser');
 const routesHandler = require('./routes/handler.js');
 //const corsMiddleware = require('./cors')
@@ -21,7 +22,7 @@ require('dotenv/config')
 // ebayAuthToken.getApplicationToken('SANDBOX', clientScope).then((data) => {
 //     console.log(data);
 // }).catch((error) => {
-//     console.log(`Error to get Access token :${JSON.stringify(error)}`);
+//     console.log(`E1`` kdx rror to get Access token :${JSON.stringify(error)}`);
 // });
 
 // // Authorization Code Auth Flow

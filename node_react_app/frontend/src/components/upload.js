@@ -73,30 +73,32 @@ class Upload extends Component {
     const isEnabled = itemName.length > 0 && itemDescription.length > 0 && EbayPrice > 0 && EtsyPrice > 0;
     return (
       <div className="Upload">
-        <form onSubmit={this.onSubmit}>
+      <form onSubmit={this.onSubmit}>
+        <form method="POST" action="/addItem">
             <div className="form-group">
                 <label>Select Image</label>
                 <input type="file" accept=".jpg, .jpeg, .png" name="myImage" onChange={this.onImageChange} />
             </div>
             <div className="form-group">
                 <label>Item Name</label>
-                <input type="text" minLength="1" maxLength="50" className="form-control" value={this.state.itemName} onChange={this.onItemChange} />
+                <input type="text" minLength="1" name="itemName" maxLength="50" className="form-control" value={this.state.itemName} onChange={this.onItemChange} />
             </div>
             <div class="form-group">
                 <label>Item Description</label>
-                <textarea class="form-control rounded-0" id="exampleFormControlTextarea1" rows="10" input type="text" minLength="1" maxLength="300" className="form-control" value={this.state.itemDescription} onChange={this.onDescriptionChange} />
+                <textarea class="form-control rounded-0" name="itemDescription"id="exampleFormControlTextarea1" rows="10" input type="text" minLength="1" maxLength="300" className="form-control" value={this.state.itemDescription} onChange={this.onDescriptionChange} />
             </div>
             <div className="form-group">
                 <label>Ebay Price</label>
-                <input type="number" min="0" step="any" className="form-control" value={this.state.EbayPrice} onChange={this.onEbayChange} />
+                <input type="number" min="0" step="any" name="ebayPrice"className="form-control" value={this.state.EbayPrice} onChange={this.onEbayChange} />
             </div>
             <div className="form-group">
                 <label>Etsy Price</label>
-                <input type="number" min="0" step="any" className="form-control" value={this.state.EtsyPrice} onChange={this.onEtsyChange} />
+                <input type="number" min="0" step="any" name="etsyPrice" zclassName="form-control" value={this.state.EtsyPrice} onChange={this.onEtsyChange} />
             </div>
             <button id="sumbit" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
                 Submit
             </button>
+          </form>
         </form>
       </div>
     );
