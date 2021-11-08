@@ -6,6 +6,7 @@
 Certain files need to be removed and reinstalled. <br>
 In the backend
 - rm -r node_modules
+- rm package-lock.json
 - npm install
 
 In the frontend
@@ -20,7 +21,7 @@ when react is set up for frontend it uses 3000 port, for backend it needs to be 
 
 - **npm run server** will run nodemon index.js using script found in package.json. (USE TO RUN BACKEND) <br>
 Message displayed will be <br>
-> backend@1.0.0 server /Users/jasoncho/SoulSeller-5/node_react_app/backend <br>
+> backend@1.0.0 server {current working path} <br>
 > nodemon index.js <br>
 > [nodemon] 2.0.14 <br>
 > [nodemon] to restart at any time, enter `rs` <br>
@@ -30,6 +31,6 @@ Message displayed will be <br>
 > Secure Server is running on port 4000. <br>
 > DB connected <br>
 
-- **npm start** will run the development server connected to port 3000.
+- **npm run start** will run the development server connected to port 3000. (USE TO RUN FRONTEND)
 
 
