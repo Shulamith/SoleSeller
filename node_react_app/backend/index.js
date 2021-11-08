@@ -1,29 +1,26 @@
-const express = require('express');
-const router = express.Router();  
-const bodyParser = require('body-parser');
-const routesHandler = require('./routes/handler.js');
-//const corsMiddleware = require('./cors')
-const mongoose = require('mongoose');
+const express = require('express')
+const bodyParser = require('body-parser')
+const routesHandler = require('./routes/handler.js')
+const corsMiddleware = require('./cors')
+
+//needed for ebayAuth added by SD
+const fs = require('fs')
+const path = require('path')
+const https = require('https')
+
+const mongoose = require('mongoose')
 
 const app = express();
 
 //CORS Middleware below may not be necessary
-//app.use(corsMiddleware);
+app.use(corsMiddleware);
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:false}));
-app.use('/', routesHandler);
+//app.use(bodyParser.urlencoded({extended:false}));
+app.use('/', routesHandler, corsMiddleware);
 
 require('dotenv/config')
 
 
-
-// const clientScope = 'https://api.ebay.com/oauth/api_scope';
-// // // Client Crendential Auth Flow
-// ebayAuthToken.getApplicationToken('SANDBOX', clientScope).then((data) => {
-//     console.log(data);
-// }).catch((error) => {
-//     console.log(`E1`` kdx rror to get Access token :${JSON.stringify(error)}`);
-// });
 
 // // Authorization Code Auth Flow
 // ebayAuthToken.generateUserAuthorizationUrl('SANDBOX', scopes); // get user consent url.
@@ -68,8 +65,12 @@ if (process.env.NODE_ENV === 'production') {
 }
 */
 
+const sslServer = https.createServer({
+  key: fs.readFileSync(path.join(__dirname, 'cert', 'key.pem')),
+  cert: fs.readFileSync(path.join(__dirname, 'cert', 'cert.pem'))
+}, app)
 // access port parameter set in env file or add 4000 to it
 const PORT = process.env.PORT || 4000; // backend routing port
-app.listen(PORT, () =>  {
-  console.log(`Server is running on port ${PORT}.`);
+sslServer.listen(PORT, () =>  {
+  console.log(`Secure Server is running on port ${PORT}.`);
 });

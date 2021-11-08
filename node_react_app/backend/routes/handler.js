@@ -8,34 +8,12 @@ const fetch = require('cross-fetch');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
-
-router.use(express.urlencoded({ extended: false }));
+const axios = require('axios');
+//router.use(express.urlencoded({ extended: false }));
 
 const users = []
 
 /* ------------------ BEGIN ETSY OAUTH ------------------ */
-
-// Send a JSON response to a default get request
-router.get('/ping', async (req, res) => {
-    const requestOptions = {
-        'method': 'GET',
-        'headers': {
-            'x-api-key': 'b397ddo9ov4lu91igrv1rjjc',
-        },
-    };
-
-    const response = await fetch(
-        'https://openapi.etsy.com/v3/application/openapi-ping',
-        requestOptions
-    );
-
-    if (response.ok) {
-        const data = await response.json();
-        res.send(data);
-    } else {
-        res.send("oops");
-    }
-});
 
 /**
 These variables contain our Etsy API Key, the state sent
@@ -44,7 +22,7 @@ to the code_challenge sent with the initial authorization request
 */
 const etsyClientID = 'b397ddo9ov4lu91igrv1rjjc';
 const etsyClientVerifier = 'dL5oT2IMlIV6zVXXRRaEk-OwbVGPKrlU0ids8Dg2ahk';
-const etsyRedirectUri = 'http://localhost:3000/oauth/redirect';
+const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 
 router.get("/oauth/redirect", async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
@@ -70,12 +48,35 @@ router.get("/oauth/redirect", async (req, res) => {
     // Extract the access token from the response access_token data field
     if (response.ok) {
         const tokenData = await response.json();
-        res.redirect('/inventory');
-        //res.redirect(`/inventory?access_token=${tokenData.access_token}`);
+        //res.redirect('/inventory');
+        res.redirect(`/inventory?access_token=${tokenData.access_token}`);
     } else {
         res.send("oops");
     }
 });
+
+// Send a JSON response to a default get request
+router.get('/ping', async (req, res) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'x-api-key': etsyClientID,
+        },
+    };
+
+    const response = await fetch(
+        'https://openapi.etsy.com/v3/application/openapi-ping',
+        requestOptions
+    );
+
+    if (response.ok) {
+        const data = await response.json();
+        res.send(data);
+    } else {
+        res.send("oops");
+    }
+});
+
 
 /* ------------------ END ETSY OAUTH ------------------ */
 
@@ -237,17 +238,69 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
+  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
   // // Authorization Code Auth Flow
   //res.header('Access-Control-Allow-Origin', '*');
-  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('SANDBOX', scopes);
+  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
+
   console.log(AuthUrl);
+  //console.log(res.redirect(AuthUrl));
   return res.redirect(AuthUrl);
-  //res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
+  //console.log("RESPONSE QUERY", res.query)
+  //console.log(res.query);
+  //return ("authurl");
 //  return res.end(JSON.stringify(AuthUrl));
+})
+
+router.get('/ebayauth/callback', async (req, res) => {
+  //code = await res.code
+  console.log("CALLBACK");
+  //console.log(code)
+  // console.log(res);
+  //console.log(res.req.query.code);
+  const code = res.req.query.code;
+  console.log("CODE", code);
+  token = ""
+  // Exchange Code for Authorization token
+  const test = await ebayAuthToken.exchangeCodeForAccessToken('PRODUCTION', code).then((data) => { // eslint-disable-line no-undef
+      console.log("DATA", data);
+      console.log("TOKEN!!", JSON.parse(data).access_token);
+      token = JSON.parse(data).access_token;
+  }).catch((error) => {
+      console.log(error);
+      console.log(`Error to get Access token :${JSON.stringify(error)}`);
+  });
+  if (token) {
+    const inventoryData = await getInventory(token);
+    console.log("Token:", token);
+    console.log("inventoryData", inventoryData);
+  }
+  return res.redirect('http://localhost:3000/inventory');
 });
 
+
+async function getInventory (token) {
+  auth = 'Bearer ' + token;
+  axios.get('https://api.ebay.com/sell/inventory/v1/inventory_item?limit=2&offset=0',{
+    headers: {
+      'Authorization': auth,
+      'Accept': 'application/json',
+      'Content-Type':'application/json'
+    }})
+  .then(response => {
+    console.log(response.data);
+    console.log(response.data.url);
+    console.log(response.data.explanation);
+  })
+  .catch(error => {
+    console.log(error);
+  });
+  return "GET INVENTORY";
+};
+
+
 router.post('/addProduct', (req, res) => {
-    res.end('NA');
+    res.end('NA')
 });
 
 
