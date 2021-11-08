@@ -11,7 +11,6 @@ const Schemas = require('../models/Schemas.js');
 const axios = require('axios');
 //router.use(express.urlencoded({ extended: false }));
 
-const users = []
 
 /* ------------------ BEGIN ETSY OAUTH ------------------ */
 
@@ -24,7 +23,29 @@ const etsyClientID = 'b397ddo9ov4lu91igrv1rjjc';
 const etsyClientVerifier = 'dL5oT2IMlIV6zVXXRRaEk-OwbVGPKrlU0ids8Dg2ahk';
 const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 
-router.get("/oauth/redirect", async (req, res) => {
+// Send a JSON response to a default get request
+router.get('/ping', async (req, res) => {
+    const requestOptions = {
+        method: 'GET',
+        headers: {
+            'x-api-key': etsyClientID,
+        },
+    };
+
+    const response = await fetch(
+        'https://openapi.etsy.com/v3/application/openapi-ping',
+        requestOptions
+    );
+
+    if (response.ok) {
+        const data = await response.json();
+        res.send(data);
+    } else {
+        res.send("oops");
+    }
+});
+
+router.get('/oauth/redirect', async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
     // to this route. The authorization code is in the `code` param
     const authCode = req.query.code;
@@ -55,26 +76,56 @@ router.get("/oauth/redirect", async (req, res) => {
     }
 });
 
-// Send a JSON response to a default get request
-router.get('/ping', async (req, res) => {
+router.get('/inventory/:access_token', async (req, res) => {
+    // We passed the access token in via the querystring
+    const { access_token } = req.query;
+
+    // An Etsy access token includes your shop/user ID
+    // as a token prefix, so we can extract that too
+    const user_id = access_token.split('.')[0];
+
     const requestOptions = {
-        method: 'GET',
         headers: {
             'x-api-key': etsyClientID,
-        },
+        }
     };
 
     const response = await fetch(
-        'https://openapi.etsy.com/v3/application/openapi-ping',
+        `https://openapi.etsy.com/v3/application/users/${user_id}/shops`,
         requestOptions
     );
 
     if (response.ok) {
-        const data = await response.json();
-        res.send(data);
+        const shopData = await response.json();
+        const shop_id = shopData.shop_id;
+
+        const shopRequestOptions = {
+            method: 'GET',
+            headers: {
+                'x-api-key': clientID,
+
+                // Scoped endpoints require a bearer token
+                Authorization: `Bearer ${access_token}`,
+            }
+        }
+
+        shopResponse = await fetch(
+            `https://openapi.etsy.com/v3/application/shops/${shop_id}/listings?state=inactive`,
+            shopRequestOptions
+        );
+
+        if (shopResponse.ok) {
+            const listingData = await shopResponse.json();
+
+            res.send(listingData.count);
+        } else {
+            res.send("oops");
+        }
+
     } else {
         res.send("oops");
     }
+
 });
 
 
