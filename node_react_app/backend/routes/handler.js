@@ -145,17 +145,21 @@ router.get('/inventory', async (req, res) => { // here we grab our items
 });
 
 router.post('/addItem', async (req, res) => { // when user post items it gets sent to router to be added
-    const userItem = req.body.itemInput; // get item input field, name of field = itemInput
-    const userItemPrice = req.body.itemPriceInput;
+    const itemName = req.body.itemName; // get item input field, name of field = itemInput
+    const itemDescription = req.body.itemDescription;
+    const ebayPrice = req.body.ebayPrice;
+    const etsyPrice = req.body.etsyPrice;
     const user = Schemas.Users; //define user
     const userId = await user.findOne({ username: 'tahmid198' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
     const newItem = new Schemas.Items({  // save the item
-        item: userItem,
+        item: itemName,
+        description: itemDescription,
+        etsyPrice: etsyPrice,
+        ebayPrice: ebayPrice,
         user: userId._id, // field to link user whose saving item
-        price: userItemPrice
     });
 
     try { // we try to add it now

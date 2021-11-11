@@ -8,8 +8,7 @@ const userSchema = new Schema({
     username: { type: String, required: true },
     email: { type: String, required: true },
     password: { type: String, requierd: true },
-    entryDate: { type: Date, default: Date.now }
-});
+},{timestamps:true});
 
 const channelSchema = new Schema({
     // _id: ObjectId
@@ -17,13 +16,13 @@ const channelSchema = new Schema({
     user: {type: Schema.Types.ObjectId, ref: 'users'} // referencing through user id
     // SELECT FROM a INNER JOIN b ON a.id = b.id
 });
-
 const itemSchema = new Schema ({
     item: {type: String, required: true},
-    price: {type: String, required: true},
-    channel: {type: String, required: false},
+    description: {type: String, requierd: true},
+    etsyPrice: {type: String, required: false},
+    ebayPrice:{type:String, required:false},
     user:{type: Schema.Types.ObjectId, ref: 'users'} // references user table tru id
-});
+},{timestamps:true});
 
 
 const Users = mongoose.model('users', userSchema, 'users');
