@@ -209,10 +209,10 @@ router.post('/login', (req, res) => {
 
 router.post('/register', async (req, res) => {
 
-    const _salt = async () => { await bcrypt.genSalt(Math.floor(Math.random() * 13) + 11) };
-    const hashedPassword = async () => { await bcrypt.hash(req.body.password, _salt) };
+    const _salt = await bcrypt.genSalt(Math.floor(Math.random() * 13) + 11);
+    const hashedPassword = bcrypt.hashSync(req.body.password, _salt);
 
-    const user = { username: req.body.name, email: req.body.email, password: hashedPassword, salt: _salt };
+    const user = { username: req.body.name, email: req.body.email, password: hashedPassword };
     const newUser = new Schemas.Users(user);
 
     try {
@@ -229,7 +229,7 @@ router.post('/register', async (req, res) => {
         res.end('User not added!');
     }
 
-    
+});
 
 
 module.exports = router;
