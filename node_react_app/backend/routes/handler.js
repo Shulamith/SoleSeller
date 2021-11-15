@@ -21,7 +21,7 @@ to the code_challenge sent with the initial authorization request
 */
 const etsyClientID = 'b397ddo9ov4lu91igrv1rjjc';
 const etsyClientVerifier = 'dL5oT2IMlIV6zVXXRRaEk-OwbVGPKrlU0ids8Dg2ahk';
-const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
+const etsyRedirectUri = 'https://localhost:4000/oauth/redirect';
 
 // Send a JSON response to a default get request
 router.get('/ping', async (req, res) => {
@@ -228,38 +228,6 @@ router.post('/addItem', async (req, res) => { // when user post items it gets se
         res.end(); // end page
     }
 });
-
-router.get('/addRegister', function(req, res){
-    res.send("Hello from the root application URL");
-});
-
-router.post('/addRegister', async(req, res) => {
-    // const userName = req.body.name;
-    // const userEmail = req.body.email;
-    // const userPassword = bcrypt.hash(req.body.password, 10);
-
-    const userName = "Tahmid";
-    const userEmail = "LoverBoy1800@gmail.com";
-    const userPassword = await bcrypt.hash("12233455f", 10);
-
-    const newUser = new Schemas.Users ({
-        username: userName,
-        email: userEmail,
-        password: userPassword
-    });
-    try {
-        await newUser.save((err, newUserResults) => {
-            if (err) res.end('Error Saving.');
-            res.redirect('/login');
-            res.end();
-            });    
-        } catch (err) {
-            console.log(err)
-            res.redirect('/Register');
-             res.end();
-            
-        }      
-});
 // router.post('/Register', (req, res) => {
 //     try {
 //         const hashedPassword = async () => { await bcrypt.hash(req.form.password.value, 10) };
@@ -269,7 +237,7 @@ router.post('/addRegister', async(req, res) => {
 //             email: req.form.email.value,
 //             password: hashedPassword
 //         });
-        
+
 //     res.redirect('/login');
 //     } catch {
 //         res.redirect('/Register');
@@ -340,8 +308,7 @@ async function getInventory (token) {
     }})
   .then(response => {
     console.log(response.data);
-    console.log(response.data.url);
-    console.log(response.data.explanation);
+    console.log(response);
   })
   .catch(error => {
     console.log(error);
@@ -349,10 +316,10 @@ async function getInventory (token) {
   return "GET INVENTORY";
 };
 
-
-router.post('/addProduct', (req, res) => {
-    res.end('NA')
-});
+//
+// router.post('/addProduct', (req, res) => {
+//     res.end('NA')
+// });
 
 
 
@@ -361,4 +328,3 @@ router.post('/login', (req, res) => {
 });
 
 module.exports = router;
-

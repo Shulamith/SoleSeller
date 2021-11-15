@@ -82,16 +82,16 @@ export default class Register extends Component {
                     </div>
                     <div className="form-group">
                         <label>Email</label>
-                        <input type="text" name= "email"className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
+                        <input type="email" name= "email"className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
                     </div>
                     <div className="form-group">
                         <label>Password</label>
-                        <input type="text" name ="password"className="form-control" value={this.state.password} onChange={this.onChangePassword} />
+                        <input type="password" name ="password"className="form-control" value={this.state.password} onChange={this.onChangePassword} />
                     </div>
                     <button id="register" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
                       <Link to ="/login">
                         Register
-                      </Link>  
+                      </Link>
                     </button>
                 </form>
                 </form>

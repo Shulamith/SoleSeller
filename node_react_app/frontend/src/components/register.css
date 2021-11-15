@@ -2,18 +2,17 @@
     .Register {
       padding: 120px 0;
     }
-  
+
     .Register form {
       margin: 0 auto;
       max-width: 320px;
     }
 
     a {
-      color : #FFF;
+      color : black;
     }
   }
 
   #register {
-    background-color: white;
+    background-color: black;
   }
-

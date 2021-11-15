@@ -2,8 +2,8 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-node_react_app/backend/node_modules/
+./node_react_app/backend/node_modules/
+./node_react_app/frontend/node_modules/
 /.vs/slnx.sqlite-journal
 /.vs/slnx.sqlite
-/.gitignore
 /.vs

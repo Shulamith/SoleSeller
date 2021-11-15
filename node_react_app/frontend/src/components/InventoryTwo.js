@@ -38,24 +38,24 @@ function InventoryTwo() {
                                         <td></td>
                                         <td>Etsy</td>
                                         <td>eBay</td>
-                                        <td>Etc.</td>
+                                        <td>Coming Soon!</td>
                                     </tr>
                                     <tr>
                                         <td>Selling Price</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>$200</td>
+                                        <td>{val.product.price}</td>
                                         <td></td>
                                     </tr>
                                     <tr>
                                         <td>Fees</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>$0.20</td>
+                                        <td>{val.product.fees}</td>
                                         <td></td>
                                     </tr>
                                     <tr>
                                         <td>Total Earnings</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>$199.80</td>
+                                        <td>{val.product.total}</td>
                                         <td></td>
                                     </tr>
                                 </table>
