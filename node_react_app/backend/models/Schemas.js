@@ -7,7 +7,8 @@ const userSchema = new Schema({
     // _id: ObjectId  (automatically created by mongoose everytime a doc is made)
     username: { type: String, required: true },
     email: { type: String, required: true },
-    password: { type: String, requierd: true },
+    password: { type: String, required: true },
+    salt: { type: String, required: true },
 },{timestamps:true});
 
 const channelSchema = new Schema({

@@ -5,7 +5,7 @@ const ebayAuthToken = new EbayAuthToken({
     filePath: './routes/ebay-config.json' // input file path.
 });
 const fetch = require('cross-fetch');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const Schemas = require('../models/Schemas.js');
 
 router.use(express.urlencoded({ extended: false }));
@@ -80,22 +80,22 @@ router.get("/oauth/redirect", async (req, res) => {
 
 
 //GO http://localhost:4000/addUser TO ADD NEW USER WITH THIS CODE
-router.get('/addUser', async (req, res) => {
-    const user = { username: 'superman', fullname: 'clark kent' };
-    const newUser = new Schemas.Users(user);
+//router.get('/addUser', async (req, res) => {
+//    const user = { username: 'superman', fullname: 'clark kent' };
+//    const newUser = new Schemas.Users(user);
 
-    try {
-        await newUser.save(async (err, newUserResult) => {
-            console.log('New user created!');
-            res.end('New user created!');
-        });
+//    try {
+//        await newUser.save(async (err, newUserResult) => {
+//            console.log('New user created!');
+//            res.end('New user created!');
+//        });
 
-    } catch (err) {
-        console.log(err);
-        res.end('User not added!');
-    }
+//    } catch (err) {
+//        console.log(err);
+//        res.end('User not added!');
+//    }
 
-});
+//});
 
 //GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
 router.get('/addItem', async (req, res) => {
@@ -207,21 +207,29 @@ router.post('/login', (req, res) => {
 });
 
 
-router.post('/Register', (req, res) => {
+router.post('/register', async (req, res) => {
+
+    const _salt = async () => { await bcrypt.genSalt(Math.floor(Math.random() * 13) + 11) };
+    const hashedPassword = async () => { await bcrypt.hash(req.body.password, _salt) };
+
+    const user = { username: req.body.name, email: req.body.email, password: hashedPassword, salt: _salt };
+    const newUser = new Schemas.Users(user);
+
     try {
-        const hashedPassword = async () => { await bcrypt.hash(req.form.password.value, 10) };
-        //const newUser = schemas.Users;
-        users.push({
-            username: req.form.Name.value,
-            email: req.form.email.value,
-            password: hashedPassword
+        await newUser.save(async (err, newUserResult) => {
+            console.log('New user created!');
+            console.log(req.body.name);
+            console.log(req.body.email);
+            console.log(hashedPassword);
+            res.end('New user created!');
         });
-        res.redirect('/login');
-    } catch {
-        res.redirect('/Register');
+
+    } catch (err) {
+        console.log(err);
+        res.end('User not added!');
     }
-    console.log(users);
-});
+
+    
 
 
 module.exports = router;
