@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import "./register.css";
 
 export default class Register extends Component {
@@ -36,37 +37,28 @@ export default class Register extends Component {
     }
 
     onSubmit(e) {
-        e.preventDefault()
+        e.preventDefault();
+
+        axios.post('http://localhost:4000/register', {
+            name: e.target.name.value,
+            email: e.target.email.value,
+            password: e.target.password.value
+        })
+            .then(function (response) {
+                window.location.href = "http://localhost:3000/login";
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
 
         this.setState({
             name: '',
             email: '',
             password: ''
-        })
+        });
+
     }
 
-    // React Life Cycleu
-    componentDidMount() {
-        this.userData = JSON.parse(localStorage.getItem('userReg'));
-
-        if (localStorage.getItem('userReg')) {
-            this.setState({
-                name: this.userData.name,
-                email: this.userData.email,
-                password: this.userData.password
-            })
-        } else {
-            this.setState({
-                name: '',
-                email: '',
-                password: ''
-            })
-        }
-    }
-
-    componentWillUpdate(nextProps, nextState) {
-        localStorage.setItem('userReg', JSON.stringify(nextState));
-    }
 
     render() {
         const { name, email, password } = this.state;
@@ -87,9 +79,7 @@ export default class Register extends Component {
                         <input type="password" name="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
                     </div>
                     <button id="register" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
-                      <Link to ="/login">
                         Register
-                      </Link>  
                     </button>
                 </form>
             </div>

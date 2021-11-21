@@ -7,19 +7,41 @@ const ebayAuthToken = new EbayAuthToken({
 const fetch = require('cross-fetch');
 const bcrypt = require('bcryptjs');
 const Schemas = require('../models/Schemas.js');
+const User = Schemas.Users;
+
+require('dotenv/config');
 
 router.use(express.urlencoded({ extended: false }));
 
-const users = []
+
+// Add Access Control Allow Origin headers
+router.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+});
 
 /* ------------------ BEGIN ETSY OAUTH ------------------ */
+
+/**
+These variables contain our Etsy API Key, the state sent
+in the initial authorization request, and the client verifier compliment
+to the code_challenge sent with the initial authorization request
+*/
+const etsyClientID = process.env.ETSY_KEY;
+const etsyClientVerifier = process.env.ETSY_VERIFY;
+const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
+
 
 // Send a JSON response to a default get request
 router.get('/ping', async (req, res) => {
     const requestOptions = {
         'method': 'GET',
         'headers': {
-            'x-api-key': 'b397ddo9ov4lu91igrv1rjjc',
+            'x-api-key': etsyClientID,
         },
     };
 
@@ -36,14 +58,6 @@ router.get('/ping', async (req, res) => {
     }
 });
 
-/**
-These variables contain our Etsy API Key, the state sent
-in the initial authorization request, and the client verifier compliment
-to the code_challenge sent with the initial authorization request
-*/
-const etsyClientID = 'b397ddo9ov4lu91igrv1rjjc';
-const etsyClientVerifier = 'dL5oT2IMlIV6zVXXRRaEk-OwbVGPKrlU0ids8Dg2ahk';
-const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 
 router.get("/oauth/redirect", async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
@@ -79,23 +93,6 @@ router.get("/oauth/redirect", async (req, res) => {
 /* ------------------ END ETSY OAUTH ------------------ */
 
 
-//GO http://localhost:4000/addUser TO ADD NEW USER WITH THIS CODE
-//router.get('/addUser', async (req, res) => {
-//    const user = { username: 'superman', fullname: 'clark kent' };
-//    const newUser = new Schemas.Users(user);
-
-//    try {
-//        await newUser.save(async (err, newUserResult) => {
-//            console.log('New user created!');
-//            res.end('New user created!');
-//        });
-
-//    } catch (err) {
-//        console.log(err);
-//        res.end('User not added!');
-//    }
-
-//});
 
 //GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
 router.get('/addItem', async (req, res) => {
@@ -115,8 +112,7 @@ router.get('/addItem', async (req, res) => {
         console.log(err);
         res.end('Item not added!');
     }
-})
-
+});
 
 
 router.get('/inventory', async (req, res) => { // here we grab our items
@@ -201,16 +197,34 @@ router.post('/addProduct', (req, res) => {
 });
 
 
+//router.post('/login', (req, res) => {
 
-router.post('/login', (req, res) => {
+//    const User = Schemas.Users;
 
-});
+//    User.findOne({ email: req.body.email }, function (err, docs) {
+//        if (err) {
+//            console.log(err);
+//        }
+//        else {
+//            console.log("First function call : ", docs.password);
+//        }
+//    });
+//    res.end();
+//});
 
 
 router.post('/register', async (req, res) => {
 
-    const _salt = await bcrypt.genSalt(Math.floor(Math.random() * 13) + 11);
-    const hashedPassword = bcrypt.hashSync(req.body.password, _salt);
+    var salt = '';
+    var hashedPassword = '';
+
+    try {
+        salt = await bcrypt.genSalt(Math.floor(Math.random() * 12));
+        hashedPassword = await bcrypt.hash(req.body.password, salt);
+    } catch (err) {
+        console.log(err);
+        res.end('Password not generated!')
+    }
 
     const user = { username: req.body.name, email: req.body.email, password: hashedPassword };
     const newUser = new Schemas.Users(user);
@@ -218,14 +232,10 @@ router.post('/register', async (req, res) => {
     try {
         await newUser.save(async (err, newUserResult) => {
             console.log('New user created!');
-            console.log(req.body.name);
-            console.log(req.body.email);
-            console.log(hashedPassword);
-            res.end('New user created!');
+            res.end();
         });
 
     } catch (err) {
-        console.log(err);
         res.end('User not added!');
     }
 
