@@ -33,7 +33,7 @@ to the code_challenge sent with the initial authorization request
 */
 const etsyClientID = process.env.ETSY_KEY;
 const etsyClientVerifier = process.env.ETSY_VERIFY;
-const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
+const etsyRedirectUri = 'https://localhost:4000/oauth/redirect';
 
 
 // Send a JSON response to a default get request
@@ -183,12 +183,17 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
+  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
   // // Authorization Code Auth Flow
   //res.header('Access-Control-Allow-Origin', '*');
-  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('SANDBOX', scopes);
+  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
+
   console.log(AuthUrl);
+  //console.log(res.redirect(AuthUrl));
   return res.redirect(AuthUrl);
-  //res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
+  //console.log("RESPONSE QUERY", res.query)
+  //console.log(res.query);
+  //return ("authurl");
 //  return res.end(JSON.stringify(AuthUrl));
 });
 
@@ -231,7 +236,7 @@ router.post('/login', async (req, res) => {
                 res.status(500).send();
             }
 
-            return res.json({ status: 'ok', accessToken: accessToken, refreshToken: refreshToken });
+            return res.json({ status: 'ok', message: 'User log in was successful', accessToken: accessToken, refreshToken: refreshToken });
         }
 
     } catch (err) {
@@ -252,7 +257,7 @@ router.delete('/logout', authenticateToken, async (req, res) => {
         if (!err) {
 
             console.log(deleteSuccess);
-            res.sendStatus(204);
+            res.json({ status: '204', message: 'User was successfully logged out' });
 
         } else console.log(err);
 
@@ -323,6 +328,25 @@ function authenticateToken(req, res, next) {
 
 function generateAccessToken(user) {
     return jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.ACCESS_SECRET, { expiresIn: '1d' });
+};
+
+async function getInventory(token) {
+    auth = 'Bearer ' + token;
+    axios.get('https://api.ebay.com/sell/inventory/v1/inventory_item?limit=2&offset=0', {
+        headers: {
+            'Authorization': auth,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            console.log(response.data);
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    return "GET INVENTORY";
 };
 
 
