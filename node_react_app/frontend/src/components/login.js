@@ -48,8 +48,7 @@ export default class Login extends Component {
             password: e.target.password.value
         })
             .then(function (response) {
-                console.log(response);
-            })
+                window.location.href = "http://localhost:3000/profile";            })
             .catch(function (error) {
                 console.log(error);
             });
@@ -60,28 +59,6 @@ export default class Login extends Component {
             password: ''
         })
     }
-
-    // React Life Cycleu
-    //componentDidMount() {
-    //    this.userData = JSON.parse(localStorage.getItem('user'));
-
-    //    if (localStorage.getItem('user')) {
-    //        this.setState({
-    //            email: this.userData.email,
-    //            password: this.userData.password
-    //        })
-    //    } else {
-    //        this.setState({
-    //            name: '',
-    //            email: '',
-    //            password: ''
-    //        })
-    //    }
-    //}
-
-    //componentWillUpdate(nextProps, nextState) {
-    //    localStorage.setItem('user', JSON.stringify(nextState));
-    //}
 
     render() {
       const { email, password } = this.state;

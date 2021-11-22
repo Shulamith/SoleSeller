@@ -193,7 +193,11 @@ router.get('/ebayauth', (req, res) => {
 });
 
 router.get('/profile', authenticateToken, (req, res) => {
-    return res.json({ status: 'ok', username: req.user.name });
+    res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
+});
+
+router.get('/nav', authenticateToken, (req, res) => {
+    res.json({ id: req.user.id, username: req.user.username, email: req.user.email });
 });
 
 
@@ -204,7 +208,7 @@ router.post('/login', async (req, res) => {
 
     if (!user) {
 
-        return res.json({ status: 'error', error: 'Invalid email/password1' });
+        return res.json({ status: 'error', error: 'Invalid email/password' });
     }
 
     try {
@@ -235,7 +239,7 @@ router.post('/login', async (req, res) => {
         console.log(err);
     }
     
-    res.json({ status: 'error', error: 'Invalid email/password2' });
+    res.json({ status: 'error', error: 'Invalid email/password' });
 
 });
 
@@ -243,20 +247,17 @@ router.delete('/logout', authenticateToken, async (req, res) => {
 
     const Token = Schemas.Refresh;
 
-    await Token.findOneAndRemove({ token: req.body.token }, (err, deleteSuccess) => {
+    await Token.findOneAndRemove({ user: req.body.id }, (err, deleteSuccess) => {
 
         if (!err) {
 
             console.log(deleteSuccess);
             res.sendStatus(204);
 
-        }
-
-        else console.log(err);
+        } else console.log(err);
 
     });
 });
-
 
 router.post('/register', async (req, res) => {
 
@@ -321,7 +322,7 @@ function authenticateToken(req, res, next) {
 };
 
 function generateAccessToken(user) {
-    return jwt.sign({ id: user._id, username: user.username }, process.env.ACCESS_SECRET, { expiresIn: '1d' });
+    return jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.ACCESS_SECRET, { expiresIn: '1d' });
 };
 
 

@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
 import './InventoryTwo.css';
 
-console.log(inventoryData.length);
 function InventoryTwo() {
 
     return (
