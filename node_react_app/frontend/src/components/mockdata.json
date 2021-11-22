@@ -9,6 +9,9 @@
             "condition": "NEW",
             "product": {
                 "title": "Louis Vuitton Duck Bag",
+                "price": "$500.00",
+                "fees": "$75.00",
+                "total": "425.00",
                 "description": "New Louis Vuitton Special Edition Bag.",
                 "aspects": {
                     "Brand": [
@@ -32,6 +35,9 @@
             "condition": "NEW",
             "product": {
                 "title": "RED NIKE SHOES",
+                "price": "$100",
+                "fees": "$15",
+                "total": "$75",
                 "description": "Red nike shoes. Unopened Box. ",
                 "aspects": {
                     "Brand": [

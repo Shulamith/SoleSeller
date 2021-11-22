@@ -9,7 +9,7 @@ section {
 
 #ebay {
     color: black;
-    background-color: white;
+    background-color: black;
     max-width: 320px;
     display:flex;
     align-items:center;
@@ -19,11 +19,11 @@ section {
 
 #etsy {
     color: black;
-    background-color: white;
+    background-color: black;
     max-width: 320px;
     display:flex;
     align-items:center;
-    justify-content:center; 
+    justify-content:center;
     margin: auto
 }
 
@@ -33,11 +33,10 @@ section {
     max-width: 320px;
     display:flex;
     align-items:center;
-    justify-content:center; 
-    margin: auto  
+    justify-content:center;
+    margin: auto
 }
 
 a {
     color : rgb(0, 0, 0);
   }
-

@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 
 // The next two functions help us generate the code challenge
-// required by Etsy’s OAuth implementation.
+// required by Etsyï¿½s OAuth implementation.
 const base64URLEncode = (str) =>
     str
         .toString("base64")
@@ -11,7 +11,7 @@ const base64URLEncode = (str) =>
 
 const sha256 = (buffer) => crypto.createHash("sha256").update(buffer).digest();
 
-// We’ll use the verifier to generate the challenge.
+// Weï¿½ll use the verifier to generate the challenge.
 // The verifier needs to be saved for a future step in the OAuth flow.
 const codeVerifier = base64URLEncode(crypto.randomBytes(32));
 
@@ -23,4 +23,4 @@ const state = Math.random().toString(36).substring(7);
 console.log(`State: ${state}`);
 console.log(`Code challenge: ${codeChallenge}`);
 console.log(`Code verifier: ${codeVerifier}`);
-console.log(`Full URL: https://www.etsy.com/oauth/connect?response_type=code&redirect_uri=http://localhost:4000/oauth/redirect&scope=email_r&client_id=b397ddo9ov4lu91igrv1rjjc&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`)
+console.log(`Full URL: https://www.etsy.com/oauth/connect?response_type=code&redirect_uri=https://localhost:4000/oauth/redirect&scope=email_r&client_id=b397ddo9ov4lu91igrv1rjjc&state=${state}&code_challenge=${codeChallenge}&code_challenge_method=S256`)
