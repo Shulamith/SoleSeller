@@ -6,8 +6,8 @@ const ebayAuthToken = new EbayAuthToken({
 });
 const fetch = require('cross-fetch');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
-const User = Schemas.Users;
 
 require('dotenv/config');
 
@@ -115,7 +115,7 @@ router.get('/addItem', async (req, res) => {
 });
 
 
-router.get('/inventory', async (req, res) => { // here we grab our items
+router.get('/inventory', authenticateToken, async (req, res) => { // here we grab our items
     const items = Schemas.Items;
 
     // const userItems = await items.find({}, (err, itemsData) => {
@@ -192,35 +192,78 @@ router.get('/ebayauth', (req, res) => {
 //  return res.end(JSON.stringify(AuthUrl));
 });
 
-router.post('/addProduct', (req, res) => {
-    res.end('NA');
+router.get('/profile', authenticateToken, (req, res) => {
+    return res.json({ status: 'ok', username: req.user.name });
 });
 
 
-//router.post('/login', (req, res) => {
+router.post('/login', async (req, res) => {
 
-//    const User = Schemas.Users;
+    const User = Schemas.Users;
+    const user = await User.findOne({ email: req.body.email }).lean();
 
-//    User.findOne({ email: req.body.email }, function (err, docs) {
-//        if (err) {
-//            console.log(err);
-//        }
-//        else {
-//            console.log("First function call : ", docs.password);
-//        }
-//    });
-//    res.end();
-//});
+    if (!user) {
+
+        return res.json({ status: 'error', error: 'Invalid email/password1' });
+    }
+
+    try {
+
+        if (await bcrypt.compare(req.body.password, user.password)) {
+
+            const accessToken = generateAccessToken(user);
+            const refreshToken = jwt.sign(user, process.env.REFRESH_SECRET);
+
+            const _newToken = { token: refreshToken, user: user };
+            const newToken = new Schemas.Refresh(_newToken);
+
+            try {
+                await newToken.save(async (err, newTokenResult) => {
+                    console.log('New token generated!');
+                    res.status(201).send();
+                });
+
+            } catch (err) {
+                res.status(500).send();
+            }
+
+            return res.json({ status: 'ok', accessToken: accessToken, refreshToken: refreshToken });
+        }
+
+    } catch (err) {
+
+        console.log(err);
+    }
+    
+    res.json({ status: 'error', error: 'Invalid email/password2' });
+
+});
+
+router.delete('/logout', authenticateToken, async (req, res) => {
+
+    const Token = Schemas.Refresh;
+
+    await Token.findOneAndRemove({ token: req.body.token }, (err, deleteSuccess) => {
+
+        if (!err) {
+
+            console.log(deleteSuccess);
+            res.sendStatus(204);
+
+        }
+
+        else console.log(err);
+
+    });
+});
 
 
 router.post('/register', async (req, res) => {
 
-    var salt = '';
     var hashedPassword = '';
 
     try {
-        salt = await bcrypt.genSalt(Math.floor(Math.random() * 12));
-        hashedPassword = await bcrypt.hash(req.body.password, salt);
+        hashedPassword = await bcrypt.hash(req.body.password, 12);
     } catch (err) {
         console.log(err);
         res.end('Password not generated!')
@@ -232,14 +275,54 @@ router.post('/register', async (req, res) => {
     try {
         await newUser.save(async (err, newUserResult) => {
             console.log('New user created!');
-            res.end();
+            res.status(201).send();
         });
 
     } catch (err) {
-        res.end('User not added!');
+        res.status(500).send();
     }
 
 });
+
+router.post('/token', async (req, res) => {
+
+    const refreshToken = req.body.token;
+
+    if (refreshToken == null) return res.sendStatus(401);
+
+    const Token = Schemas.Refresh;
+    const token = await Token.findOne({ token: refreshToken }).lean();
+    if (!token) return res.sendStatus(403);
+
+    jwt.verify(token, process.env.REFRESH_SECRET, (err, user) => {
+
+        if (err) return res.sendStatus(403);
+        const accessToken = generateAccessToken({ name: user.name });
+        res.json({ accessToken: accessToken });
+
+    });
+
+});
+
+function authenticateToken(req, res, next) {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+
+    });
+
+};
+
+function generateAccessToken(user) {
+    return jwt.sign({ id: user._id, username: user.username }, process.env.ACCESS_SECRET, { expiresIn: '1d' });
+};
 
 
 module.exports = router;
