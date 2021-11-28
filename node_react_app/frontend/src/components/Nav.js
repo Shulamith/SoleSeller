@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-//import fetch from "cross-fetch";
 
 function Nav() {
+
     const [user, setUser] = useState({});
     useEffect(() => {
         { /*
@@ -12,29 +12,9 @@ function Nav() {
         */}
         setInterval(() => {
             const user = localStorage.getItem("user");
-            //const user = JSON.parse(userString);
             setUser(user);
         }, [])
     }, 5000);
-
-
-
-
-    //axios.get("http://localhost:4000/nav")
-    //    .then(res => {
-    //        if (res.status >= 400) {
-    //            throw new Error("Bad response from server");
-    //        }
-    //        return res.json();
-    //    })
-    //    .then(user => {
-    //        id = user.id;
-    //        console.log(user);
-    //    })
-    //    .catch(err => {
-    //        console.error(err);
-    //    });
-
 
 
   if(!user) {
