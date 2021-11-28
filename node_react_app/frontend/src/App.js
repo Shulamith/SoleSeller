@@ -10,10 +10,11 @@ import Register from './components/register';
 import EbayAuth from './components/EbayAuth';
 import Profile from './components/profile';
 import Upload from './components/upload';
+import Logout from './components/logout';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom';
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token"));
+  //const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token"));
   return (
     // Since Nav and links will direct us to different pages, it has to act as a URL router
     // Routes added for Home link and tweet Link
@@ -29,6 +30,7 @@ function App() {
           <Route path="/login" exact component = {Login} />
           <Route path="/profile" exact component={Profile} />
           <Route path="/upload" exact component={Upload} />
+          <Route path="/logout" exact component={Logout} />
         </Switch>
       </header>
     </div>
