@@ -12,8 +12,8 @@ function Home() {
         "login", as soon as user logs out.
         */}
             setInterval(() => {
-                const userString = localStorage.getItem("user");
-                const user = JSON.parse(userString);
+                const user = localStorage.getItem("user");
+                //const user = JSON.parse(userString);
                 setUser(user);
                 }, [])
         }, 5000);

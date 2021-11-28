@@ -3,32 +3,41 @@ import axios from "axios";
 //import fetch from "cross-fetch";
 
 function Nav() {
-    //const [user, setUser] = useState({});
-
-    var id = "";
-
-
-
-    axios.get("http://localhost:4000/nav")
-        //.then(res => {
-        //    if (res.status >= 400) {
-        //        throw new Error("Bad response from server");
-        //    }
-        //    return res.json();
-        //})
-        .then(user => {
-            id = user.id;
-            console.log(user);
-        })
-        .catch(err => {
-            console.error(err);
-        });
+    const [user, setUser] = useState({});
+    useEffect(() => {
+        { /*
+            setInterval was used in order to refresh the page constantly
+        in order to have the "logout" button show immediately in place of
+        "login", as soon as user logs out.
+        */}
+        setInterval(() => {
+            const user = localStorage.getItem("user");
+            //const user = JSON.parse(userString);
+            setUser(user);
+        }, [])
+    }, 5000);
 
 
-    console.log(id);
 
 
-  if(id === "") {
+    //axios.get("http://localhost:4000/nav")
+    //    .then(res => {
+    //        if (res.status >= 400) {
+    //            throw new Error("Bad response from server");
+    //        }
+    //        return res.json();
+    //    })
+    //    .then(user => {
+    //        id = user.id;
+    //        console.log(user);
+    //    })
+    //    .catch(err => {
+    //        console.error(err);
+    //    });
+
+
+
+  if(!user) {
     return (
         // HTML code using Bootstrap for simple navigation that has two lings
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
@@ -48,7 +57,7 @@ function Nav() {
       </nav>
     );
   }
-  else {
+  if(user) {
     return(
       <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">

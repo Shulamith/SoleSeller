@@ -48,7 +48,11 @@ export default class Login extends Component {
             password: e.target.password.value
         })
             .then(function (response) {
-                window.location.href = "http://localhost:3000/profile";            })
+                window.localStorage.setItem("user", response.data.user);
+                window.localStorage.setItem("email", response.data.email);
+                window.localStorage.setItem("token", response.data.accessToken);
+                window.location.href = "/profile";
+            })
             .catch(function (error) {
                 console.log(error);
             });

@@ -17,8 +17,9 @@ router.use(express.urlencoded({ extended: false }));
 // Add Access Control Allow Origin headers
 router.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "*");
+    res.setHeader("Access-Control-Allow-Headers", "*");
     res.header(
-        "Access-Control-Allow-Headers",
         "Origin, X-Requested-With, Content-Type, Accept"
     );
     next();
@@ -201,11 +202,6 @@ router.get('/profile', authenticateToken, (req, res) => {
     res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
 });
 
-router.get('/nav', authenticateToken, (req, res) => {
-    res.json({ id: req.user.id, username: req.user.username, email: req.user.email });
-});
-
-
 router.post('/login', async (req, res) => {
 
     const User = Schemas.Users;
@@ -236,7 +232,7 @@ router.post('/login', async (req, res) => {
                 res.status(500).send();
             }
 
-            return res.json({ status: 'ok', message: 'User log in was successful', accessToken: accessToken, refreshToken: refreshToken });
+            return res.json({ status: 'ok', message: 'User log in was successful', user: user.username, email: user.email, accessToken: accessToken });
         }
 
     } catch (err) {
@@ -250,9 +246,13 @@ router.post('/login', async (req, res) => {
 
 router.delete('/logout', authenticateToken, async (req, res) => {
 
+    const User = Schemas.Users;
+
+    const user = await User.findOne({ email: req.body.email });
+
     const Token = Schemas.Refresh;
 
-    await Token.findOneAndRemove({ user: req.body.id }, (err, deleteSuccess) => {
+    await Token.findOneAndRemove({ user: user._id }, (err, deleteSuccess) => {
 
         if (!err) {
 
@@ -262,6 +262,8 @@ router.delete('/logout', authenticateToken, async (req, res) => {
         } else console.log(err);
 
     });
+
+    res.json({ status: 'ok', message: 'logout successful' });
 });
 
 router.post('/register', async (req, res) => {
@@ -327,7 +329,7 @@ function authenticateToken(req, res, next) {
 };
 
 function generateAccessToken(user) {
-    return jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.ACCESS_SECRET, { expiresIn: '1d' });
+    return jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.ACCESS_SECRET, { expiresIn: '1h' });
 };
 
 async function getInventory(token) {

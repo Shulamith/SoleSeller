@@ -8,6 +8,8 @@ import "./profile.css";
 
 
 export default function Profile() {
+
+    const User = window.localStorage.getItem("user");
     /*function componentDidMount() {
         const userLog = localStorage.getItem('userLog') === 'true';
         const userReg = localStorage.getItem('userReg') === 'true';
@@ -18,7 +20,7 @@ export default function Profile() {
     return(
         <section>
             <div className = "row-img-bg">
-                <p>Welcome User</p>
+                <p>Welcome {User}</p>
             </div>
             <div className = "buttons">
                 <Button id="ebay" block size="sm" type="link">
