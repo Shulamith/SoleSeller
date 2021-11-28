@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import "./register.css";
 
@@ -81,6 +82,12 @@ export default class Register extends Component {
                         Register
                     </button>
                 </form>
+                <div className="mt-5">
+                    <Link to="/login"
+                        style={{ color: '#FFF' }}>
+                        Already have an account? Click Here!
+                    </Link>
+                </div>
             </div>
         )
     }

@@ -49,7 +49,6 @@ export default class Login extends Component {
         })
             .then(function (response) {
                 window.localStorage.setItem("user", response.data.user);
-                window.localStorage.setItem("email", response.data.email);
                 window.localStorage.setItem("token", response.data.accessToken);
                 window.location.href = "/profile";
             })
@@ -83,7 +82,7 @@ export default class Login extends Component {
             </button>
           </form>
           <div className="mt-5">
-            <Link to="/Register" 
+            <Link to="/register" 
               style={{ color: '#FFF' }}>
               Don't have a login? Click Here!
             </Link>

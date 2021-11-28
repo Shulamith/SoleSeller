@@ -18,14 +18,10 @@ export default class Logout extends Component {
         axios.delete('http://localhost:4000/logout', {
         headers: {
             authorization: `Bearer ${window.localStorage.getItem("token")}`
-        },
-        data: {
-            email: window.localStorage.getItem("email")
         }
     })
         .then(function (response) {
             window.localStorage.removeItem("user");
-            window.localStorage.removeItem("email");
             window.localStorage.removeItem("token");
             window.location.href = "/login";
         })

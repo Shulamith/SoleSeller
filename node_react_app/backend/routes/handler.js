@@ -232,7 +232,7 @@ router.post('/login', async (req, res) => {
                 res.status(500).send();
             }
 
-            return res.json({ status: 'ok', message: 'User log in was successful', user: user.username, email: user.email, accessToken: accessToken });
+            return res.json({ status: 'ok', message: 'User log in was successful', user: user.username, accessToken: accessToken });
         }
 
     } catch (err) {
@@ -246,13 +246,9 @@ router.post('/login', async (req, res) => {
 
 router.delete('/logout', authenticateToken, async (req, res) => {
 
-    const User = Schemas.Users;
-
-    const user = await User.findOne({ email: req.body.email });
-
     const Token = Schemas.Refresh;
 
-    await Token.findOneAndRemove({ user: user._id }, (err, deleteSuccess) => {
+    await Token.findOneAndRemove({ user: req.user.id }, (err, deleteSuccess) => {
 
         if (!err) {
 
