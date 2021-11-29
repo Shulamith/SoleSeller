@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
 import './InventoryTwo.css';
 
+console.log(inventoryData.length);
 function InventoryTwo() {
     useEffect( () => {
         fetchItems();
@@ -26,18 +27,10 @@ function calculateFees(price) {
         <div className="InventoryTwo">
             <table id="display">
                 <tr>
-                    {inventoryData.map((val, key) => {
-                        return (
-                            <td key={key} id="pics">
-                                <Image src={val.product.imageUrls} />
-                            </td>
-                        )
-                    })}
-                </tr>
-                <tr>
                     {items.map((val, key) => {
                         return (
                             <tr key={key}>
+                                <picture><Image src={val.image}/></picture>
                                 <table>
                                     <tr>
                                         <td><h5>{val.item}</h5></td>
