@@ -8,17 +8,13 @@ import "./profile.css";
 
 
 export default function Profile() {
-    /*function componentDidMount() {
-        const userLog = localStorage.getItem('userLog') === 'true';
-        const userReg = localStorage.getItem('userReg') === 'true';
-        const user = (userLog.JSON.parse("email") ? userReg.JSON.parse("email") && userLog.JSON.parse("password") ? userReg.JSON.parse("password") : '';
-        this.setState({ user, userLog });
-    }*/
+
+    const User = window.localStorage.getItem("user");
 
     return(
         <section>
             <div className = "row-img-bg">
-                <p>Welcome User</p>
+                <p>Welcome {User}</p>
             </div>
             <div className = "buttons">
                 <Button id="ebay" block size="sm" type="link">

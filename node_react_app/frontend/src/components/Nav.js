@@ -1,24 +1,21 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 function Nav() {
-  const [user, setUser] = useState({});
-  useEffect(() => {
-  { /*
-      setInterval was used in order to refresh the page constantly
-  in order to have the "logout" button show immediately in place of
-  "login", as soon as user logs out.
-  */}
-      setInterval(() => {
-          const userString = localStorage.getItem("user");
-          const user = JSON.parse(userString);
-          setUser(user);
-          }, [])
-  }, 5000);
 
+    const [user, setUser] = useState({});
+    useEffect(() => {
+        { /*
+            setInterval was used in order to refresh the page constantly
+        in order to have the "logout" button show immediately in place of
+        "login", as soon as user logs out.
+        */}
+        setInterval(() => {
+            const user = localStorage.getItem("user");
+            setUser(user);
+        }, [])
+    }, 5000);
 
-  const logout = () => {
-      return localStorage.removeItem("user");
-  }
 
   if(!user) {
     return (
@@ -61,9 +58,9 @@ function Nav() {
               <a class="nav-link" href="/upload">Upload</a>
             </li>
             </ul>
-          <button id="login" type="button" class="btn btn-primary navbar-btn" onClick={logout}>
-            <a class="nav-link" href="/">Logout</a>
-          </button>
+            <button id="login" class="btn btn-primary navbar-btn">
+                <a class="nav-link" href='/logout'>Logout</a>
+            </button>
         </div>
       </nav>
     );

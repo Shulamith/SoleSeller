@@ -1,6 +1,6 @@
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom';
 import './Home.css';
-import React, { useEffect, useState } from "react";
 import cartoon from './online-selling-sites.jpg';
 
 function Home() {
@@ -12,8 +12,8 @@ function Home() {
         "login", as soon as user logs out.
         */}
             setInterval(() => {
-                const userString = localStorage.getItem("user");
-                const user = JSON.parse(userString);
+                const user = localStorage.getItem("user");
+                //const user = JSON.parse(userString);
                 setUser(user);
                 }, [])
         }, 5000);
@@ -36,7 +36,7 @@ function Home() {
                     <img src={cartoon} alt = "Marketplace Cartoon Image"/>
                     <h1 className="mt-5">Welcome to Sole Seller</h1>
                     <h3 className="mt-5">The Market Place Seller's App</h3>
-                    <h5 className="mt-5">Please <Link to="/login" id="links">login</Link> or <Link to="/Register" id="links">register</Link> to use the website</h5>
+                    <h5 className="mt-5">Please <Link to="/login" id="links">login</Link> or <Link to="/register" id="links">register</Link> to use the website</h5>
                 </div>
             </section>
             )

@@ -11,6 +11,10 @@
     a {
       color : black;
     }
+
+    link {
+        text-align: center;
+    }
   }
 
   #register {

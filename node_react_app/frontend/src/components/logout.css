@@ -1,0 +1,12 @@
+#confirm {
+    font-size: 30px;
+    text-align: center;
+    padding: 2px;
+    padding-top: 200px;
+}
+
+#logout {
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
