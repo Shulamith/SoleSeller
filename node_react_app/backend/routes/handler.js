@@ -12,6 +12,37 @@ router.use(express.urlencoded({ extended: false }));
 
 const users = []
 
+const fs = require('fs')
+const multer = require('multer') // multer will parse bodies that cannot be parse by bodyparser such as form data
+
+const storage = multer.diskStorage({
+    destination: function(req, file, cb){ 
+    cb(null, './uploads/'); // where incoming file gets stored
+    },
+    filename: function(req, file, cb) {
+        cb(null, new Date().toISOString() + file.originalname); // set name of incoming file
+    }
+});
+
+const fileFilter = (req, file, cb) => {
+    
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
+        cb(null, true); //accept files
+    } else {
+        cb(null, false); //reject files
+    }
+};
+
+const upload = multer({
+    storage: storage, 
+    limits: {
+        fileSize: 1024 * 1024 * 5 // accept files up to 5MB
+    },
+    fileFilter: fileFilter
+}); // multer will try to store all incoming files here
+
+
+
 /* ------------------ BEGIN ETSY OAUTH ------------------ */
 
 // Send a JSON response to a default get request
@@ -144,13 +175,19 @@ router.get('/inventory', async (req, res) => { // here we grab our items
     // res.end(JSON.stringify(str));
 });
 
-router.post('/addItem', async (req, res) => { // when user post items it gets sent to router to be added
+
+// .single will try to parse one file only, field name  = productImage
+router.post('/addItem', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
+    
+    console.log(req.file);
+
     const itemName = req.body.itemName; // get item input field, name of field = itemInput
     const itemDescription = req.body.itemDescription;
     const ebayPrice = req.body.ebayPrice;
     const etsyPrice = req.body.etsyPrice;
+    const imagePath = req.file.path;
     const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'tahmid198' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+    const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
@@ -160,6 +197,7 @@ router.post('/addItem', async (req, res) => { // when user post items it gets se
         etsyPrice: etsyPrice,
         ebayPrice: ebayPrice,
         user: userId._id, // field to link user whose saving item
+        image: imagePath
     });
 
     try { // we try to add it now
