@@ -213,6 +213,14 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     }
 });
 
+// router.post(‘/addItem’, async(req,res,next) => {
+//     const newItem = new Schemas.Items({ 
+//     newItem.image.data = fs.readFileSync(req.file.path)
+//     newItem.image.contentType = file.mimetype;   
+//     });
+// newItem.save()
+//   });  
+
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
     'https://api.ebay.com/oauth/api_scope/sell.marketing.readonly',
