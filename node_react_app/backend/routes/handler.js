@@ -9,7 +9,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
 const axios = require('axios');
-//router.use(express.urlencoded({ extended: false }));
 
 
 /* ------------------ BEGIN ETSY OAUTH ------------------ */
@@ -73,6 +72,21 @@ router.get('/oauth/redirect', async (req, res) => {
         console.log("Response okay");
         //res.redirect('/inventory');
         const inventory = await getEtsyInventory(tokenData.access_token);
+        //console.log("EtsyInventory", inventory);
+
+        // const requestOptions = {
+        //     method: 'POST',
+        //     body: JSON.stringify({
+        //         grant_type: 'authorization_code',
+        //         client_id: etsyClientID,
+        //         redirect_uri: etsyRedirectUri,
+        //         code: authCode,
+        //         code_verifier: etsyClientVerifier,
+        //     }),
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        //res.redirect('http://localhost:3000/inventory')
         res.send(inventory);
 
         //res.redirect('/inventory?access_token=${tokenData.access_token}');
@@ -114,6 +128,8 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
         axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
           .then(shopResponse => {
             console.log("SHOP RESPONSE", shopResponse.data);
+            console.log("Price", shopResponse.data.results[0].price);
+            return shopResponse.data;
           })
         .catch(error => {
           console.log("ERROR");
@@ -124,8 +140,7 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
       console.log("ERROR");
       console.log(error);
     });
-    return "blank";
-
+    return "EtsyInventory";
 };
 
 
@@ -154,7 +169,7 @@ router.get('/addUser', async (req, res) => {
 //GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
 router.get('/addItem', async (req, res) => {
     const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'tahmid198' }).exec();
+    const userId = await user.findOne({ username: 'ramon' }).exec();
 
     const item = { item: 'Soul Eater, Volumes: 1-5',description:'A dope read', etsyPrice: '15.49', ebayPrice: '15.49', user: userId }
     const newItem = new Schemas.Items(item);
@@ -176,8 +191,6 @@ router.get('/addItem', async (req, res) => {
 router.get('/inventory', async (req, res) => { // here we grab our items
     const items = Schemas.Items;
 
-    // const userItems = await items.find({}, (err, itemsData) => {
-
     // this code will get all items and join the user table
     const userItems = await items.find({}).populate("user").exec((err, itemsData) => { // finds all items and automaticlly add user associated with item
         if (err) throw err;                                                             // we want to be able to select all the items and find the user
@@ -186,16 +199,7 @@ router.get('/inventory', async (req, res) => { // here we grab our items
         } else {
             res.end();
         }
-    }); // so when we query our tables and finds all of our items with will auto add user associated with that tweet
-
-
-
-    // const str = [{
-    //     "product": "Nintendo Gameboy Advance",
-    //     "channel": "Amazon",
-    //     "username": "tahmid_z"
-    // }];
-    // res.end(JSON.stringify(str));
+    });
 });
 
 router.post('/addItem', async (req, res) => { // when user post items it gets sent to router to be added
@@ -228,22 +232,6 @@ router.post('/addItem', async (req, res) => { // when user post items it gets se
         res.end(); // end page
     }
 });
-// router.post('/Register', (req, res) => {
-//     try {
-//         const hashedPassword = async () => { await bcrypt.hash(req.form.password.value, 10) };
-//         //const newUser = schemas.Users;
-//         users.push({
-//             username: req.form.Name.value,
-//             email: req.form.email.value,
-//             password: hashedPassword
-//         });
-
-//     res.redirect('/login');
-//     } catch {
-//         res.redirect('/Register');
-//     }
-//     console.log(users);
-// });
 
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
@@ -257,33 +245,18 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
-  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
-  // // Authorization Code Auth Flow
-  //res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', '*');
   const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
-
   console.log(AuthUrl);
-  //console.log(res.redirect(AuthUrl));
   return res.redirect(AuthUrl);
-  //console.log("RESPONSE QUERY", res.query)
-  //console.log(res.query);
-  //return ("authurl");
-//  return res.end(JSON.stringify(AuthUrl));
 })
 
 router.get('/ebayauth/callback', async (req, res) => {
-  //code = await res.code
   console.log("CALLBACK");
-  //console.log(code)
-  // console.log(res);
-  //console.log(res.req.query.code);
   const code = res.req.query.code;
-  //console.log("CODE", code);
   token = ""
   // Exchange Code for Authorization token
   const test = await ebayAuthToken.exchangeCodeForAccessToken('PRODUCTION', code).then((data) => { // eslint-disable-line no-undef
-    //  console.log("DATA", data);
-    //  console.log("TOKEN!!", JSON.parse(data).access_token);
       token = JSON.parse(data).access_token;
   }).catch((error) => {
       console.log(error);
@@ -291,8 +264,6 @@ router.get('/ebayauth/callback', async (req, res) => {
   });
   if (token) {
     const inventoryData = await getInventory(token);
-    //console.log("Token:", token);
-  //  console.log("inventoryData", inventoryData);
   }
   return res.redirect('http://localhost:3000/inventory');
 });
@@ -307,20 +278,14 @@ async function getInventory (token) {
       'Content-Type':'application/json'
     }})
   .then(response => {
-    console.log(response.data);
-    console.log(response);
+    console.log("EBAYDATA",response.data.inventoryItems);
+    //console.log(response);
   })
   .catch(error => {
     console.log(error);
   });
   return "GET INVENTORY";
 };
-
-//
-// router.post('/addProduct', (req, res) => {
-//     res.end('NA')
-// });
-
 
 
 router.post('/login', (req, res) => {
