@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Image from 'react-bootstrap/Image'
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
@@ -7,59 +7,57 @@ import './InventoryTwo.css';
 
 console.log(inventoryData.length);
 function InventoryTwo() {
+    useEffect( () => {
+        fetchItems();
+    }, []);
+
+    const [items, setItems] = useState([]);
+
+    const fetchItems = async() => {
+        const data = await fetch('/inventory'); // Inventory url from port 4000, retriving data
+        const items = await data.json(); // set it into items as json data
+        setItems(items);
+    };
+
+function calculateFees(price) {
+    return price / 10;
+}
 
     return (
         <div className="InventoryTwo">
             <table id="display">
                 <tr>
-                    {inventoryData.map((val, key) => {
+                    {items.map((val, key) => {
                         return (
-                            <td key={key} id="pics">
-                                <Image src={val.product.imageUrls} />
-                            </td>
-                        )
-                    })}
-                </tr>
-                <tr>
-                    {inventoryData.map((val, key) => {
-                        return (
-                            <th key={key} id="itemName">
-                                {val.product.title}
-                            </th>
-                        )
-                    })}
-                </tr>
-                <tr>
-                    {inventoryData.map((val, key) => {
-                        return (
-                            <td key={key} id="dataTable">
+                            <tr key={key}>
+                                <picture><Image src={val.image}/></picture>
                                 <table>
                                     <tr>
-                                        <td></td>
+                                        <td><h5>{val.item}</h5></td>
                                         <td>Etsy</td>
                                         <td>eBay</td>
                                         <td>Etc.</td>
                                     </tr>
                                     <tr>
                                         <td>Selling Price</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>{val.etsyPrice}</td>
+                                        <td>{val.ebayPrice}</td>
                                         <td></td>
                                     </tr>
                                     <tr>
                                         <td>Fees</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>{((val.etsyPrice)*(.05)).toFixed(2)}</td>
+                                        <td>{((val.ebayPrice)*(.05)).toFixed(2)}</td>
                                         <td></td>
                                     </tr>
                                     <tr>
                                         <td>Total Earnings</td>
-                                        <td></td>
-                                        <td></td>
+                                        <td>{val.etsyPrice-(((val.etsyPrice)*(.05)).toFixed(2))}</td>
+                                        <td>{val.ebayPrice-(((val.ebayPrice)*(.05)).toFixed(2))}</td>
                                         <td></td>
                                     </tr>
                                 </table>
-                            </td>
+                            </tr>
                         )
                     })}
                 </tr>

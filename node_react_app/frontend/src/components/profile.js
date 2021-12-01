@@ -8,31 +8,27 @@ import "./profile.css";
 
 
 export default function Profile() {
-    /*function componentDidMount() {
-        const userLog = localStorage.getItem('userLog') === 'true';
-        const userReg = localStorage.getItem('userReg') === 'true';
-        const user = (userLog.JSON.parse("email") ? userReg.JSON.parse("email") && userLog.JSON.parse("password") ? userReg.JSON.parse("password") : '';
-        this.setState({ user, userLog });
-    }*/
+
+    const User = window.localStorage.getItem("user");
 
     return(
         <section>
             <div className = "row-img-bg">
-                <p>Welcome User</p>
+                <p>Welcome {User}</p>
             </div>
             <div className = "buttons">
                 <Button id="ebay" block size="sm" type="link">
-                    <a href="http://signin.ebay.com">
+                    <Link to="https://localhost:4000/ebayauth" style={{ color: '#000' }}>
                         <img src={ebay} height = {25} width = {50}/>
                         Connect to Ebay
-                    </a>
+                    </Link>
                 </Button>
                 &nbsp;
                 <Button id="etsy" block size="sm" type="link" >
-                    <a href="https://www.etsy.com/oauth/connect?response_type=code&redirect_uri=http://localhost:4000/oauth/redirect&scope=email_r&client_id=b397ddo9ov4lu91igrv1rjjc&state=8056a9&code_challenge=-fqDGjHEsuMqqH57qgaopzCacIJLBijMkjlaQv-2HhA&code_challenge_method=S256">
+                    <Link to="https://www.etsy.com/oauth/connect?response_type=code&redirect_uri=https://localhost:4000/oauth/redirect&scope=email_r%20listings_r&client_id=b397ddo9ov4lu91igrv1rjjc&state=8056a9&code_challenge=-fqDGjHEsuMqqH57qgaopzCacIJLBijMkjlaQv-2HhA&code_challenge_method=S256" style={{ color: '#000' }}>
                         <img src={etsy} height = {25} width = {50}/>
                         Connect to Etsy
-                    </a>
+                    </Link>
                 </Button>
             </div>
         </section>

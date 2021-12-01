@@ -5,12 +5,25 @@ const ebayAuthToken = new EbayAuthToken({
     filePath: './routes/ebay-config.json' // input file path.
 });
 const fetch = require('cross-fetch');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
+
+require('dotenv/config');
 
 router.use(express.urlencoded({ extended: false }));
 
-const users = []
+
+// Add Access Control Allow Origin headers
+router.use((req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "*");
+    res.setHeader("Access-Control-Allow-Headers", "*");
+    res.header(
+        "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+});
 
 const fs = require('fs')
 const multer = require('multer') // multer will parse bodies that cannot be parse by bodyparser such as form data
@@ -45,12 +58,22 @@ const upload = multer({
 
 /* ------------------ BEGIN ETSY OAUTH ------------------ */
 
+/**
+These variables contain our Etsy API Key, the state sent
+in the initial authorization request, and the client verifier compliment
+to the code_challenge sent with the initial authorization request
+*/
+const etsyClientID = process.env.ETSY_KEY;
+const etsyClientVerifier = process.env.ETSY_VERIFY;
+const etsyRedirectUri = 'https://localhost:4000/oauth/redirect';
+
+
 // Send a JSON response to a default get request
 router.get('/ping', async (req, res) => {
     const requestOptions = {
         'method': 'GET',
         'headers': {
-            'x-api-key': 'b397ddo9ov4lu91igrv1rjjc',
+            'x-api-key': etsyClientID,
         },
     };
 
@@ -67,14 +90,6 @@ router.get('/ping', async (req, res) => {
     }
 });
 
-/**
-These variables contain our Etsy API Key, the state sent
-in the initial authorization request, and the client verifier compliment
-to the code_challenge sent with the initial authorization request
-*/
-const etsyClientID = 'b397ddo9ov4lu91igrv1rjjc';
-const etsyClientVerifier = 'dL5oT2IMlIV6zVXXRRaEk-OwbVGPKrlU0ids8Dg2ahk';
-const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 
 router.get("/oauth/redirect", async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
@@ -110,23 +125,6 @@ router.get("/oauth/redirect", async (req, res) => {
 /* ------------------ END ETSY OAUTH ------------------ */
 
 
-//GO http://localhost:4000/addUser TO ADD NEW USER WITH THIS CODE
-router.get('/addUser', async (req, res) => {
-    const user = { username: 'superman', fullname: 'clark kent' };
-    const newUser = new Schemas.Users(user);
-
-    try {
-        await newUser.save(async (err, newUserResult) => {
-            console.log('New user created!');
-            res.end('New user created!');
-        });
-
-    } catch (err) {
-        console.log(err);
-        res.end('User not added!');
-    }
-
-});
 
 //GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
 router.get('/addItem', async (req, res) => {
@@ -146,11 +144,10 @@ router.get('/addItem', async (req, res) => {
         console.log(err);
         res.end('Item not added!');
     }
-})
+});
 
 
-
-router.get('/inventory', async (req, res) => { // here we grab our items
+router.get('/inventory', authenticateToken, async (req, res) => { // here we grab our items
     const items = Schemas.Items;
 
     // const userItems = await items.find({}, (err, itemsData) => {
@@ -233,41 +230,168 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
+  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
   // // Authorization Code Auth Flow
   //res.header('Access-Control-Allow-Origin', '*');
-  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('SANDBOX', scopes);
+  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
+
   console.log(AuthUrl);
+  //console.log(res.redirect(AuthUrl));
   return res.redirect(AuthUrl);
-  //res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
+  //console.log("RESPONSE QUERY", res.query)
+  //console.log(res.query);
+  //return ("authurl");
 //  return res.end(JSON.stringify(AuthUrl));
 });
 
-router.post('/addProduct', (req, res) => {
-    res.end('NA');
+router.get('/profile', authenticateToken, (req, res) => {
+    res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
 });
 
+router.post('/login', async (req, res) => {
 
+    const User = Schemas.Users;
+    const user = await User.findOne({ email: req.body.email }).lean();
 
-router.post('/login', (req, res) => {
+    if (!user) {
 
-});
-
-
-router.post('/Register', (req, res) => {
-    try {
-        const hashedPassword = async () => { await bcrypt.hash(req.form.password.value, 10) };
-        //const newUser = schemas.Users;
-        users.push({
-            username: req.form.Name.value,
-            email: req.form.email.value,
-            password: hashedPassword
-        });
-        res.redirect('/login');
-    } catch {
-        res.redirect('/Register');
+        return res.json({ status: 'error', error: 'Invalid email/password' });
     }
-    console.log(users);
+
+    try {
+
+        if (await bcrypt.compare(req.body.password, user.password)) {
+
+            const accessToken = generateAccessToken(user);
+            const refreshToken = jwt.sign(user, process.env.REFRESH_SECRET);
+
+            const _newToken = { token: refreshToken, user: user };
+            const newToken = new Schemas.Refresh(_newToken);
+
+            try {
+                await newToken.save(async (err, newTokenResult) => {
+                    console.log('New token generated!');
+                    res.status(201).send();
+                });
+
+            } catch (err) {
+                res.status(500).send();
+            }
+
+            return res.json({ status: 'ok', message: 'User log in was successful', user: user.username, accessToken: accessToken });
+        }
+
+    } catch (err) {
+
+        console.log(err);
+    }
+    
+    res.json({ status: 'error', error: 'Invalid email/password' });
+
 });
+
+router.delete('/logout', authenticateToken, async (req, res) => {
+
+    const Token = Schemas.Refresh;
+
+    await Token.findOneAndRemove({ user: req.user.id }, (err, deleteSuccess) => {
+
+        if (!err) {
+
+            console.log(deleteSuccess);
+            res.json({ status: '204', message: 'User was successfully logged out' });
+
+        } else console.log(err);
+
+    });
+
+    res.json({ status: 'ok', message: 'logout successful' });
+});
+
+router.post('/register', async (req, res) => {
+
+    var hashedPassword = '';
+
+    try {
+        hashedPassword = await bcrypt.hash(req.body.password, 12);
+    } catch (err) {
+        console.log(err);
+        res.end('Password not generated!')
+    }
+
+    const user = { username: req.body.name, email: req.body.email, password: hashedPassword };
+    const newUser = new Schemas.Users(user);
+
+    try {
+        await newUser.save(async (err, newUserResult) => {
+            console.log('New user created!');
+            res.status(201).send();
+        });
+
+    } catch (err) {
+        res.status(500).send();
+    }
+
+});
+
+router.post('/token', async (req, res) => {
+
+    const refreshToken = req.body.token;
+
+    if (refreshToken == null) return res.sendStatus(401);
+
+    const Token = Schemas.Refresh;
+    const token = await Token.findOne({ token: refreshToken }).lean();
+    if (!token) return res.sendStatus(403);
+
+    jwt.verify(token, process.env.REFRESH_SECRET, (err, user) => {
+
+        if (err) return res.sendStatus(403);
+        const accessToken = generateAccessToken({ name: user.name });
+        res.json({ accessToken: accessToken });
+
+    });
+
+});
+
+function authenticateToken(req, res, next) {
+
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (token == null) return res.sendStatus(401);
+
+    jwt.verify(token, process.env.ACCESS_SECRET, (err, user) => {
+
+        if (err) return res.sendStatus(403);
+        req.user = user;
+        next();
+
+    });
+
+};
+
+function generateAccessToken(user) {
+    return jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.ACCESS_SECRET, { expiresIn: '1h' });
+};
+
+async function getInventory(token) {
+    auth = 'Bearer ' + token;
+    axios.get('https://api.ebay.com/sell/inventory/v1/inventory_item?limit=2&offset=0', {
+        headers: {
+            'Authorization': auth,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    })
+        .then(response => {
+            console.log(response.data);
+            console.log(response);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    return "GET INVENTORY";
+};
 
 
 module.exports = router;

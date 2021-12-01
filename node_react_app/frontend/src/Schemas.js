@@ -21,10 +21,9 @@ const itemSchema = new Schema ({
     item: {type: String, required: true},
     description: {type: String, requierd: true},
     etsyPrice: {type: String, required: false},
-    ebayPrice:{type:String, required:false},
-    image:{type:String, required:false},
-    user:{type: Schema.Types.ObjectId, ref: 'users'} // references user table tru id
-},{timestamps:true});
+    ebayPrice: {type:String, required:false},
+    user: {type: Schema.Types.ObjectId, ref: 'users'} // references user table tru id
+}, { timestamps: true });
 
 const refreshTokenSchema = new Schema({
     token: { type: String, required: true },

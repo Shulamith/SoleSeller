@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import "./login.css";
 
 export default class Login extends Component {
@@ -42,33 +43,24 @@ export default class Login extends Component {
     onSubmit(e) {
         e.preventDefault()
 
+        axios.post('http://localhost:4000/login', {
+            email: e.target.email.value,
+            password: e.target.password.value
+        })
+            .then(function (response) {
+                window.localStorage.setItem("user", response.data.user);
+                window.localStorage.setItem("token", response.data.accessToken);
+                window.location.href = "/profile";
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
+
         this.setState({
             name: '',
             email: '',
             password: ''
         })
-    }
-
-    // React Life Cycleu
-    componentDidMount() {
-        this.userData = JSON.parse(localStorage.getItem('user'));
-
-        if (localStorage.getItem('user')) {
-            this.setState({
-                email: this.userData.email,
-                password: this.userData.password
-            })
-        } else {
-            this.setState({
-                name: '',
-                email: '',
-                password: ''
-            })
-        }
-    }
-
-    componentWillUpdate(nextProps, nextState) {
-        localStorage.setItem('user', JSON.stringify(nextState));
     }
 
     render() {
@@ -79,25 +71,23 @@ export default class Login extends Component {
           <form onSubmit={this.onSubmit}>
             <div className="form-group">
               <label>Email</label>
-              <input type="email" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
+              <input type="email" name="email" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
             </div>
             <div className="form-group">
               <label>Password</label>
-              <input type="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
+              <input type="password" name="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
             </div>
             <button id="login" block size="lg" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
-                <Link to ="/profile">
-                  Login
-                </Link>
+                Login
             </button>
           </form>
           <div className="mt-5">
-            <Link to="/Register" 
+            <Link to="/register" 
               style={{ color: '#FFF' }}>
-              Don't have a login?
+              Don't have a login? Click Here!
             </Link>
           </div>
-      </div>
-    );
+        </div>
+      );
   }
 }
