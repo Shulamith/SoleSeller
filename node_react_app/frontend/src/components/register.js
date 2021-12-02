@@ -39,13 +39,13 @@ export default class Register extends Component {
     onSubmit(e) {
         e.preventDefault();
 
-        axios.post('http://localhost:4000/register', {
+        axios.post('/register', {
             name: e.target.name.value,
             email: e.target.email.value,
             password: e.target.password.value
         })
             .then(function (response) {
-                window.location.href = "http://localhost:3000/login";
+                window.location.href = "/login";
             })
             .catch(function (error) {
                 console.log(error);

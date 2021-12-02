@@ -43,12 +43,12 @@ export default class Login extends Component {
     onSubmit(e) {
         e.preventDefault()
 
-        axios.post('http://localhost:4000/login', {
+        axios.post('/login', {
             email: e.target.email.value,
             password: e.target.password.value
         })
             .then(function (response) {
-                if (response.data.status === "error") { window.location.href = "/login"; }
+                if (response.data.status === "error") { window.alert("Incorrect email/password combination. Please try again"); }
                 else {
                     window.localStorage.setItem("user", response.data.user);
                     window.localStorage.setItem("token", response.data.accessToken);

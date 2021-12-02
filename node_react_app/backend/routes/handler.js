@@ -224,7 +224,7 @@ router.post('/login', async (req, res) => {
 
             try {
                 await newToken.save(async (err, newTokenResult) => {
-                    console.log('New token generated!');
+                    console.log('User login successful');
                     res.status(201).send();
                 });
 
@@ -252,14 +252,14 @@ router.delete('/logout', authenticateToken, async (req, res) => {
 
         if (!err) {
 
+            console.log('User successfully logged out');
             console.log(deleteSuccess);
-            res.json({ status: '204', message: 'User was successfully logged out' });
 
         } else console.log(err);
 
-    });
+    }).clone();
 
-    res.json({ status: 'ok', message: 'logout successful' });
+    res.json({ status: '204', message: 'User successfully logged out' });
 });
 
 router.post('/register', async (req, res) => {

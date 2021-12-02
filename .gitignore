@@ -7,3 +7,6 @@
 /.vs/slnx.sqlite-journal
 /.vs/slnx.sqlite
 /.vs
+/.DS_Store
+./node_react_app/backend/.DS_Store
+./node_react_app/frontend/.DS_Store
