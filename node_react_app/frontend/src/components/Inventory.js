@@ -3,7 +3,7 @@ import Image from 'react-bootstrap/Image'
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
-import './InventoryTwo.css';
+import './Inventory.css';
 
 function Inventory() {
     useEffect(() => {
