@@ -15,7 +15,7 @@ export default class Logout extends Component {
     onSubmit(e) {
         e.preventDefault();
 
-        axios.delete('http://localhost:4000/logout', {
+        axios.delete('/logout', {
         headers: {
             authorization: `Bearer ${window.localStorage.getItem("token")}`
         }
