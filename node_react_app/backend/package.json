@@ -15,7 +15,7 @@
     "nodemon": "^2.0.12"
   },
   "dependencies": {
-    "axios": "^0.24.0",
+    "axios": "^0.23.0",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "body-parse": "^0.1.0",

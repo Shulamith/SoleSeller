@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import "./register.css";
 
 export default class Register extends Component {
@@ -36,65 +37,57 @@ export default class Register extends Component {
     }
 
     onSubmit(e) {
-        e.preventDefault()
+        e.preventDefault();
+
+        axios.post('/register', {
+            name: e.target.name.value,
+            email: e.target.email.value,
+            password: e.target.password.value
+        })
+            .then(function (response) {
+                window.location.href = "/login";
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
 
         this.setState({
             name: '',
             email: '',
             password: ''
-        })
+        });
+
     }
 
-    // React Life Cycleu
-    componentDidMount() {
-        this.userData = JSON.parse(localStorage.getItem('userReg'));
-
-        if (localStorage.getItem('userReg')) {
-            this.setState({
-                name: this.userData.name,
-                email: this.userData.email,
-                password: this.userData.password
-            })
-        } else {
-            this.setState({
-                name: '',
-                email: '',
-                password: ''
-            })
-        }
-    }
-
-    componentWillUpdate(nextProps, nextState) {
-        localStorage.setItem('userReg', JSON.stringify(nextState));
-    }
 
     render() {
         const { name, email, password } = this.state;
         const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
         return (
             <div className="Register">
-                                <form method="POST" action="/addRegister">
-
-            <form onSubmit={this.onSubmit}>
+                <form onSubmit={this.onSubmit}>
                     <div className="form-group">
                         <label>Name</label>
-                        <input type="text" name= "name "className="form-control" value={this.state.name} onChange={this.onChangeName} />
+                        <input type="text" name="name" className="form-control" value={this.state.name} onChange={this.onChangeName} />
                     </div>
                     <div className="form-group">
                         <label>Email</label>
-                        <input type="email" name= "email"className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
+                        <input type="email" name="email" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
                     </div>
                     <div className="form-group">
                         <label>Password</label>
-                        <input type="password" name ="password"className="form-control" value={this.state.password} onChange={this.onChangePassword} />
+                        <input type="password" name="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
                     </div>
                     <button id="register" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
-                      <Link to ="/login">
                         Register
-                      </Link>
                     </button>
                 </form>
-                </form>
+                <div className="mt-5">
+                    <Link to="/login"
+                        style={{ color: '#FFF' }}>
+                        Already have an account? Click Here!
+                    </Link>
+                </div>
             </div>
         )
     }

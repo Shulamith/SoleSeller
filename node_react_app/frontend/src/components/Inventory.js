@@ -1,88 +1,79 @@
-import React, {useEffect, useState} from 'react';
-import {Link} from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import Image from 'react-bootstrap/Image'
+import Button from "react-bootstrap/Button";
+import { Link } from 'react-router-dom';
+import inventoryData from "./mockdata.json";
 import './Inventory.css';
 
 function Inventory() {
-
-    // useEffect retrives  data from backend
-    useEffect( () => {
+    useEffect(() => {
         fetchItems();
     }, []);
 
     const [items, setItems] = useState([]);
 
-    const fetchItems = async() => {
+    const fetchItems = async () => {
         const data = await fetch('/inventory'); // Inventory url from port 4000, retriving data
         const items = await data.json(); // set it into items as json data
         setItems(items);
     };
 
-    //some bootstrap to pretty things up
-    return(
-        <section>
+    function calculateFees(price) {
+        return price / 10;
+    }
 
-            <div className="container-fluid">
-                <h1 className="mt-5">Items</h1>
-                <form method="POST" action="/addItem">
-                    <div className="input-group justify-content-center">
-                            <div className="input-group-prepend">
-                                <input type="text" name="itemInput" className="form-control" placeholder="Item Name"/>
-                                <input type="text" name ="itemPriceInput" className="form-control" placeholder="Item Price"/>
-                                <input type="submit" value="Send" className="btn btn-primary mb-2"/>
-                            </div>
-                    </div>
-                </form>
-
-                {/* <form>
-                    <div className="form-group">
-                        <label for="exampleInputEmail1">Email address</label>
-                        <input type="email" className="form-control" placeholder="Enter email"/>
-                    </div>
-                    <div className="form-group">
-                        <label for="exampleInputPassword1">Password</label>
-                        <input type="password" className="form-control"  placeholder="Password"/>
-                    </div>
-                    <button type="submit" className="btn btn-primary">Submit</button>
-                </form> */}
-
-            {
-                <div className="container">
-                    <div className="row row-cols-2">
-                        <div className="col">
-                            <p>Product 1</p>
-                            <p>Price</p>
-                            <p>Ebay</p>
-                        </div>
-                        <div className="col">
-                            Product 1
-                            Price
-                            Etsy
-                        </div>
-                        <div className="col">
-                            Product 2
-                            Price
-                            Ebay
-                        </div>
-                        <div className="col">
-                            Product 2
-                            Price
-                            Etsy
-                        </div>
-                    </div>
-                </div>
-                /*items.map(item => (
-                    <div>
-                        <p>{item.product}</p>
-                        <p>{item.channel}</p>
-                        <p>{item.username}</p>
-                    </div>
-                ))*/
-            }
-            </div>
-        </section>
-
-
+    return (
+        <div className="Inventory">
+            <table id="display">
+                <tr>
+                    {items.map((val, key) => {
+                        return (
+                            <tr key={key}>
+                                <picture><Image src={val.image} /></picture>
+                                <table>
+                                    <tr>
+                                        <td><h5>{val.item}</h5></td>
+                                        <td>Etsy</td>
+                                        <td>eBay</td>
+                                        <td>Etc.</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Selling Price</td>
+                                        <td>{val.etsyPrice}</td>
+                                        <td>{val.ebayPrice}</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Fees</td>
+                                        <td>{((val.etsyPrice) * (.05)).toFixed(2)}</td>
+                                        <td>{((val.ebayPrice) * (.05)).toFixed(2)}</td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total Earnings</td>
+                                        <td>{val.etsyPrice - (((val.etsyPrice) * (.05)).toFixed(2))}</td>
+                                        <td>{val.ebayPrice - (((val.ebayPrice) * (.05)).toFixed(2))}</td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </tr>
+                        )
+                    })}
+                </tr>
+                <tr>
+                    <td colspan={inventoryData.length} >
+                        <footer>
+                            <h3>Want to post a new listing?</h3>
+                            <Button block size="lg">
+                                <Link to="/upload">Click Here</Link>
+                            </Button>
+                        </footer>
+                    </td>
+                </tr>
+            </table>
+        </div>
     );
 }
+
 
 export default Inventory;
