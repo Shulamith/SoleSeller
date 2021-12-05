@@ -34,7 +34,7 @@ to the code_challenge sent with the initial authorization request
 */
 const etsyClientID = process.env.ETSY_KEY;
 const etsyClientVerifier = process.env.ETSY_VERIFY;
-const etsyRedirectUri = 'https://localhost:4000/oauth/redirect';
+const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 
 
 // Send a JSON response to a default get request
