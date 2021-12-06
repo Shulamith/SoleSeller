@@ -1,8 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, useState } from 'react';
+import axios from 'axios';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
 import "./upload.css";
+
+
+//const [file, setfile] = useState(null);
 
 class Upload extends Component {
   constructor(props) {
@@ -22,8 +26,34 @@ class Upload extends Component {
     this.onEtsyChange = this.onEtsyChange.bind(this);
   }
 
-  onImageChange(e) {
+ 
+    
+// //App = () => {
+//     // stop from refreshing page
+//      onFormSubmit = (e) => {
+//         e.preventDefault();
+
+//         const formData = new FormData();
+//         formData.append('productImage', file); // photo same as one in backend
+//         const config = {
+//             headers: {
+//                 'content-type': 'multipart/form-data',
+//             },
+//         };
+//         const url = 'https://localhost:4000/addItem'
+//         axios.post('url, formData, config').then((response) => {
+//             alert('Image Uploaded Successfully!')
+//         }).catch((err) => {
+//             console.log('err', err);
+//         });
+//     };
+// //};
+  
+
+
+  onImageChange = (e) => {
       this.setState({ image: e.target.value })
+    //   setfile(e.target.files[0]) 
   }
 
   onItemChange(e) {
@@ -77,7 +107,7 @@ class Upload extends Component {
                     <Form method="POST" action="/addItem">
                         <div className="form-group">
                             <label>Select Image</label>
-                            <input type="file" accept=".jpg, .jpeg, .png" name="myImage" onChange={this.onImageChange} />
+                            <input type="file" accept=".jpg, .jpeg, .png" name="productImage" onChange={this.onImageChange} />
                         </div>
                         <div className="form-group">
                             <label>Item Name</label>
