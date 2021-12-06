@@ -1,19 +1,41 @@
-.container-fluid {
-    padding-top: 20px;
+.Inventory {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.container {
-    padding: 120px;
+table {
+    width: 900px;
+    height: 100px;
+    margin-top: 90px;
+    margin-bottom: 10px;
 }
 
-.input-group-prepend {
-    padding-top: 30px;
+th {
+    text-align: center;
+    border: 2px solid black;
 }
 
-.col {
-    border: solid 2px white;
+td {
+    text-align: center;
+    border: 2px solid black;
+    width: 300px;
 }
 
-.buttons {
-    align-items:center;
+#dataTable table {
+    border: 2px solid black;
+}
+
+#dataTable tr {
+    border-bottom: 1px solid black;
+}
+
+#dataTable td {
+    border-left: 1px solid black;
+}
+
+#display h3 {
+    text-align: center;
 }

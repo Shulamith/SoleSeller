@@ -1,27 +1,26 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'react-bootstrap/Image'
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
 import './InventoryTwo.css';
 
-console.log(inventoryData.length);
 function InventoryTwo() {
-    useEffect( () => {
+    useEffect(() => {
         fetchItems();
     }, []);
 
     const [items, setItems] = useState([]);
 
-    const fetchItems = async() => {
+    const fetchItems = async () => {
         const data = await fetch('/inventory'); // Inventory url from port 4000, retriving data
         const items = await data.json(); // set it into items as json data
         setItems(items);
     };
 
-function calculateFees(price) {
-    return price / 10;
-}
+    function calculateFees(price) {
+        return price / 10;
+    }
 
     return (
         <div className="InventoryTwo">
@@ -30,7 +29,7 @@ function calculateFees(price) {
                     {items.map((val, key) => {
                         return (
                             <tr key={key}>
-                                <picture><Image src={val.image}/></picture>
+                                <picture><Image src={val.image} /></picture>
                                 <table>
                                     <tr>
                                         <td><h5>{val.item}</h5></td>
@@ -46,14 +45,14 @@ function calculateFees(price) {
                                     </tr>
                                     <tr>
                                         <td>Fees</td>
-                                        <td>{((val.etsyPrice)*(.05)).toFixed(2)}</td>
-                                        <td>{((val.ebayPrice)*(.05)).toFixed(2)}</td>
+                                        <td>{((val.etsyPrice) * (.05)).toFixed(2)}</td>
+                                        <td>{((val.ebayPrice) * (.05)).toFixed(2)}</td>
                                         <td></td>
                                     </tr>
                                     <tr>
                                         <td>Total Earnings</td>
-                                        <td>{val.etsyPrice-(((val.etsyPrice)*(.05)).toFixed(2))}</td>
-                                        <td>{val.ebayPrice-(((val.ebayPrice)*(.05)).toFixed(2))}</td>
+                                        <td>{val.etsyPrice - (((val.etsyPrice) * (.05)).toFixed(2))}</td>
+                                        <td>{val.ebayPrice - (((val.ebayPrice) * (.05)).toFixed(2))}</td>
                                         <td></td>
                                     </tr>
                                 </table>
@@ -62,7 +61,7 @@ function calculateFees(price) {
                     })}
                 </tr>
                 <tr>
-                    <td colspan={ inventoryData.length } >
+                    <td colspan={inventoryData.length} >
                         <footer>
                             <h3>Want to post a new listing?</h3>
                             <Button block size="lg">

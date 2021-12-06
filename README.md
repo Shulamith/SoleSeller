@@ -5,6 +5,8 @@
 Frontend uses ES6 for react
 Backend will use Node JS code
 
+*IF CONNECTING TO A SSL SERVER SEVERAL CHANGES NEED TO BE MADE TO THE 'index.js' FILE IN THE BACKEND, SEE COMMENTS FOR DETAILS. ALSO NEED TO SET UP THE PROXY IN THE FRONTEND 'package.json' FILE.*
+
 
 when react is set up for frontend it uses 3000 port, for backend it needs to be routed differently so we use 4000. Ports can use any number.
 
