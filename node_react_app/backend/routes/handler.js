@@ -8,7 +8,7 @@ const fetch = require('cross-fetch');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
-
+const axios = require('axios');
 require('dotenv/config');
 
 router.use(express.urlencoded({ extended: false }));
@@ -29,7 +29,7 @@ const fs = require('fs')
 const multer = require('multer') // multer will parse bodies that cannot be parse by bodyparser such as form data
 
 const storage = multer.diskStorage({
-    destination: function(req, file, cb){ 
+    destination: function(req, file, cb){
     cb(null, './uploads/'); // where incoming file gets stored
     },
     filename: function(req, file, cb) {
@@ -38,7 +38,7 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req, file, cb) => {
-    
+
     if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
         cb(null, true); //accept files
     } else {
@@ -47,7 +47,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const upload = multer({
-    storage: storage, 
+    storage: storage,
     limits: {
         fileSize: 1024 * 1024 * 5 // accept files up to 5MB
     },
@@ -91,10 +91,11 @@ router.get('/ping', async (req, res) => {
 });
 
 
-router.get("/oauth/redirect", async (req, res) => {
+router.get('/oauth/redirect', async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
     // to this route. The authorization code is in the `code` param
     const authCode = req.query.code;
+    console.log("Got to etsy redirect");
     const tokenUrl = 'https://api.etsy.com/v3/public/oauth/token';
     const requestOptions = {
         method: 'POST',
@@ -115,12 +116,79 @@ router.get("/oauth/redirect", async (req, res) => {
     // Extract the access token from the response access_token data field
     if (response.ok) {
         const tokenData = await response.json();
+        console.log("Response okay");
         //res.redirect('/inventory');
-        res.redirect(`/inventory?access_token=${tokenData.access_token}`);
+        const inventory = await getEtsyInventory(tokenData.access_token);
+        //console.log("EtsyInventory", inventory);
+
+        // const requestOptions = {
+        //     method: 'POST',
+        //     body: JSON.stringify({
+        //         grant_type: 'authorization_code',
+        //         client_id: etsyClientID,
+        //         redirect_uri: etsyRedirectUri,
+        //         code: authCode,
+        //         code_verifier: etsyClientVerifier,
+        //     }),
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        //res.redirect('http://localhost:3000/inventory')
+        res.send(inventory);
+
+        //res.redirect('/inventory?access_token=${tokenData.access_token}');
     } else {
-        res.send("oops");
+        res.send("Response was not okay");
     }
 });
+
+async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
+    console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
+
+    // An Etsy access token includes your shop/user ID
+    // as a token prefix, so we can extract that too
+    const user_id = access_token.split('.')[0];
+    console.log("USER ID:", user_id);
+    const authorization = 'Bearer ' + access_token;
+    const requestOptions = {
+        headers: {
+            'x-api-key': etsyClientID
+        }
+    };
+    axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
+    .then(response => {
+      console.log("TRIED GET AND RECIEVED RESPONSE");
+      console.log(response.data);
+      //console.log(response);
+      //if(response.ok) {
+        console.log("GETTING SHOP DATA");
+        const shop_id = response.data.shop_id;
+        console.log("SHOP ID", shop_id);
+        const shopRequestOptions = {
+            method: 'GET',
+            headers: {
+                'x-api-key': etsyClientID,
+                // Scoped endpoints require a bearer token
+                'Authorization': authorization
+            }
+        }
+        axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
+          .then(shopResponse => {
+            console.log("SHOP RESPONSE", shopResponse.data);
+            console.log("Price", shopResponse.data.results[0].price);
+            return shopResponse.data;
+          })
+        .catch(error => {
+          console.log("ERROR");
+          console.log(error);
+        });
+  })
+    .catch(error => {
+      console.log("ERROR");
+      console.log(error);
+    });
+    return "EtsyInventory";
+};
 
 /* ------------------ END ETSY OAUTH ------------------ */
 
@@ -175,7 +243,7 @@ router.get('/inventory', authenticateToken, async (req, res) => { // here we gra
 
 // .single will try to parse one file only, field name  = productImage
 router.post('/addItem', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
-    
+
     console.log(req.file);
 
     const itemName = req.body.itemName; // get item input field, name of field = itemInput
@@ -203,7 +271,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
             imagePath: imagePath
         },
         user: userId._id // field to link user whose saving item
-        
+
     });
 
     try { // we try to add it now
@@ -220,12 +288,12 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
 });
 
 // router.post(‘/addItem’, async(req,res,next) => {
-//     const newItem = new Schemas.Items({ 
+//     const newItem = new Schemas.Items({
 //     newItem.image.data = fs.readFileSync(req.file.path)
-//     newItem.image.contentType = file.mimetype;   
+//     newItem.image.contentType = file.mimetype;
 //     });
 // newItem.save()
-//   });  
+//   });
 
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
@@ -294,7 +362,7 @@ router.post('/login', async (req, res) => {
 
         console.log(err);
     }
-    
+
     res.json({ status: 'error', error: 'Invalid email/password' });
 
 });
