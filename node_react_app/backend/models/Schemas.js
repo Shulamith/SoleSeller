@@ -22,7 +22,12 @@ const itemSchema = new Schema ({
     description: {type: String, requierd: true},
     etsyPrice: {type: String, required: false},
     ebayPrice:{type:String, required:false},
-    image:{type:String, required:false},
+    image: { 
+        data: Buffer, 
+        contentType: String, 
+        imagePath: String,
+        required: false
+     },
     user:{type: Schema.Types.ObjectId, ref: 'users'} // references user table tru id
 },{timestamps:true});
 

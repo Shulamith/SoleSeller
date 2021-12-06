@@ -129,7 +129,7 @@ router.get("/oauth/redirect", async (req, res) => {
 //GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
 router.get('/addItem', async (req, res) => {
     const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'tahmid198' }).exec();
+    const userId = await user.findOne({ username: 'ramon' }).exec();
 
     const item = { item: 'Soul Eater, Volumes: 1-5', price: '15.49', channel: 'Amazon', user: userId }
     const newItem = new Schemas.Items(item);
@@ -183,6 +183,10 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     const ebayPrice = req.body.ebayPrice;
     const etsyPrice = req.body.etsyPrice;
     const imagePath = req.file.path;
+    const imageType = req.file.mimetype;
+    const imageData = fs.readFileSync(req.file.path)
+    console.log(imageData);
+
     const user = Schemas.Users; //define user
     const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
@@ -193,8 +197,13 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
         description: itemDescription,
         etsyPrice: etsyPrice,
         ebayPrice: ebayPrice,
-        user: userId._id, // field to link user whose saving item
-        image: imagePath
+        image: {
+            data: imageData,
+            contentType: imageType,
+            imagePath: imagePath
+        },
+        user: userId._id // field to link user whose saving item
+        
     });
 
     try { // we try to add it now
@@ -244,9 +253,9 @@ router.get('/ebayauth', (req, res) => {
 //  return res.end(JSON.stringify(AuthUrl));
 });
 
-router.get('/profile', authenticateToken, (req, res) => {
-    res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
-});
+// router.get('/profile', authenticateToken, (req, res) => {
+//     res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
+// });
 
 router.post('/login', async (req, res) => {
 
@@ -310,7 +319,7 @@ router.delete('/logout', authenticateToken, async (req, res) => {
 
 router.post('/register', async (req, res) => {
 
-    var hashedPassword = '';
+  var hashedPassword = '';
 
     try {
         hashedPassword = await bcrypt.hash(req.body.password, 12);
