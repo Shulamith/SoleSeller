@@ -176,6 +176,9 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
           .then(shopResponse => {
             console.log("SHOP RESPONSE", shopResponse.data);
             console.log("Price", shopResponse.data.results[0].price);
+            //TEST FOR POST BELOW
+            createEtsyListing(authorization, 1, "TestWater", "testingetsyapi", 0.01,
+               "i_did", true, "made_to_order", shop_id);
             return shopResponse.data;
           })
         .catch(error => {
@@ -229,15 +232,6 @@ router.get('/inventory', authenticateToken, async (req, res) => { // here we gra
             res.end();
         }
     }); // so when we query our tables and finds all of our items with will auto add user associated with that tweet
-
-
-
-    // const str = [{
-    //     "product": "Nintendo Gameboy Advance",
-    //     "channel": "Amazon",
-    //     "username": "tahmid_z"
-    // }];
-    // res.end(JSON.stringify(str));
 });
 
 
@@ -307,7 +301,7 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
-  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
+  res.header('Access-Control-Allow-Origin', '*');
   // // Authorization Code Auth Flow
   //res.header('Access-Control-Allow-Origin', '*');
   const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
@@ -470,5 +464,62 @@ async function getInventory(token) {
     return "GET INVENTORY";
 };
 
+async function getTaxonmyID () {
+  const requestOptions = {
+      'method': 'GET',
+      'headers': {
+          'x-api-key': etsyClientID,
+      },
+  };
+  axios.get('https://openapi.etsy.com/v3/application/taxonomy/seller/get',
+  requestOptions)
+  .then( response => {
+    const data = response.json().data;
+    console.log("taxonomyData", data)
+    return data;
+  })
+  .catch( err => {
+    console.log(err)
+  });
+};
+
+/* BEGIN ETSY POST */
+async function createEtsyListing(auth, quantity, title, description, price,
+   who_made, is_supply,when_made, shop_id) {
+//require that a user is logged in?
+//test the typeof variables?
+  const taxonomy_id = 1296
+  //= await getTaxonmyID();
+  var headers = {
+    'x-api-key': etsyClientID,
+    'Authorization': auth,
+    'Host': 'openapi.etsy.com',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+  };
+  var parameters = {
+    'quantity' : quantity,
+    'title' : title,
+    'description': description,
+    'price' : price,
+    'taxonomy_id' : taxonomy_id,
+    'who_made' : who_made,
+    'is_supply' : is_supply,
+    'when_made' : when_made
+  };
+  var requestOptions = {
+    method: 'POST',
+    headers: headers,
+    body: parameters,
+    redirect: 'follow'
+  };
+  axios.post(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,
+  requestOptions)
+  .then(response => {
+      console.log(response.data);
+  })
+  .catch(error => {
+      console.log(error);
+  });
+}
 
 module.exports = router;
