@@ -9,6 +9,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
 import 'react-edit-text/dist/index.css';
@@ -95,17 +96,18 @@ function InventoryTwo() {
                             </div>
                         );
                     })}
-                </tr>
-                <tr>
-                    <td colspan={ inventoryData.length } >
+                </tr>     
+
                         <footer>
                             <h3>Want to post a new listing?</h3>
-                            <Button block size="lg">
+                            <Box textAlign = 'center'>
+                            <Button variant ="contained" block size="lg" >
                                 <Link to="/upload">Click Here</Link>
                             </Button>
+                            </Box>
+                            &nbsp;
                         </footer>
-                    </td>
-                </tr>
+                
             </table>
         </div>
     );
