@@ -1,14 +1,12 @@
-.mt-5 {
-    text-align:center;
-    align-items: center;
-    padding: 2px;
+a:hover {
+    color:black;
+    background-color: transparent; 
+    text-decoration: none;
 }
 
-/*.row-one {
-    align-items: center;
-    text-align: center;
-}*/
-
+#typography {
+    color: black;
+}
 
 img {
     display: block;
@@ -18,8 +16,4 @@ img {
     margin-right: auto;
     width: 50%;
     height: auto;
-}
-
-#links {
-    color: blue;
 }
