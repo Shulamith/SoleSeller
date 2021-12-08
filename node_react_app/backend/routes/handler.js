@@ -19,9 +19,7 @@ router.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "*");
     res.setHeader("Access-Control-Allow-Headers", "*");
-    res.header(
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
+    res.header("Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 
@@ -117,26 +115,8 @@ router.get('/oauth/redirect', async (req, res) => {
     if (response.ok) {
         const tokenData = await response.json();
         console.log("Response okay");
-        //res.redirect('/inventory');
         const inventory = await getEtsyInventory(tokenData.access_token);
-        //console.log("EtsyInventory", inventory);
-
-        // const requestOptions = {
-        //     method: 'POST',
-        //     body: JSON.stringify({
-        //         grant_type: 'authorization_code',
-        //         client_id: etsyClientID,
-        //         redirect_uri: etsyRedirectUri,
-        //         code: authCode,
-        //         code_verifier: etsyClientVerifier,
-        //     }),
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     }
-        //res.redirect('http://localhost:3000/inventory')
         res.send(inventory);
-
-        //res.redirect('/inventory?access_token=${tokenData.access_token}');
     } else {
         res.send("Response was not okay");
     }
@@ -158,12 +138,15 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
     axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
     .then(response => {
       console.log("TRIED GET AND RECIEVED RESPONSE");
+      console.log("RESPONSE For Inventory", response)
       console.log(response.data);
       //console.log(response);
       //if(response.ok) {
         console.log("GETTING SHOP DATA");
         const shop_id = response.data.shop_id;
         console.log("SHOP ID", shop_id);
+        createEtsyListing(authorization, 1, "TestWater", "testingetsyapi", 0.40,
+           "i_did", true, "made_to_order", shop_id);
         const shopRequestOptions = {
             method: 'GET',
             headers: {
@@ -177,8 +160,7 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
             console.log("SHOP RESPONSE", shopResponse.data);
             console.log("Price", shopResponse.data.results[0].price);
             //TEST FOR POST BELOW
-            createEtsyListing(authorization, 1, "TestWater", "testingetsyapi", 0.01,
-               "i_did", true, "made_to_order", shop_id);
+
             return shopResponse.data;
           })
         .catch(error => {
@@ -302,17 +284,11 @@ router.get('/ebayauth', (req, res) => {
 ];
   console.log("TEST");
   res.header('Access-Control-Allow-Origin', '*');
-  // // Authorization Code Auth Flow
-  //res.header('Access-Control-Allow-Origin', '*');
   const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
 
   console.log(AuthUrl);
   //console.log(res.redirect(AuthUrl));
-  return res.redirect(AuthUrl);
-  //console.log("RESPONSE QUERY", res.query)
-  //console.log(res.query);
-  //return ("authurl");
-//  return res.end(JSON.stringify(AuthUrl));
+  return res.redirect(AuthUrl);;
 });
 
 // router.get('/profile', authenticateToken, (req, res) => {
@@ -330,7 +306,6 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-
         if (await bcrypt.compare(req.body.password, user.password)) {
 
             const accessToken = generateAccessToken(user);
@@ -490,13 +465,13 @@ async function createEtsyListing(auth, quantity, title, description, price,
 //test the typeof variables?
   const taxonomy_id = 1296
   //= await getTaxonmyID();
-  var headers = {
-    'x-api-key': etsyClientID,
-    'Authorization': auth,
+  const headers = {
+    client_id: etsyClientID,
+    Authorization: auth,
     'Host': 'openapi.etsy.com',
-    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8'
+    'Content-Type': 'application/x-www-for-urlencoded'
   };
-  var parameters = {
+  const parameters = {
     'quantity' : quantity,
     'title' : title,
     'description': description,
@@ -506,16 +481,24 @@ async function createEtsyListing(auth, quantity, title, description, price,
     'is_supply' : is_supply,
     'when_made' : when_made
   };
-  var requestOptions = {
+  const requestOptionsTwo = {
     method: 'POST',
-    headers: headers,
+    headers: {
+      'x-api-key': etsyClientID,
+      'Authorization': auth,
+      'Host': 'openapi.etsy.com',
+      'Content-Type': 'application/x-www-for-urlencoded'
+    },
     body: parameters,
     redirect: 'follow'
   };
-  axios.post(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,
-  requestOptions)
+  console.log("TRYING TO POST from etsy")
+  // }
+  axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,
+  requestOptionsTwo)
   .then(response => {
-      console.log(response.data);
+    console.log("GOT ETSY RESPONSE FOR LISTINGS", response.data)
+    console.log(response.data);
   })
   .catch(error => {
       console.log(error);
