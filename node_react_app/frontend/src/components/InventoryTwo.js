@@ -1,67 +1,103 @@
-import React, { useEffect, useState } from 'react';
-import Image from 'react-bootstrap/Image'
-import Button from "react-bootstrap/Button";
+import React, {useEffect, useState} from 'react';
+import { styled } from '@mui/material/styles';
+import Card from '@mui/material/Card';
+import CardActions from '@mui/material/CardActions';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@mui/material/CardMedia';
+import Collapse from '@mui/material/Collapse';
+import IconButton from '@mui/material/IconButton';
+import Typography from '@mui/material/Typography';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
+import Button from '@mui/material/Button';
 import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
+import 'react-edit-text/dist/index.css';
 import './InventoryTwo.css';
 
+console.log(inventoryData.length);
 function InventoryTwo() {
-    useEffect(() => {
+    const [expanded, setExpanded] = React.useState(false);
+
+    const handleExpandClick = (key) => {
+        setExpandedId(expandedId === key ? -1 : key);
+    };
+      useEffect( () => {
         fetchItems();
     }, []);
 
     const [items, setItems] = useState([]);
 
-    const fetchItems = async () => {
+    const fetchItems = async() => {
         const data = await fetch('/inventory'); // Inventory url from port 4000, retriving data
         const items = await data.json(); // set it into items as json data
         setItems(items);
     };
 
+    const ExpandMore = styled((props) => {
+        const { expand, ...other } = props;
+        return <IconButton {...other} />;
+      })(({ theme, expand }) => ({
+        transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+        marginLeft: 'auto',
+        transition: theme.transitions.create('transform', {
+          duration: theme.transitions.duration.shortest,
+        }),
+      }));
+
+      const [expandedId, setExpandedId] = React.useState(-1);
+
     function calculateFees(price) {
         return price / 10;
     }
-
     return (
         <div className="InventoryTwo">
             <table id="display">
                 <tr>
                     {items.map((val, key) => {
                         return (
-                            <tr key={key}>
-                                <picture><Image src={val.image} /></picture>
-                                <table>
-                                    <tr>
-                                        <td><h5>{val.item}</h5></td>
-                                        <td>Etsy</td>
-                                        <td>eBay</td>
-                                        <td>Etc.</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Selling Price</td>
-                                        <td>{val.etsyPrice}</td>
-                                        <td>{val.ebayPrice}</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Fees</td>
-                                        <td>{((val.etsyPrice) * (.05)).toFixed(2)}</td>
-                                        <td>{((val.ebayPrice) * (.05)).toFixed(2)}</td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Total Earnings</td>
-                                        <td>{val.etsyPrice - (((val.etsyPrice) * (.05)).toFixed(2))}</td>
-                                        <td>{val.ebayPrice - (((val.ebayPrice) * (.05)).toFixed(2))}</td>
-                                        <td></td>
-                                    </tr>
-                                </table>
-                            </tr>
-                        )
+                            <div  className="card">
+                            <Card sx={{ maxWidth: 345 }}>
+                            {
+                            <CardMedia
+                                component="img"
+                                height="194"
+                                image={val.image}
+                                alt='image'
+                            />
+                            }
+                            <CardContent>
+                                <Typography variant="body2" color="text.secondary">
+                                {val.description}
+                                </Typography>
+                            </CardContent>
+                            <CardActions disableSpacing>
+                                <Button size="small">Edit</Button>
+                                <Button size="small">Delete</Button>
+                                <ExpandMore
+                                onClick={() => handleExpandClick(key)}
+                                aria-expanded={expandedId === key}
+                                aria-label="show more"
+                                >
+                                <MoreVertIcon />
+                                </ExpandMore>
+                            </CardActions>
+                            <Collapse in={expandedId === key} timeout="auto" unmountOnExit>
+                                <CardContent>
+                                <p>Ebay Price: ${val.ebayPrice}</p>
+                                <p>Ebay Fees: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)} </p>
+                                <p>Ebay Profit: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)} </p>
+                                <p>Etsy Price: ${val.etsyPrice}</p>
+                                <p>Etsy Fees: ${((val.etsyPrice)*(.05)-(.20)).toFixed(2)}</p>
+                                <p>Etsy Profit: ${(val.etsyPrice-(((val.etsyPrice)*(.05)-(.20)).toFixed(2))).toFixed(2)}</p>
+                                </CardContent>
+                            </Collapse>
+                            </Card>
+                            </div>
+                        );
                     })}
                 </tr>
                 <tr>
-                    <td colspan={inventoryData.length} >
+                    <td colspan={ inventoryData.length } >
                         <footer>
                             <h3>Want to post a new listing?</h3>
                             <Button block size="lg">
