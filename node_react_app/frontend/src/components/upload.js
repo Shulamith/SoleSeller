@@ -6,10 +6,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Grid from '@material-ui/core/Grid';
 import Form from "react-bootstrap/Form";
-import {
-  Typography,
-  TextField
-} from "@material-ui/core";
+import { Typography, TextField } from "@material-ui/core";
 import './upload.css';
 
 class Upload extends Component {
@@ -28,6 +25,14 @@ class Upload extends Component {
     this.onDescriptionChange = this.onDescriptionChange.bind(this);
     this.onEbayChange = this.onEbayChange.bind(this);
     this.onEtsyChange = this.onEtsyChange.bind(this);
+    this.handleChange = this.handleChange.bind(this)
+  }
+
+  
+  handleChange(event) {
+    this.setState({
+      file: URL.createObjectURL(event.target.files[0])
+    })
   }
 
  
@@ -131,14 +136,14 @@ class Upload extends Component {
             accept=".jpg, .jpeg, .png" 
             name="productImage"
             hidden
-            onChange={this.onImageChange}
-          />
+            onChange={this.handleChange}
+            />
         </Button>
       </CardActions>
       <CardMedia
         component="img"
         height="140"
-        image={this.state.image}
+        image={this.state.file}
       />
       <CardContent>
         <form>
