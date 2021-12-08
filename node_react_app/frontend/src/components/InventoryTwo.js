@@ -12,11 +12,9 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { createTheme,  ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
-import inventoryData from "./mockdata.json";
 import 'react-edit-text/dist/index.css';
 import './InventoryTwo.css';
 
-console.log(inventoryData.length);
 function InventoryTwo() {
     const [expanded, setExpanded] = React.useState(false);
 
@@ -100,7 +98,7 @@ function InventoryTwo() {
                                 <CardContent>
                                 <Typography paragraph>Ebay Price: ${val.ebayPrice}</Typography>
                                 <Typography paragraph>Ebay Fees: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)}</Typography>
-                                <Typography paragraph>Ebay Profit: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)}</Typography>
+                                <Typography paragraph>Ebay Profit: ${((val.ebayPrice)-((val.ebayPrice)*(.1255)-(.30)).toFixed(2))}</Typography>
                                 <Typography paragraph>Etsy Price: ${val.etsyPrice}</Typography>
                                 <Typography paragraph>Etsy Fees: ${((val.etsyPrice)*(.05)-(.20)).toFixed(2)}</Typography>
                                 <Typography paragraph>Etsy Profit: ${(val.etsyPrice-(((val.etsyPrice)*(.05)-(.20)).toFixed(2))).toFixed(2)}</Typography>
