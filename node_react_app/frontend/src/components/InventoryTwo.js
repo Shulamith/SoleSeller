@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import { createTheme,  ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import inventoryData from "./mockdata.json";
 import 'react-edit-text/dist/index.css';
@@ -47,6 +48,17 @@ function InventoryTwo() {
 
       const [expandedId, setExpandedId] = React.useState(-1);
 
+      const theme = createTheme({
+        palette: {
+          primary: {
+            main: '#ff0000',
+          },
+          secondary: {
+              main: '#808080',
+          },
+        },
+        });
+
     function calculateFees(price) {
         return price / 10;
     }
@@ -72,8 +84,10 @@ function InventoryTwo() {
                                 </Typography>
                             </CardContent>
                             <CardActions disableSpacing>
-                                <Button size="small">Edit</Button>
-                                <Button size="small">Delete</Button>
+                            <ThemeProvider theme={theme}>
+                                <Button size="small" color= "secondary">Edit</Button>
+                                <Button size="small" color= "primary">Delete</Button>
+                                </ThemeProvider>
                                 <ExpandMore
                                 onClick={() => handleExpandClick(key)}
                                 aria-expanded={expandedId === key}
