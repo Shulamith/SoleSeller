@@ -8,7 +8,6 @@ export default class Login extends Component {
 
   constructor(props) {
       super(props);
-      this.onChangeName = this.onChangeName.bind(this);
       this.onChangeEmail = this.onChangeEmail.bind(this);
       this.onChangePassword = this.onChangePassword.bind(this);
       this.onSubmit = this.onSubmit.bind(this);
@@ -22,10 +21,6 @@ export default class Login extends Component {
   }
 
   // Form Events
-  onChangeName(e) {
-    this.setState({ name: e.target.value })
-  }
-
   onChangeEmail(e) {
     this.setState({
       email: e.target.value,
@@ -39,9 +34,23 @@ export default class Login extends Component {
   }
 
   onSubmit(e) {
-      e.preventDefault()
-      console.log(this.state.email),
-      console.log(this.state.password)
+      e.preventDefault();
+
+      axios.post('/login', {
+          email: e.target.email.value,
+          password: e.target.password.value
+      })
+          .then(function (response) {
+              if (response.data.status === "error") { window.alert("Incorrect email/password combination. Please try again"); }
+              else {
+                  window.localStorage.setItem("user", response.data.user);
+                  window.localStorage.setItem("token", response.data.accessToken);
+                  window.location.href = "/profile";
+              }
+          })
+          .catch(function (error) {
+              console.log(error);
+          });
 
       this.setState({
           name: '',
@@ -64,8 +73,8 @@ export default class Login extends Component {
                      <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
                     <h2>Sign In</h2>
                 </Grid>
-                <TextField label='Email' placeholder='Enter email' value={this.state.email} onChange={this.onChangeEmail} fullWidth required/>
-                <TextField label='Password' placeholder='Enter password' type='password' value={this.state.password} onChange={this.onChangePassword} fullWidth required/>
+                <TextField label='Email' name='email' placeholder='Enter email' type='email' value={this.state.email} onChange={this.onChangeEmail} fullWidth required/>
+                <TextField label='Password' name='password' placeholder='Enter password' type='password' value={this.state.password} onChange={this.onChangePassword} fullWidth required/>
                 <Button type='submit' color='primary' variant="contained" disabled={!isEnabled} style={btnstyle}fullWidth>
                   <Link to="/profile">Sign In</Link>
                 </Button>

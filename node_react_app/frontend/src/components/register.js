@@ -43,7 +43,8 @@ export default class Register extends Component {
             password: e.target.password.value
         })
             .then(function (response) {
-                window.location.href = "/login";
+                if (response.data.status === "error") { window.alert("A user with that email already exists"); }
+                else { window.location.href = "/login"; }
             })
             .catch(function (error) {
                 console.log(error);
@@ -72,9 +73,9 @@ render() {
                      <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
                     <h2>Register</h2>
                 </Grid>
-                <TextField label='Name' placeholder='Enter Name' value={this.state.name} onChange={this.onChangeName} fullWidth reuqired/>
-                <TextField label='Email' placeholder='Enter email' type='email' value={this.state.email} onChange={this.onChangeEmail} fullWidth required/>
-                <TextField label='Password' placeholder='Enter password' value={this.state.password} onChange={this.onChangePassword} type='password' fullWidth required/>
+                <TextField label='Name' name='name' placeholder='Enter Name' value={this.state.name} onChange={this.onChangeName} fullWidth reuqired/>
+                <TextField label='Email' name='email' placeholder='Enter email' type='email' value={this.state.email} onChange={this.onChangeEmail} fullWidth required/>
+                <TextField label='Password' name='password' placeholder='Enter password' value={this.state.password} onChange={this.onChangePassword} type='password' fullWidth required/>
                 <Button type='submit' color='primary' variant="contained" style={btnstyle} disabled={!isEnabled} fullWidth>Register</Button>
                 <Typography > Already have an account?
                     <br></br>
