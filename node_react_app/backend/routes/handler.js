@@ -9,6 +9,11 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
 
+
+var objectId = require('mongodb').ObjectId;
+// const {MongoClient} = require('mongodb');
+var mongoClient = require('mongodb').MongoClient
+var assert = require('assert');
 require('dotenv/config');
 
 router.use(express.urlencoded({ extended: false }));
@@ -26,7 +31,8 @@ router.use((req, res, next) => {
 });
 
 const fs = require('fs')
-const multer = require('multer') // multer will parse bodies that cannot be parse by bodyparser such as form data
+const multer = require('multer'); // multer will parse bodies that cannot be parse by bodyparser such as form data
+const { mongo } = require('mongoose');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){ 
@@ -186,6 +192,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     const imageType = req.file.mimetype;
     const imageData = fs.readFileSync(req.file.path)
     console.log(imageData);
+    console.log(itemName);
 
     const user = Schemas.Users; //define user
     const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
@@ -219,13 +226,143 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     }
 });
 
-// router.post(‘/addItem’, async(req,res,next) => {
-//     const newItem = new Schemas.Items({ 
-//     newItem.image.data = fs.readFileSync(req.file.path)
-//     newItem.image.contentType = file.mimetype;   
+
+// .single will try to parse one file only, field name  = productImage
+router.post('/update', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
+    
+    console.log(req.file);
+
+    const itemName = req.body.itemName; // get item input field, name of field = itemInput
+    const itemDescription = req.body.itemDescription;
+    const ebayPrice = req.body.ebayPrice;
+    const etsyPrice = req.body.etsyPrice;
+    // const imagePath = req.file.path;
+    // const imageType = req.file.mimetype;
+    // const imageData = fs.readFileSync(req.file.path)
+    // console.log(imageData);
+    const productName = req.body.name;
+    const id = req.body.id;
+    var o_id = new objectId(id);
+    console.log(id);
+    console.log(itemName);
+
+    const user = Schemas.Users; //define user
+    const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+    // grab and wait till it gets it
+    // findone = mongose function to find document in db
+
+    const updateItem = new Schemas.Items({  // save the item
+        item: itemName,
+        description: itemDescription,
+        etsyPrice: etsyPrice,
+        ebayPrice: ebayPrice,
+        // image: {
+        //     data: imageData,
+        //     contentType: imageType,
+        //     imagePath: imagePath
+        // },
+        user: userId._id // field to link user whose saving item
+  
+    });
+    const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
+    // const client = new MongoClient(DB_URI);
+
+      mongoClient.connect(DB_URI, async function(err, client) {
+     if(err) throw err;
+     var db = client.db("node_soulseller")
+     assert.equal(null, err);
+    //     db.collection('items').updateOne({item: productName}, {$set: updateItem}, function(err, result) {
+    //       if(err) throw err;
+    //       console.log('Item updated');
+    //     //  console.log(result);
+    //       client.close();
+    //     });
+        try { // we try to add it now
+           await db.collection('items').updateOne({"_id": objectId(o_id)}, // use to filter item
+                                                    {$set: {"item":itemName, "description":itemDescription, "etsyPrice": etsyPrice, "ebayPrice": ebayPrice  }}, // update item 
+                                                    { upsert: false }, (err, newItemResults) => {
+            //if (err) res.end('Error Updating.'); // if error
+            if (err) throw err;
+            res.redirect('/inventory'); // else, redirect back to inventory page
+            res.end(); // make sure page ends after redirection
+        });
+    } catch (err) { // catch any errors
+        console.log(err); // console log any erros
+        res.redirect('/inventory'); // redirect page
+        res.end(); // end page
+     } finally {
+        await client.close();
+        console.log("client closed");
+    }
+
+    });
+
+      
+
+
+    // try { // we try to add it now
+    //     await  db.collection('items').updateOne({"_id": objectId(id)},{$set:updateItem}, (err, newItemResults) => {
+    //         if (err) res.end('Error Updating.'); // if error
+    //         res.redirect('/inventory'); // else, redirect back to inventory page
+    //         res.end(); // make sure page ends after redirection
+    //     });
+    // } catch (err) { // catch any errors
+    //     console.log(err); // console log any erros
+    //     res.redirect('/inventory'); // redirect page
+    //     res.end(); // end page
+    // }
+
+   
+        // collection('orders').updateOne(
+        //     {"_id": objectId(id)}, 
+        //     {$set:updateItem})
+        //     .then((obj) => {
+        //         console.log('Updated - ' + obj);
+        //         res.redirect('orders')
+        //     })
+        //     .catch((err) => {
+        //         console.log('Error: ' + err);
+        //     })
+   
+});
+
+
+// router.post('/update', async (req, res, next) => { // when user post items it gets sent to router to be added
+    
+//     const itemName = req.body.itemName; // get item input field, name of field = itemInput
+//     const itemDescription = req.body.itemDescription;
+//     const ebayPrice = req.body.ebayPrice;
+//     const etsyPrice = req.body.etsyPrice;
+//     const id = req.body.id;
+//     console.log(itemName);
+//     const user = Schemas.Users; //define user
+//     const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+//     // grab and wait till it gets it
+//     // findone = mongose function to find document in db
+
+//     const updateItem = new Schemas.Items({  // save the item
+//         item: itemName,
+//         description: itemDescription,
+//         etsyPrice: etsyPrice,
+//         ebayPrice: ebayPrice,
+//         user: userId._id // field to link user whose saving item
 //     });
-// newItem.save()
-//   });  
+   
+
+//     try { // we try to add it now
+//         await updateItem.updateOne({"_id": objectId(id)},{$set:updateItem}, (err, newItemResults) => {
+//             if (err) res.end('Error Updating.'); // if error
+//             res.redirect('/inventory'); // else, redirect back to inventory page
+//             res.end(); // make sure page ends after redirection
+//         });
+//     } catch (err) { // catch any errors
+//         console.log(err); // console log any erros
+//         res.redirect('/inventory'); // redirect page
+//         res.end(); // end page
+//     }
+// });
+ 
+
 
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
