@@ -5,6 +5,7 @@ const ebayAuthToken = new EbayAuthToken({
     filePath: './routes/ebay-config.json' // input file path.
 });
 const fetch = require('cross-fetch');
+//const fetch = require('node-fetch');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
@@ -465,6 +466,20 @@ async function createEtsyListing(auth, quantity, title, description, price,
 //test the typeof variables?
   const taxonomy_id = 1296
   //= await getTaxonmyID();
+  // var headers = new Headers();
+  // headers.append("Content-Type", "application/x-www-form-urlencoded");
+  // headers.append("x-api-key", etsyClientID);
+  // headers.append("Authorization", auth);
+  //
+  // var urlencoded = new URLSearchParams();
+  // urlencoded.append('quantity', quantity);
+  // urlencoded.append('title',title);
+  // urlencoded.append('description', description);
+  // urlencoded.append('price', price);
+  // urlencoded.append('taxonomy_id', taxonomy_id);
+  // urlencoded.append('who_made', who_made);
+  // urlencoded.append('is_supply', is_supply);
+  // urlencoded.append('when_made', when_made);
   const headers = {
     client_id: etsyClientID,
     Authorization: auth,
@@ -492,14 +507,22 @@ async function createEtsyListing(auth, quantity, title, description, price,
     body: parameters,
     redirect: 'follow'
   };
+//   var requestOptions = {
+//     method: 'POST',
+//     headers: headers,
+//     body: urlencoded,
+//     redirect: 'follow'
+// };
   console.log("TRYING TO POST from etsy")
   // }
-  axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,
+  axios.post(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,
   requestOptionsTwo)
+  //fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`, requestOptions)
   .then(response => {
-    console.log("GOT ETSY RESPONSE FOR LISTINGS", response.data)
-    console.log(response.data);
+    console.log("GOT ETSY RESPONSE FOR LISTINGS", response)
+    console.log("post etsy res data:",response.data)
   })
+  .then(result => console.log(result))
   .catch(error => {
       console.log(error);
   });
