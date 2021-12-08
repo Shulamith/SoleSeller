@@ -8,14 +8,18 @@
     max-width: 320px;
   }
 
-  .picture {
-      
+  .Upload {
+    font-family: sans-serif;
+    text-align: center;
+    color: white;
   }
+  
 
   a {
     color: #FFF;
   }
 }
+
 
 #browse {
     background-color: white;
