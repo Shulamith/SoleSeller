@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { Link } from 'react-router-dom';
+import { Grid,Paper, Avatar, TextField, Button, Typography,Link } from '@material-ui/core'
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import axios from 'axios';
-import "./register.css";
 
 export default class Register extends Component {
     userData;
@@ -60,35 +58,33 @@ export default class Register extends Component {
     }
 
 
-    render() {
-        const { name, email, password } = this.state;
-        const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
-        return (
-            <div className="Register">
-                <form onSubmit={this.onSubmit}>
-                    <div className="form-group">
-                        <label>Name</label>
-                        <input type="text" name="name" className="form-control" value={this.state.name} onChange={this.onChangeName} />
-                    </div>
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
-                    </div>
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
-                    </div>
-                    <button id="register" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
-                        Register
-                    </button>
-                </form>
-                <div className="mt-5">
-                    <Link to="/login"
-                        style={{ color: '#FFF' }}>
-                        Already have an account? Click Here!
-                    </Link>
-                </div>
-            </div>
-        )
-    }
+render() {
+    const { name, email, password } = this.state;
+    const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
+    const paperStyle={padding :20,height:'70vh',width:280, margin:"20px auto"}
+    const avatarStyle={backgroundColor:'black'}
+    const btnstyle={margin:'8px 0'}
+    return(
+        <Grid>
+            <Paper elevation={5} style={paperStyle}>
+            <form onSubmit={this.onSubmit}>
+                <Grid align='center'>
+                     <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
+                    <h2>Register</h2>
+                </Grid>
+                <TextField label='Name' placeholder='Enter Name' value={this.state.name} onChange={this.onChangeName} fullWidth reuqired/>
+                <TextField label='Email' placeholder='Enter email' type='email' value={this.state.email} onChange={this.onChangeEmail} fullWidth required/>
+                <TextField label='Password' placeholder='Enter password' value={this.state.password} onChange={this.onChangePassword} type='password' fullWidth required/>
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} disabled={!isEnabled} fullWidth>Register</Button>
+                <Typography > Already have an account?
+                    <br></br>
+                  <Link href="/login" >
+                    Click Here To Login
+                  </Link>
+                </Typography>
+            </form>
+            </Paper>
+        </Grid>
+    )
+}
 }
