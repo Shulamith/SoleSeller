@@ -68,20 +68,20 @@ function InventoryTwo() {
                 <tr>
                     {items.map((val, key) => {
                         return (
-                            <div  className="card">
-                            <Card sx={{ maxWidth: 345 }}>
-                            {
+                            <div className="card">
+                            <Card sx={{ maxWidth: 345 }} >
                             <CardMedia
                                 component="img"
-                                height="194"
                                 image={val.image}
                                 alt='image'
                             />
-                            }
                             <CardContent>
-                                <Typography variant="body2" color="text.secondary">
-                                {val.description}
-                                </Typography>
+                            <Typography gutterBottom variant="h5" component="div">
+                            {val.item}
+                            </Typography>
+                            <Typography gutterBottom variant="body2" color="text.secondary">
+                            {val.description}
+                            </Typography>
                             </CardContent>
                             <CardActions disableSpacing>
                             <ThemeProvider theme={theme}>
@@ -98,12 +98,12 @@ function InventoryTwo() {
                             </CardActions>
                             <Collapse in={expandedId === key} timeout="auto" unmountOnExit>
                                 <CardContent>
-                                <p>Ebay Price: ${val.ebayPrice}</p>
-                                <p>Ebay Fees: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)} </p>
-                                <p>Ebay Profit: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)} </p>
-                                <p>Etsy Price: ${val.etsyPrice}</p>
-                                <p>Etsy Fees: ${((val.etsyPrice)*(.05)-(.20)).toFixed(2)}</p>
-                                <p>Etsy Profit: ${(val.etsyPrice-(((val.etsyPrice)*(.05)-(.20)).toFixed(2))).toFixed(2)}</p>
+                                <Typography paragraph>Ebay Price: ${val.ebayPrice}</Typography>
+                                <Typography paragraph>Ebay Fees: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)}</Typography>
+                                <Typography paragraph>Ebay Profit: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)}</Typography>
+                                <Typography paragraph>Etsy Price: ${val.etsyPrice}</Typography>
+                                <Typography paragraph>Etsy Fees: ${((val.etsyPrice)*(.05)-(.20)).toFixed(2)}</Typography>
+                                <Typography paragraph>Etsy Profit: ${(val.etsyPrice-(((val.etsyPrice)*(.05)-(.20)).toFixed(2))).toFixed(2)}</Typography>
                                 </CardContent>
                             </Collapse>
                             </Card>
