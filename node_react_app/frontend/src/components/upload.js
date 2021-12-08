@@ -48,8 +48,32 @@ class Upload extends Component {
 //         });
 //     };
 // //};
-  
 
+  onSubmit(e) {
+      e.preventDefault();
+
+      axios.post('/addItem', {
+          headers: {
+              authorization: `Bearer ${window.localStorage.getItem('token')}`
+          },
+          body: {
+              itemName: e.target.itemName,
+              itemDescription: e.target.itemDescription,
+              ebayPrice: e.target.ebayPrice,
+              etsyPrice: e.target.etsyPrice,
+              productImage: e.target.productImage
+          }
+      })
+          .then(function (response) {
+              if (response.data.status === "error") { window.alert("Item was not uploaded. Please try again"); }
+              else {
+                  window.location.href = "/inventory";
+              }
+          })
+          .catch(function (error) {
+              console.log(error);
+          });
+  }
 
   onImageChange = (e) => {
       this.setState({ image: e.target.value })
@@ -104,7 +128,7 @@ class Upload extends Component {
         return (
             <div className="Upload">
                 <Form onSubmit={this.onSubmit}>
-                    <Form method="POST" action="/addItem">
+                    {/*<Form>*/}
                         <div className="form-group">
                             <label>Select Image</label>
                             <input type="file" accept=".jpg, .jpeg, .png" name="productImage" onChange={this.onImageChange} />
@@ -128,7 +152,7 @@ class Upload extends Component {
                         <Button id="sumbit" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
                             Submit
                         </Button>
-                    </Form>
+                    {/*</Form>*/}
                 </Form>
             </div>
         );

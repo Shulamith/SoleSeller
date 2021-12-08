@@ -243,12 +243,20 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
 router.get('/inventory', authenticateToken, async (req, res) => {
     const userID = req.user.id;
 
+    const inventory = Schemas.Items;
 
+    const items = await inventory.find({ user: userID });
+
+    if (!items) {
+        return res.json({ status: 'error', message: 'You currently have no items in your inventory' });
+    }
+
+    return res.json({ items: items });
 });
 
 
 // .single will try to parse one file only, field name  = productImage
-router.post('/addItem', [authenticateToken, upload.single('productImage')], async (req, res, next) => { // when user post items it gets sent to router to be added
+router.post('/addItem', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
 
     console.log(req.file);
 
@@ -261,8 +269,8 @@ router.post('/addItem', [authenticateToken, upload.single('productImage')], asyn
     const imageData = fs.readFileSync(req.file.path)
     console.log(imageData);
 
-    const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: req.user.username }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+    //const user = Schemas.Users; //define user
+    //const userId = await user.findOne({ username: req.user.username }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
@@ -276,20 +284,18 @@ router.post('/addItem', [authenticateToken, upload.single('productImage')], asyn
             contentType: imageType,
             imagePath: imagePath
         },
-        user: userId.id // field to link user whose saving item
+        user: req.user.id // field to link user whose saving item
 
     });
 
     try { // we try to add it now
         await newItem.save((err, newItemResults) => {
-            if (err) res.end('Error Saving.'); // if error
-            res.redirect('/inventory'); // else, redirect back to inventory page
-            res.end(); // make sure page ends after redirection
+            if (err) res.json({ status: 'error', message: 'Something went wrong. Item was not saved' }); // if error
+            res.json({ status: 'ok', message: 'Item saved successfully' }); // make sure page ends after redirection
         });
     } catch (err) { // catch any errors
         console.log(err); // console log any erros
-        res.redirect('/inventory'); // redirect page
-        res.end(); // end page
+        res.json({ status: 'error', message: 'Something went wrong. Please try again' }); // end page
     }
 });
 
@@ -454,7 +460,6 @@ function authenticateToken(req, res, next) {
 
         if (err) return res.sendStatus(403);
         req.user = user;
-        console.log(req);
         next();
 
     });
