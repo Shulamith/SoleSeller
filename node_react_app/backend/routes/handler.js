@@ -195,54 +195,60 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
 
 
 //GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
-router.get('/addItem', async (req, res) => {
-    const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'ramon' }).exec();
+//router.get('/addItem', async (req, res) => {
+//    const user = Schemas.Users; //define user
+//    const userId = await user.findOne({ username: 'ramon' }).exec();
 
-    const item = { item: 'Soul Eater, Volumes: 1-5', price: '15.49', channel: 'Amazon', user: userId }
-    const newItem = new Schemas.Items(item);
+//    const item = { item: 'Soul Eater, Volumes: 1-5', price: '15.49', channel: 'Amazon', user: userId }
+//    const newItem = new Schemas.Items(item);
 
-    try {
-        await newItem.save(async (err, newItemResult) => {
-            console.log('New Item created!');
-            res.end('New Item created!');
-        });
+//    try {
+//        await newItem.save(async (err, newItemResult) => {
+//            console.log('New Item created!');
+//            res.end('New Item created!');
+//        });
 
-    } catch (err) {
-        console.log(err);
-        res.end('Item not added!');
-    }
-});
-
-
-router.get('/inventory', authenticateToken, async (req, res) => { // here we grab our items
-    const items = Schemas.Items;
-
-    // const userItems = await items.find({}, (err, itemsData) => {
-
-    // this code will get all items and join the user table
-    const userItems = await items.find({}).populate("user").exec((err, itemsData) => { // finds all items and automaticlly add user associated with item
-        if (err) throw err;                                                             // we want to be able to select all the items and find the user
-        if (itemsData) {
-            res.end(JSON.stringify(itemsData));
-        } else {
-            res.end();
-        }
-    }); // so when we query our tables and finds all of our items with will auto add user associated with that tweet
+//    } catch (err) {
+//        console.log(err);
+//        res.end('Item not added!');
+//    }
+//});
 
 
+//router.get('/inventory', authenticateToken, async (req, res) => { // here we grab our items
+//    const items = Schemas.Items;
 
-    // const str = [{
-    //     "product": "Nintendo Gameboy Advance",
-    //     "channel": "Amazon",
-    //     "username": "tahmid_z"
-    // }];
-    // res.end(JSON.stringify(str));
+//    // const userItems = await items.find({}, (err, itemsData) => {
+
+//    // this code will get all items and join the user table
+//    const userItems = await items.find({}).populate("user").exec((err, itemsData) => { // finds all items and automaticlly add user associated with item
+//        if (err) throw err;                                                             // we want to be able to select all the items and find the user
+//        if (itemsData) {
+//            res.end(JSON.stringify(itemsData));
+//        } else {
+//            res.end();
+//        }
+//    }); // so when we query our tables and finds all of our items with will auto add user associated with that tweet
+
+
+
+//    // const str = [{
+//    //     "product": "Nintendo Gameboy Advance",
+//    //     "channel": "Amazon",
+//    //     "username": "tahmid_z"
+//    // }];
+//    // res.end(JSON.stringify(str));
+//});
+
+router.get('/inventory', authenticateToken, async (req, res) => {
+    const userID = req.user.id;
+
+
 });
 
 
 // .single will try to parse one file only, field name  = productImage
-router.post('/addItem', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
+router.post('/addItem', [authenticateToken, upload.single('productImage')], async (req, res, next) => { // when user post items it gets sent to router to be added
 
     console.log(req.file);
 
@@ -256,7 +262,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     console.log(imageData);
 
     const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+    const userId = await user.findOne({ username: req.user.username }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
@@ -270,7 +276,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
             contentType: imageType,
             imagePath: imagePath
         },
-        user: userId._id // field to link user whose saving item
+        user: userId.id // field to link user whose saving item
 
     });
 
@@ -387,7 +393,14 @@ router.delete('/logout', authenticateToken, async (req, res) => {
 
 router.post('/register', async (req, res) => {
 
-  var hashedPassword = '';
+    var hashedPassword = '';
+
+    const User = Schemas.Users;
+    const existingUser = await User.findOne({ email: req.body.email }).lean();
+
+    if (existingUser) {
+        return res.json({ status: 'error', message: 'A user with that email already exists' });
+    }
 
     try {
         hashedPassword = await bcrypt.hash(req.body.password, 12);
@@ -441,6 +454,7 @@ function authenticateToken(req, res, next) {
 
         if (err) return res.sendStatus(403);
         req.user = user;
+        console.log(req);
         next();
 
     });

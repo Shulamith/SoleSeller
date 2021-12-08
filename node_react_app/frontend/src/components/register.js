@@ -45,7 +45,10 @@ export default class Register extends Component {
             password: e.target.password.value
         })
             .then(function (response) {
-                window.location.href = "/login";
+                if (response.data.status === "error") { window.alert("A user with that email already exists"); }
+                else {
+                    window.location.href = "/login";
+                }
             })
             .catch(function (error) {
                 console.log(error);
