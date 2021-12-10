@@ -1,7 +1,13 @@
 import React, { Component } from 'react';
-import { Grid,Paper, Avatar, TextField, Button, Typography,Link } from '@material-ui/core'
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import { Grid,Paper,TextField, Button, Typography,Link, InputAdornment } from '@material-ui/core'
+import test from './test.gif';
+import logo from './logo.png';
 import axios from 'axios';
+import { AccountCircle, LockRounded } from "@material-ui/icons";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+
+
 
 export default class Login extends Component {
   userData;
@@ -19,6 +25,7 @@ export default class Login extends Component {
           password: '',
       }
   }
+  
 
   // Form Events
   onChangeEmail(e) {
@@ -58,6 +65,7 @@ export default class Login extends Component {
           password: ''
       })
   }
+  
 
   render() {
     const { email, password } = this.state;
@@ -66,26 +74,74 @@ export default class Login extends Component {
     const avatarStyle={backgroundColor:'black'}
     const btnstyle={margin:'8px 0'}
     return(
-        <Grid>
+      <Grid container style={{minHeight: '100vh'}}>
+        <Grid item xs={12} sm={6}>
+          <img src={test} 
+          style={{ width: '100%', height: '100%', objectFit: 'cover'}} 
+          alt="brand" />
+        </Grid>
+        <Grid container item xs={12} sm={6} alignItems="center" direction="column" justify="space-between" style={{padding:10}}>
           <form onSubmit={this.onSubmit}>
-            <Paper elevation={5} style={paperStyle}>
-                <Grid align='center'>
-                     <Avatar style={avatarStyle}><LockOutlinedIcon/></Avatar>
-                    <h2>Sign In</h2>
-                </Grid>
-                <TextField label='Email' name='email' placeholder='Enter email' type='email' value={this.state.email} onChange={this.onChangeEmail} fullWidth required/>
-                <TextField label='Password' name='password' placeholder='Enter password' type='password' value={this.state.password} onChange={this.onChangePassword} fullWidth required/>
+          <Card >
+                      <CardContent>
+                        <div style={{display:'flex', 
+                            flexDirection: "column", 
+                            maxWidth: 500, 
+                            minWidth: 300}}>
+                      <Grid container justify="center">
+                        <img src={logo}
+                        width={200}
+                        alt="logo"
+                        />
+                      </Grid>
+
+                      <h2>Welcome Back!</h2>
+                      <h2>Sign In</h2>
+                <TextField label='Email' 
+                          name='email' 
+                          placeholder='Enter email' 
+                          type='email' 
+                          value={this.state.email} 
+                          onChange={this.onChangeEmail} 
+                          margin="normal" 
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <AccountCircle />
+                              </InputAdornment>
+                            ),
+                          }}
+                          fullWidth required/>
+                <TextField label='Password' 
+                            name='password' 
+                            placeholder='Enter password' 
+                            type='password' 
+                            value={this.state.password} 
+                            onChange={this.onChangePassword} 
+                            margin="normal" 
+                            InputProps={{
+                                startAdornment: (
+                                <InputAdornment position="start">
+                                  <LockRounded />
+                                </InputAdornment>
+                              ),
+                            }}
+                            fullWidth required/>
                 <Button type='submit' color='primary' variant="contained" disabled={!isEnabled} style={btnstyle}fullWidth>
                   <Link to="/profile">Sign In</Link>
                 </Button>
-                <Typography > Do you not have an account?
+                <Typography > Do you not have an account? </Typography>
+                <Typography>
                   <Link href="/register" >
                     Click Here To Register
                   </Link>
                 </Typography>
-            </Paper>
+                </div>
+                </CardContent>
+                </Card>
           </form>
         </Grid>
+      </Grid>
     )
 }
 }
