@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import logo from './logo.png';
 import Button from '@mui/material/Button';
 
 
@@ -38,7 +39,7 @@ if(user)
             component="div"
             sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
           >
-            Sole Seller
+          <img src={logo} style={{width:100}} />
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <a class="nav-link" href="/">
@@ -97,7 +98,7 @@ if(!user)
               component="div"
               sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
             >
-              Sole Seller
+          <img src={logo} style={{width:100}} />
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <a class="nav-link" href="/">
