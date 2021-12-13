@@ -143,8 +143,10 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
       //console.log("GETTING SHOP DATA");
       const shop_id = response.data.shop_id;
     //  console.log("SHOP ID", shop_id);
-        createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
-           "i_did", "true", "made_to_order", shop_id);
+          //TEST!!!!!!
+          updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
+        // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
+        //    "i_did", "true", "made_to_order", shop_id);
         const shopRequestOptions = {
             method: 'GET',
             headers: {
@@ -454,6 +456,31 @@ async function getTaxonmyID () {
   });
 };
 
+async function updateEtsyListing(auth, shop_id, listing_id, price) {
+//description, price, title, could add more parameters later
+var headers = new fetch.Headers();
+headers.append("Content-Type", "application/x-www-form-urlencoded");
+headers.append("x-api-key", etsyClientID);
+headers.append("Authorization", auth);
+
+var updateParams = new URLSearchParams();
+updateParams.append("price", price);
+// var updateParams = new URLSearchParams();
+// description ? : updateParams.append("description", description)
+// price ?: updateParams.append("price", )
+console.log("PRICE", price)
+var requestUpdateOptions = {
+  method: 'PUT',
+  headers: headers,
+  body: updateParams,
+  redirect: 'follow'
+}
+fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}`, requestUpdateOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+
+};
 
 /* BEGIN ETSY POST */
 //TODO:
@@ -461,7 +488,7 @@ async function getTaxonmyID () {
 //2)get the ShippingID for the user (and ask them to select which?)
 //3) or ask them to create one.
 //4) Redirect to....
-//5)
+//5) Ask them whether they want to publish the draft
 
 async function createEtsyListing(auth, quantity, title, description, price,
    who_made, is_supply,when_made, shop_id) {
