@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
-import { Link } from 'react-router-dom';
+import { Grid,TextField, Button, Typography,Link, InputAdornment } from '@material-ui/core'
+import test from './test.gif';
+import logo from './logo.png';
 import axios from 'axios';
-import "./register.css";
+import { Person, AccountCircle, LockRounded } from "@material-ui/icons";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
 
 export default class Register extends Component {
     userData;
@@ -46,9 +48,7 @@ export default class Register extends Component {
         })
             .then(function (response) {
                 if (response.data.status === "error") { window.alert("A user with that email already exists"); }
-                else {
-                    window.location.href = "/login";
-                }
+                else { window.location.href = "/login"; }
             })
             .catch(function (error) {
                 console.log(error);
@@ -63,35 +63,88 @@ export default class Register extends Component {
     }
 
 
-    render() {
-        const { name, email, password } = this.state;
-        const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
-        return (
-            <div className="Register">
+render() {
+    const { name, email, password } = this.state;
+    const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
+    const btnstyle={margin:'8px 0'}
+    return(
+        <Grid container style={{minHeight: '100vh'}}>
+            <Grid item xs={12} sm={6}>
+                <img src={test} 
+                style={{ width: '100%', height: '100%', objectFit: 'cover'}} 
+                alt="brand" />
+            </Grid>
+            <Grid container item xs={12} sm={6} alignItems="center" direction="column" justify="space-between" style={{padding:10}}>
                 <form onSubmit={this.onSubmit}>
-                    <div className="form-group">
-                        <label>Name</label>
-                        <input type="text" name="name" className="form-control" value={this.state.name} onChange={this.onChangeName} />
-                    </div>
-                    <div className="form-group">
-                        <label>Email</label>
-                        <input type="email" name="email" className="form-control" value={this.state.email} onChange={this.onChangeEmail} />
-                    </div>
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input type="password" name="password" className="form-control" value={this.state.password} onChange={this.onChangePassword} />
-                    </div>
-                    <button id="register" type="submit" className="btn btn-primary btn-block" disabled={!isEnabled}>
-                        Register
-                    </button>
-                </form>
-                <div className="mt-5">
-                    <Link to="/login"
-                        style={{ color: '#FFF' }}>
-                        Already have an account? Click Here!
-                    </Link>
+                <Card>
+                    <CardContent>
+                        <div style={{display:'flex', 
+                            flexDirection: "column", 
+                            maxWidth: 500, 
+                            minWidth: 300}}>
+                      <Grid container justify="center">
+                        <img src={logo}
+                        width={200}
+                        alt="logo"
+                        />
+                      </Grid>
+
+                      <h2>Welcome To Sole Seller</h2>
+                      <h2>Register as a New User</h2>
+                <TextField label='Name' 
+                            name='name' 
+                            placeholder='Enter Name' 
+                            value={this.state.name} 
+                            onChange={this.onChangeName} 
+                            InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <Person />
+                                  </InputAdornment>
+                                ),
+                            }}                          
+                            fullWidth reuqired/>
+                <TextField label='Email' 
+                            name='email' 
+                            placeholder='Enter Email' 
+                            type='email' 
+                            value={this.state.email} 
+                            onChange={this.onChangeEmail} 
+                            InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    <AccountCircle />
+                                  </InputAdornment>
+                                ),
+                            }}
+                            fullWidth required/>
+                <TextField label='Password' 
+                            name='password' 
+                            placeholder='Enter Password' 
+                            value={this.state.password} 
+                            onChange={this.onChangePassword} 
+                            type='password' 
+                            InputProps={{
+                                startAdornment: (
+                                <InputAdornment position="start">
+                                  <LockRounded />
+                                </InputAdornment>
+                              ),
+                            }}
+                            fullWidth required/>
+                <Button type='submit' color='primary' variant="contained" style={btnstyle} disabled={!isEnabled} fullWidth>Register</Button>
+                <Typography > Already have an account?
+                    <br></br>
+                  <Link href="/login" >
+                    Click Here To Login
+                  </Link>
+                </Typography>
                 </div>
-            </div>
-        )
-    }
+                </CardContent>
+                </Card>
+            </form>
+        </Grid>
+    </Grid>
+    )
+}
 }
