@@ -1,7 +1,11 @@
 import React, { Component } from 'react';
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
 import axios from "axios";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import CardMedia from '@material-ui/core/CardMedia';
+import CardActions from '@mui/material/CardActions';
+import { Grid, Button, Typography } from '@material-ui/core'
+import image from "./online-selling-sites.jpg";
 import "./logout.css";
 
 
@@ -31,13 +35,36 @@ export default class Logout extends Component {
     }
 
     render() {
+        const btnstyle={margin:'8px 0'}
         return (
-            <div className="Logout">
-                <h1 id="confirm">Are you sure you want to log out of your account?</h1>
-                <Form onSubmit={this.onSubmit}>
-                    <Button id="logout" block size="lg" type="submit" className="btn btn-primary btn-block">Click here to confirm</Button>
-                </Form>
-            </div>
+            <Grid
+            container
+            spacing={0}
+            direction="column"
+            alignItems="center"
+            justify="center"
+            style={{ minHeight: '100vh' }}
+           >
+            <Card sx={{ maxWidth: 600 }}>
+            <form onSubmit={this.onSubmit}>
+            <CardMedia
+              component="img"
+              height="140"
+              image={image}
+            />
+            <CardContent>
+              <Typography gutterBottom variant="h5" component="div">
+                Leaving already? Come back soon!
+              </Typography>
+            </CardContent>
+            <CardActions>
+                <Button size="small" type='submit' color='primary' variant="contained" style={btnstyle}fullWidth>
+                    Confirm Logout
+                </Button>
+            </CardActions>
+            </form>
+          </Card>
+          </Grid>
         );
     }
 }
