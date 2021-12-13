@@ -66,8 +66,6 @@ export default class Register extends Component {
 render() {
     const { name, email, password } = this.state;
     const isEnabled = name.length > 0 && email.length > 0 && password.length > 0;
-    const paperStyle={padding :20,height:'70vh',width:280, margin:"20px auto"}
-    const avatarStyle={backgroundColor:'black'}
     const btnstyle={margin:'8px 0'}
     return(
         <Grid container style={{minHeight: '100vh'}}>
