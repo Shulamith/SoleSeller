@@ -138,13 +138,8 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
     };
     axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
     .then(response => {
-    //  console.log("TRIED GET AND RECIEVED RESPONSE");
-      //console.log(response.data);
-      //console.log("GETTING SHOP DATA");
       const shop_id = response.data.shop_id;
-    //  console.log("SHOP ID", shop_id);
-          //TEST!!!!!!
-          updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
+      updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
         // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
         const shopRequestOptions = {
@@ -158,7 +153,7 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
         axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
           .then(shopResponse => {
             //console.log("Price", shopResponse.data.results[0].price);
-            //TEST FOR POST BELOW
+            console.log(shopResponse.data);
             return JSON.stringify(shopResponse.data);
           })
         .catch(error => {
