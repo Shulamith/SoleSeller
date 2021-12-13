@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Grid,Paper,TextField, Button, Typography,Link, InputAdornment } from '@material-ui/core'
+import { Grid,TextField, Button, Typography,Link, InputAdornment } from '@material-ui/core'
 import test from './test.gif';
 import logo from './logo.png';
 import axios from 'axios';
@@ -70,8 +70,6 @@ export default class Login extends Component {
   render() {
     const { email, password } = this.state;
     const isEnabled = email.length > 0 && password.length > 0;
-    const paperStyle={padding :20,height:'70vh',width:280, margin:"20px auto"}
-    const avatarStyle={backgroundColor:'black'}
     const btnstyle={margin:'8px 0'}
     return(
       <Grid container style={{minHeight: '100vh'}}>
@@ -143,5 +141,5 @@ export default class Login extends Component {
         </Grid>
       </Grid>
     )
-}
+  }
 }
