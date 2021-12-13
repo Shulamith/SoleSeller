@@ -6,31 +6,21 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import logo from './logo.png';
-import Button from '@mui/material/Button';
 
 
-const pages = ['Home', 'Inventory', 'Profile','Upload'];
-const routes = ['/home','/inventory','/profile','/upload']
 
 const NavBar = () => {
   const [user, setUser] = useState({});
   useEffect(() => {
-      { /*
-          setInterval was used in order to refresh the page constantly
-      in order to have the "logout" button show immediately in place of
-      "login", as soon as user logs out.
-      */}
       setInterval(() => {
           const user = localStorage.getItem("user");
           setUser(user);
       }, [])
   }, 5000);
 
-
-
 if(user)
   return (
-    <AppBar position="static" style={{ background: '#483D8B' }}>
+    <AppBar position="static" style={{ background: '#7A57D1' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography
@@ -39,7 +29,7 @@ if(user)
             component="div"
             sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
           >
-          <img src={logo} style={{width:100}} />
+          <img src={logo} style={{width:100}} alt="logo" />
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <a class="nav-link" href="/">
@@ -89,7 +79,7 @@ if(user)
   );
 if(!user)
     return (
-      <AppBar position="static" style={{ background: '#483D8B' }}>
+      <AppBar position="static" style={{ background: '#7A57D1' }}>
         <Container maxWidth="xl">
           <Toolbar disableGutters>
             <Typography
@@ -98,7 +88,7 @@ if(!user)
               component="div"
               sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
             >
-          <img src={logo} style={{width:100}} />
+          <img src={logo} style={{width:100}} alt="logo"/>
             </Typography>
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             <a class="nav-link" href="/">
