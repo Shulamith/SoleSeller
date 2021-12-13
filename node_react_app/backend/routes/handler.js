@@ -456,6 +456,7 @@ async function getTaxonmyID () {
   });
 };
 
+//TODO: add server end point for updating
 async function updateEtsyListing(auth, shop_id, listing_id, price) {
 //description, price, title, could add more parameters later
 var headers = new fetch.Headers();
@@ -465,9 +466,7 @@ headers.append("Authorization", auth);
 
 var updateParams = new URLSearchParams();
 updateParams.append("price", price);
-// var updateParams = new URLSearchParams();
 // description ? : updateParams.append("description", description)
-// price ?: updateParams.append("price", )
 console.log("PRICE", price)
 var requestUpdateOptions = {
   method: 'PUT',
