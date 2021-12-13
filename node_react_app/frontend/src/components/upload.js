@@ -123,7 +123,7 @@ class Upload extends Component {
    >
     <Card sx={{ maxWidth: 345 }}>
       <Typography gutterBottom variant="h5" component="div" align="center">
-          Upload Form,
+          Upload Form
         </Typography>
       <Typography gutterBottom variant="h5" component="div" align="center">
           List Your Item!
