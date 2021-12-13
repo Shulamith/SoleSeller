@@ -193,51 +193,18 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
 /* ------------------ END ETSY OAUTH ------------------ */
 
 
+router.get('/inventory', authenticateToken, async (req, res) => {
+    const userID = req.user.id;
 
-//GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
-router.get('/addItem', async (req, res) => {
-    const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'ramon' }).exec();
+    const inventory = Schemas.Items;
 
-    const item = { item: 'Soul Eater, Volumes: 1-5', price: '15.49', channel: 'Amazon', user: userId }
-    const newItem = new Schemas.Items(item);
+    const items = await inventory.find({ user: userID });
 
-    try {
-        await newItem.save(async (err, newItemResult) => {
-            console.log('New Item created!');
-            res.end('New Item created!');
-        });
-
-    } catch (err) {
-        console.log(err);
-        res.end('Item not added!');
+    if (!items) {
+        return res.json({ status: 'error', message: 'You currently have no items in your inventory' });
     }
-});
 
-
-router.get('/inventory', authenticateToken, async (req, res) => { // here we grab our items
-    const items = Schemas.Items;
-
-    // const userItems = await items.find({}, (err, itemsData) => {
-
-    // this code will get all items and join the user table
-    const userItems = await items.find({}).populate("user").exec((err, itemsData) => { // finds all items and automaticlly add user associated with item
-        if (err) throw err;                                                             // we want to be able to select all the items and find the user
-        if (itemsData) {
-            res.end(JSON.stringify(itemsData));
-        } else {
-            res.end();
-        }
-    }); // so when we query our tables and finds all of our items with will auto add user associated with that tweet
-
-
-
-    // const str = [{
-    //     "product": "Nintendo Gameboy Advance",
-    //     "channel": "Amazon",
-    //     "username": "tahmid_z"
-    // }];
-    // res.end(JSON.stringify(str));
+    return res.json({ items: items });
 });
 
 
@@ -255,8 +222,8 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     const imageData = fs.readFileSync(req.file.path)
     console.log(imageData);
 
-    const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+    //const user = Schemas.Users; //define user
+    //const userId = await user.findOne({ username: req.user.username }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
@@ -270,20 +237,18 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
             contentType: imageType,
             imagePath: imagePath
         },
-        user: userId._id // field to link user whose saving item
+        user: req.user.id // field to link user whose saving item
 
     });
 
     try { // we try to add it now
         await newItem.save((err, newItemResults) => {
-            if (err) res.end('Error Saving.'); // if error
-            res.redirect('/inventory'); // else, redirect back to inventory page
-            res.end(); // make sure page ends after redirection
+            if (err) res.json({ status: 'error', message: 'Something went wrong. Item was not saved' }); // if error
+            res.json({ status: 'ok', message: 'Item saved successfully' }); // make sure page ends after redirection
         });
     } catch (err) { // catch any errors
         console.log(err); // console log any erros
-        res.redirect('/inventory'); // redirect page
-        res.end(); // end page
+        res.json({ status: 'error', message: 'Something went wrong. Please try again' }); // end page
     }
 });
 
@@ -320,10 +285,6 @@ router.get('/ebayauth', (req, res) => {
   //return ("authurl");
 //  return res.end(JSON.stringify(AuthUrl));
 });
-
-// router.get('/profile', authenticateToken, (req, res) => {
-//     res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
-// });
 
 router.post('/login', async (req, res) => {
 
@@ -387,7 +348,14 @@ router.delete('/logout', authenticateToken, async (req, res) => {
 
 router.post('/register', async (req, res) => {
 
-  var hashedPassword = '';
+    var hashedPassword = '';
+
+    const User = Schemas.Users;
+    const existingUser = await User.findOne({ email: req.body.email }).lean();
+
+    if (existingUser) {
+        return res.json({ status: 'error', message: 'A user with that email already exists' });
+    }
 
     try {
         hashedPassword = await bcrypt.hash(req.body.password, 12);

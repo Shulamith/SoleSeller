@@ -9,8 +9,29 @@
 table {
     width: 900px;
     height: 100px;
-    margin-top: 90px;
-    margin-bottom: 10px;
+}
+
+picture {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top:90px;
+    margin-bottom:10px;
+}
+
+.img {
+    height: auto;
+  max-height: 150px;
+  width: auto;
+  max-width: 150px;
+}
+
+.card {
+    float: none;
+    margin: 0 auto;
+    margin-top:50px;
+    margin-bottom:50px;
+    width: 345px;
 }
 
 th {
@@ -38,4 +59,8 @@ td {
 
 #display h3 {
     text-align: center;
+}
+
+p {
+    color: black;
 }

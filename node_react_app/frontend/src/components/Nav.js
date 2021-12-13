@@ -1,69 +1,113 @@
-import React, { useEffect, useState } from "react";
-
-function Nav() {
-
-    const [user, setUser] = useState({});
-    useEffect(() => {
-        { /*
-            setInterval was used in order to refresh the page constantly
-        in order to have the "logout" button show immediately in place of
-        "login", as soon as user logs out.
-        */}
-        setInterval(() => {
-            const user = localStorage.getItem("user");
-            setUser(user);
-        }, [])
-    }, 5000);
+import * as React from 'react';
+import {useEffect, useState } from "react";
+import AppBar from '@mui/material/AppBar';
+import Box from '@mui/material/Box';
+import Toolbar from '@mui/material/Toolbar';
+import Typography from '@mui/material/Typography';
+import Container from '@mui/material/Container';
+import logo from './logo.png';
 
 
-  if(!user) {
+
+const NavBar = () => {
+  const [user, setUser] = useState({});
+  useEffect(() => {
+      setInterval(() => {
+          const user = localStorage.getItem("user");
+          setUser(user);
+      }, [])
+  }, 5000);
+
+if(user)
+  return (
+    <AppBar position="static" style={{ background: '#7A57D1' }}>
+      <Container maxWidth="xl">
+        <Toolbar disableGutters>
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+          >
+          <img src={logo} style={{width:100}} alt="logo" />
+          </Typography>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <a class="nav-link" href="/">
+            <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 1, display: { xs: 'none', md: 'flex' } }}
+          >
+            Home
+          </Typography></a>
+            <a class="nav-link" href="/inventory">
+            <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 1, display: { xs: 'none', md: 'flex' } }}
+          >
+            Inventory
+          </Typography></a>
+          <a class="nav-link" href="/profile">
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 1, display: { xs: 'none', md: 'flex' } }}
+          >
+            Profile
+          </Typography></a>
+          <a class="nav-link" href="/upload">
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 1, display: { xs: 'none', md: 'flex' } }}
+          >
+            Upload
+          </Typography>
+            </a>
+          </Box>
+          <Box sx={{ flexGrow: 0 }}>
+            <a class="nav-link" href="/logout">Logout</a>
+          </Box>
+        </Toolbar>
+      </Container>
+    </AppBar>
+  );
+if(!user)
     return (
-        // HTML code using Bootstrap for simple navigation that has two lings
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-          <span className="navbar-toggler-icon"></span>
-        </button>
-        <div className="collapse navbar-collapse" id="navbarText">
-          <ul className="navbar-nav mr-auto">
-            <li className="nav-item active">
-              <a className="nav-link" href="/">Home</a>
-            </li>
-          </ul>
-          <button id="login" type="button" class="btn btn-primary navbar-btn">
-            <a class="nav-link" href="/login">Login</a>
-          </button>
-        </div>
-      </nav>
+      <AppBar position="static" style={{ background: '#7A57D1' }}>
+        <Container maxWidth="xl">
+          <Toolbar disableGutters>
+            <Typography
+              variant="h6"
+              noWrap
+              component="div"
+              sx={{ mr: 2, display: { xs: 'none', md: 'flex' } }}
+            >
+          <img src={logo} style={{width:100}} alt="logo"/>
+            </Typography>
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            <a class="nav-link" href="/">
+            <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ mr: 1, display: { xs: 'none', md: 'flex' } }}
+          >
+            Home
+          </Typography></a>
+            </Box>
+            <Box sx={{ flexGrow: 0 }}>
+              <a class="nav-link" href="/login">Login</a>
+            </Box>
+          </Toolbar>
+        </Container>
+      </AppBar>
     );
-  }
-  if(user) {
-    return(
-      <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarText">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="/">Home</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/inventory">Inventory</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/profile">Profile</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="/upload">Upload</a>
-            </li>
-            </ul>
-            <button id="login" class="btn btn-primary navbar-btn">
-                <a class="nav-link" href='/logout'>Logout</a>
-            </button>
-        </div>
-      </nav>
-    );
-  }
 }
 
-export default Nav;
+export default NavBar;
