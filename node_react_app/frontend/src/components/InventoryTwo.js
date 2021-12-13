@@ -12,6 +12,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { createTheme,  ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import 'react-edit-text/dist/index.css';
 import './InventoryTwo.css';
 
@@ -27,10 +28,14 @@ function InventoryTwo() {
 
     const [items, setItems] = useState([]);
 
-    const fetchItems = async() => {
-        const data = await fetch('/inventory'); // Inventory url from port 4000, retriving data
-        const items = await data.json(); // set it into items as json data
-        setItems(items);
+    const fetchItems = async () => {
+        const data = await axios.get('/inventory', {
+            headers: {
+                authorization: `Bearer ${window.localStorage.getItem('token')}`
+            }
+        });
+        
+        setItems(data.data.items);
     };
 
     const ExpandMore = styled((props) => {

@@ -193,53 +193,6 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
 /* ------------------ END ETSY OAUTH ------------------ */
 
 
-
-//GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
-//router.get('/addItem', async (req, res) => {
-//    const user = Schemas.Users; //define user
-//    const userId = await user.findOne({ username: 'ramon' }).exec();
-
-//    const item = { item: 'Soul Eater, Volumes: 1-5', price: '15.49', channel: 'Amazon', user: userId }
-//    const newItem = new Schemas.Items(item);
-
-//    try {
-//        await newItem.save(async (err, newItemResult) => {
-//            console.log('New Item created!');
-//            res.end('New Item created!');
-//        });
-
-//    } catch (err) {
-//        console.log(err);
-//        res.end('Item not added!');
-//    }
-//});
-
-
-//router.get('/inventory', authenticateToken, async (req, res) => { // here we grab our items
-//    const items = Schemas.Items;
-
-//    // const userItems = await items.find({}, (err, itemsData) => {
-
-//    // this code will get all items and join the user table
-//    const userItems = await items.find({}).populate("user").exec((err, itemsData) => { // finds all items and automaticlly add user associated with item
-//        if (err) throw err;                                                             // we want to be able to select all the items and find the user
-//        if (itemsData) {
-//            res.end(JSON.stringify(itemsData));
-//        } else {
-//            res.end();
-//        }
-//    }); // so when we query our tables and finds all of our items with will auto add user associated with that tweet
-
-
-
-//    // const str = [{
-//    //     "product": "Nintendo Gameboy Advance",
-//    //     "channel": "Amazon",
-//    //     "username": "tahmid_z"
-//    // }];
-//    // res.end(JSON.stringify(str));
-//});
-
 router.get('/inventory', authenticateToken, async (req, res) => {
     const userID = req.user.id;
 
@@ -332,10 +285,6 @@ router.get('/ebayauth', (req, res) => {
   //return ("authurl");
 //  return res.end(JSON.stringify(AuthUrl));
 });
-
-// router.get('/profile', authenticateToken, (req, res) => {
-//     res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
-// });
 
 router.post('/login', async (req, res) => {
 
