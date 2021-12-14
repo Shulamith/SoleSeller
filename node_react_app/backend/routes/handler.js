@@ -422,10 +422,10 @@ async function getTaxonmyID () {
           'x-api-key': etsyClientID,
       },
   };
-  axios.get('https://openapi.etsy.com/v3/application/taxonomy/seller/get',
+  axios.get('https://openapi.etsy.com/v3/application/seller-taxonomy/nodes',
   requestOptions)
   .then( response => {
-    const data = response.json().data;
+    const data = response.data;
     console.log("taxonomyData", data);
     return data;
   })
@@ -505,8 +505,7 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
 async function createEtsyListing(auth, quantity, title, description, price,
    who_made, is_supply,when_made, shop_id) {
   const taxonomy_id = "1296"
-  //const test_taxonomy_id = await getTaxonmyID();
-  //console.log(test_taxonomy_id);
+
   var headers = new fetch.Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
   headers.append("x-api-key", etsyClientID);
