@@ -11,6 +11,11 @@ const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
 const axios = require('axios');
 require('dotenv/config');
+const fs = require('fs');
+const multer = require('multer') ;// multer will parse bodies that cannot be parse by bodyparser such as form data
+const myImage = '.PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ'
+
+
 
 router.use(express.urlencoded({ extended: false }));
 
@@ -24,8 +29,6 @@ router.use((req, res, next) => {
     next();
 });
 
-const fs = require('fs')
-const multer = require('multer') // multer will parse bodies that cannot be parse by bodyparser such as form data
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -125,7 +128,6 @@ router.get('/oauth/redirect', async (req, res) => {
 
 async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
     //console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
-
     // An Etsy access token includes your shop/user ID
     // as a token prefix, so we can extract that too
     const user_id = access_token.split('.')[0];
@@ -136,9 +138,12 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
             'x-api-key': etsyClientID
         }
     };
+    //testImage = fs.readFileSync("./uploads/waterbottle.jpeg");
+    //console.log(testImage);
     axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
     .then(response => {
       const shop_id = response.data.shop_id;
+      uploadEtsyImage(authorization, shop_id, "1140102067", myImage)
       updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
         // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
@@ -426,6 +431,28 @@ async function getTaxonmyID () {
   .catch( err => {
     console.log(err)
   });
+};
+
+async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
+  var headers = new fetch.Headers();
+  headers.append("Content-Type", "multipart/form-data");
+  headers.append("x-api-key", etsyClientID);
+  headers.append("Authorization", auth);
+
+  var imageParams = new URLSearchParams();
+  imageParams.append("image", binaryImage);
+  console.log(imageParams);
+  var requestImageOptions = {
+    method:'POST',
+    headers: headers,
+    body: imageParams,
+    redirect: 'follow'
+  }
+  fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestImageOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+
 };
 
 //TODO: add server end point for updating
