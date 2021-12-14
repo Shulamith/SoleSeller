@@ -13,7 +13,7 @@ const axios = require('axios');
 require('dotenv/config');
 const fs = require('fs');
 const multer = require('multer') ;// multer will parse bodies that cannot be parse by bodyparser such as form data
-const myImage = '.PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ'
+const myImage = 'PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ'
 
 
 
@@ -143,7 +143,8 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
     axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
     .then(response => {
       const shop_id = response.data.shop_id;
-      uploadEtsyImage(authorization, shop_id, "1140102067", myImage)
+      getEtsyImage(shop_id,"1113666128");
+      uploadEtsyImage(authorization, shop_id, "1140102067", myImage);
       updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
         // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
@@ -425,7 +426,7 @@ async function getTaxonmyID () {
   requestOptions)
   .then( response => {
     const data = response.json().data;
-    console.log("taxonomyData", data)
+    console.log("taxonomyData", data);
     return data;
   })
   .catch( err => {
@@ -441,7 +442,7 @@ async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
 
   var imageParams = new URLSearchParams();
   imageParams.append("image", binaryImage);
-  console.log(imageParams);
+
   var requestImageOptions = {
     method:'POST',
     headers: headers,
@@ -455,6 +456,19 @@ async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
 
 };
 
+async function getEtsyImage(shop_id, listing_id){
+  const requestOptions = {
+      headers: {
+          'x-api-key': etsyClientID
+      }
+  };
+  axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestOptions)
+    .then (res => {
+                  console.log(res.data)
+                  console.log(res.data.results[0].url_170x135)
+                })
+    .catch(err => console.log(err));
+}''
 //TODO: add server end point for updating
 async function updateEtsyListing(auth, shop_id, listing_id, price) {
 //description, price, title, could add more parameters later
@@ -491,7 +505,8 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
 async function createEtsyListing(auth, quantity, title, description, price,
    who_made, is_supply,when_made, shop_id) {
   const taxonomy_id = "1296"
-  //= await getTaxonmyID();
+  //const test_taxonomy_id = await getTaxonmyID();
+  //console.log(test_taxonomy_id);
   var headers = new fetch.Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
   headers.append("x-api-key", etsyClientID);
