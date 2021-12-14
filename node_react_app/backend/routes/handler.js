@@ -156,7 +156,7 @@ router.get('/addItem', async (req, res) => {
 });
 
 
-router.get('/inventory', authenticateToken, async (req, res) => { // here we grab our items
+router.get('/inventory', async (req, res) => { // here we grab our items
     const items = Schemas.Items;
 
     // const userItems = await items.find({}, (err, itemsData) => {
@@ -230,7 +230,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
 });
 
 
-// .single will try to parse one file only, field name  = productImage
+// update items in mongodb
 router.post('/update', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
     
     console.log(req.file);
@@ -315,7 +315,7 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
    
 });
 
-
+// delete items in mongodb
 router.post('/delete', upload.single('productImage'), function(req, res) {
     var id = req.body.id;
     const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
@@ -341,8 +341,44 @@ router.post('/delete', upload.single('productImage'), function(req, res) {
             console.log("client closed");
         }
     
-        });
-      });
+    });
+});
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+    res.render('Home');
+  });
+  
+router.get('/get-data', function(req, res, next) {
+    var resultArray = [];
+    const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
+    
+    mongoClient.connect(DB_URI, async function(err, client) {
+        if(err) throw err;
+        var db = client.db("node_soulseller")
+        assert.equal(null, err);
+        try {
+            var cursor = db.collection('items').find();
+           await cursor.forEach((doc, err) => {
+                if(err) throw err;
+                console.log("error: "+ err);
+                assert.equal(null, err);
+                resultArray.push(doc);
+                console.log(doc);
+            });
+            //res.redirect('/inventory');
+            //res.end(); // make sure page ends after redirection 
+        } catch (err) {
+            console.log(err); // console log any erros
+            res.redirect('/inventory'); // redirect page
+            res.end(); // end page
+        } finally {
+            await client.close();
+            //res.render('');
+        };
+    });
+
+});
   
   
   
