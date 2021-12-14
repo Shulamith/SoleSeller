@@ -5,6 +5,7 @@ const ebayAuthToken = new EbayAuthToken({
     filePath: './routes/ebay-config.json' // input file path.
 });
 const fetch = require('cross-fetch');
+//const fetch = require('node-fetch');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const Schemas = require('../models/Schemas.js');
@@ -19,9 +20,7 @@ router.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "*");
     res.setHeader("Access-Control-Allow-Headers", "*");
-    res.header(
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
+    res.header("Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 
@@ -95,7 +94,7 @@ router.get('/oauth/redirect', async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
     // to this route. The authorization code is in the `code` param
     const authCode = req.query.code;
-    console.log("Got to etsy redirect");
+    //console.log("Got to etsy redirect");
     const tokenUrl = 'https://api.etsy.com/v3/public/oauth/token';
     const requestOptions = {
         method: 'POST',
@@ -116,39 +115,21 @@ router.get('/oauth/redirect', async (req, res) => {
     // Extract the access token from the response access_token data field
     if (response.ok) {
         const tokenData = await response.json();
-        console.log("Response okay");
-        //res.redirect('/inventory');
+        //console.log("Response okay");
         const inventory = await getEtsyInventory(tokenData.access_token);
-        //console.log("EtsyInventory", inventory);
-
-        // const requestOptions = {
-        //     method: 'POST',
-        //     body: JSON.stringify({
-        //         grant_type: 'authorization_code',
-        //         client_id: etsyClientID,
-        //         redirect_uri: etsyRedirectUri,
-        //         code: authCode,
-        //         code_verifier: etsyClientVerifier,
-        //     }),
-        //     headers: {
-        //         'Content-Type': 'application/json'
-        //     }
-        //res.redirect('http://localhost:3000/inventory')
         res.send(inventory);
-
-        //res.redirect('/inventory?access_token=${tokenData.access_token}');
     } else {
         res.send("Response was not okay");
     }
 });
 
 async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
-    console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
+    //console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
 
     // An Etsy access token includes your shop/user ID
     // as a token prefix, so we can extract that too
     const user_id = access_token.split('.')[0];
-    console.log("USER ID:", user_id);
+    //console.log("USER ID:", user_id);
     const authorization = 'Bearer ' + access_token;
     const requestOptions = {
         headers: {
@@ -157,13 +138,10 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
     };
     axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
     .then(response => {
-      console.log("TRIED GET AND RECIEVED RESPONSE");
-      console.log(response.data);
-      //console.log(response);
-      //if(response.ok) {
-        console.log("GETTING SHOP DATA");
-        const shop_id = response.data.shop_id;
-        console.log("SHOP ID", shop_id);
+      const shop_id = response.data.shop_id;
+      updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
+        // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
+        //    "i_did", "true", "made_to_order", shop_id);
         const shopRequestOptions = {
             method: 'GET',
             headers: {
@@ -174,20 +152,20 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
         }
         axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
           .then(shopResponse => {
-            console.log("SHOP RESPONSE", shopResponse.data);
-            console.log("Price", shopResponse.data.results[0].price);
-            return shopResponse.data;
+            //console.log("Price", shopResponse.data.results[0].price);
+            console.log(shopResponse.data);
+            return JSON.stringify(shopResponse.data);
           })
         .catch(error => {
-          console.log("ERROR");
-          console.log(error);
+          //console.log(error);
+          return "Error"
         });
   })
     .catch(error => {
-      console.log("ERROR");
-      console.log(error);
+      //console.log("ERROR");
+      //console.log(error);
+      return "ERROR";
     });
-    return "EtsyInventory";
 };
 
 /* ------------------ END ETSY OAUTH ------------------ */
@@ -272,18 +250,12 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
-  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
-  // // Authorization Code Auth Flow
-  //res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', '*');
   const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
 
   console.log(AuthUrl);
   //console.log(res.redirect(AuthUrl));
-  return res.redirect(AuthUrl);
-  //console.log("RESPONSE QUERY", res.query)
-  //console.log(res.query);
-  //return ("authurl");
-//  return res.end(JSON.stringify(AuthUrl));
+  return res.redirect(AuthUrl);;
 });
 
 router.post('/login', async (req, res) => {
@@ -297,7 +269,6 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-
         if (await bcrypt.compare(req.body.password, user.password)) {
 
             const accessToken = generateAccessToken(user);
@@ -438,5 +409,113 @@ async function getInventory(token) {
     return "GET INVENTORY";
 };
 
+async function getTaxonmyID () {
+  const requestOptions = {
+      'method': 'GET',
+      'headers': {
+          'x-api-key': etsyClientID,
+      },
+  };
+  axios.get('https://openapi.etsy.com/v3/application/taxonomy/seller/get',
+  requestOptions)
+  .then( response => {
+    const data = response.json().data;
+    console.log("taxonomyData", data)
+    return data;
+  })
+  .catch( err => {
+    console.log(err)
+  });
+};
+
+//TODO: add server end point for updating
+async function updateEtsyListing(auth, shop_id, listing_id, price) {
+//description, price, title, could add more parameters later
+var headers = new fetch.Headers();
+headers.append("Content-Type", "application/x-www-form-urlencoded");
+headers.append("x-api-key", etsyClientID);
+headers.append("Authorization", auth);
+
+var updateParams = new URLSearchParams();
+updateParams.append("price", price);
+// description ? : updateParams.append("description", description)
+console.log("PRICE", price)
+var requestUpdateOptions = {
+  method: 'PUT',
+  headers: headers,
+  body: updateParams,
+  redirect: 'follow'
+}
+fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}`, requestUpdateOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+
+};
+
+/* BEGIN ETSY POST */
+//TODO:
+//1) getTaxonmyID,
+//2)get the ShippingID for the user (and ask them to select which?)
+//3) or ask them to create one.
+//4) Redirect to....
+//5) Ask them whether they want to publish the draft
+
+async function createEtsyListing(auth, quantity, title, description, price,
+   who_made, is_supply,when_made, shop_id) {
+  const taxonomy_id = "1296"
+  //= await getTaxonmyID();
+  var headers = new fetch.Headers();
+  headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
+  headers.append("x-api-key", etsyClientID);
+  headers.append("Authorization", auth);
+
+  var shippingParams = new URLSearchParams();
+  shippingParams.append("title", "New profile six");
+  shippingParams.append("min_processing_time", 1);
+  shippingParams.append("title", "New profile five");
+  shippingParams.append("min_processing_time", 1);
+  shippingParams.append("max_processing_time", 9);
+  shippingParams.append("origin_country_iso", "BV");
+  shippingParams.append("primary_cost", 50.00);
+  shippingParams.append("secondary_cost", 35.00);
+  shippingParams.append("destination_country_iso", "BV");
+  shippingParams.append("min_delivery_days", 2);
+  shippingParams.append("max_delivery_days", 45);
+
+var requestShippingProfile = {
+    method: 'POST',
+    headers: headers,
+    body: shippingParams,
+    redirect: 'follow'
+};
+
+fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/shipping-profiles`, requestShippingProfile)
+    .then(result => console.log("RESULT",result))
+    .catch(error => console.log('error', error));
+
+  var urlencoded = new URLSearchParams();
+  urlencoded.append('quantity', quantity);
+  urlencoded.append('title',title);
+  urlencoded.append('description', description);
+  urlencoded.append('price', price);
+  urlencoded.append('taxonomy_id', taxonomy_id);
+  urlencoded.append('who_made', who_made);
+  urlencoded.append('is_supply', is_supply);
+  urlencoded.append('when_made', when_made);
+  urlencoded.append('shipping_profile_id',162052746338)
+
+  var requestOptions = {
+    method: 'POST',
+    headers: headers,
+    body: urlencoded,
+    redirect: 'follow'
+ };
+
+fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`, requestOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+}
 
 module.exports = router;
