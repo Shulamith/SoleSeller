@@ -5,14 +5,20 @@ const ebayAuthToken = new EbayAuthToken({
     filePath: './routes/ebay-config.json' // input file path.
 });
 const fetch = require('cross-fetch');
+//const fetch = require('node-fetch');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+<<<<<<< HEAD
 
 // mongodb depencencies
 const Schemas = require('../models/Schemas.js');
 var objectId = require('mongodb').ObjectId;
 var mongoClient = require('mongodb').MongoClient
 var assert = require('assert');
+=======
+const Schemas = require('../models/Schemas.js');
+const axios = require('axios');
+>>>>>>> main
 require('dotenv/config');
 
 router.use(express.urlencoded({ extended: false }));
@@ -23,9 +29,7 @@ router.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Allow-Methods", "*");
     res.setHeader("Access-Control-Allow-Headers", "*");
-    res.header(
-        "Origin, X-Requested-With, Content-Type, Accept"
-    );
+    res.header("Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
 
@@ -36,7 +40,7 @@ const multer = require('multer'); // multer will parse bodies that cannot be par
 const { mongo } = require('mongoose');
 
 const storage = multer.diskStorage({
-    destination: function(req, file, cb){ 
+    destination: function(req, file, cb){
     cb(null, './uploads/'); // where incoming file gets stored
     },
     filename: function(req, file, cb) {
@@ -46,7 +50,7 @@ const storage = multer.diskStorage({
 
 // filter user pictures with minetype
 const fileFilter = (req, file, cb) => {
-    
+
     if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
         cb(null, true); //accept files
     } else {
@@ -56,7 +60,7 @@ const fileFilter = (req, file, cb) => {
 
 // upload image to server side storage, make sure image does not exceed limits
 const upload = multer({
-    storage: storage, 
+    storage: storage,
     limits: {
         fileSize: 1024 * 1024 * 5 // accept files up to 5MB
     },
@@ -100,10 +104,11 @@ router.get('/ping', async (req, res) => {
 });
 
 
-router.get("/oauth/redirect", async (req, res) => {
+router.get('/oauth/redirect', async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
     // to this route. The authorization code is in the `code` param
     const authCode = req.query.code;
+    //console.log("Got to etsy redirect");
     const tokenUrl = 'https://api.etsy.com/v3/public/oauth/token';
     const requestOptions = {
         method: 'POST',
@@ -124,67 +129,85 @@ router.get("/oauth/redirect", async (req, res) => {
     // Extract the access token from the response access_token data field
     if (response.ok) {
         const tokenData = await response.json();
-        //res.redirect('/inventory');
-        res.redirect(`/inventory?access_token=${tokenData.access_token}`);
+        //console.log("Response okay");
+        const inventory = await getEtsyInventory(tokenData.access_token);
+        res.send(inventory);
     } else {
-        res.send("oops");
+        res.send("Response was not okay");
     }
 });
+
+async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
+    //console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
+
+    // An Etsy access token includes your shop/user ID
+    // as a token prefix, so we can extract that too
+    const user_id = access_token.split('.')[0];
+    //console.log("USER ID:", user_id);
+    const authorization = 'Bearer ' + access_token;
+    const requestOptions = {
+        headers: {
+            'x-api-key': etsyClientID
+        }
+    };
+    axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
+    .then(response => {
+      const shop_id = response.data.shop_id;
+      updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
+        // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
+        //    "i_did", "true", "made_to_order", shop_id);
+        const shopRequestOptions = {
+            method: 'GET',
+            headers: {
+                'x-api-key': etsyClientID,
+                // Scoped endpoints require a bearer token
+                'Authorization': authorization
+            }
+        }
+        axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
+          .then(shopResponse => {
+            //console.log("Price", shopResponse.data.results[0].price);
+            console.log(shopResponse.data);
+            return JSON.stringify(shopResponse.data);
+          })
+        .catch(error => {
+          //console.log(error);
+          return "Error"
+        });
+  })
+    .catch(error => {
+      //console.log("ERROR");
+      //console.log(error);
+      return "ERROR";
+    });
+};
 
 /* ------------------ END ETSY OAUTH ------------------ */
 
-
-
-//GO http://localhost:4000/addItem TO ADD ITEM WITH THIS CODE
-router.get('/addItem', async (req, res) => {
-    const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'ramon' }).exec();
-
-    const item = { item: 'Soul Eater, Volumes: 1-5', price: '15.49', channel: 'Amazon', user: userId }
-    const newItem = new Schemas.Items(item);
-
-    try {
-        await newItem.save(async (err, newItemResult) => {
-            console.log('New Item created!');
-            res.end('New Item created!');
-        });
-
-    } catch (err) {
-        console.log(err);
-        res.end('Item not added!');
-    }
-});
-
-
+<<<<<<< HEAD
 router.get('/inventory', async (req, res) => { // here we grab our items
     const items = Schemas.Items;
+=======
+>>>>>>> main
 
-    // const userItems = await items.find({}, (err, itemsData) => {
+router.get('/inventory', authenticateToken, async (req, res) => {
+    const userID = req.user.id;
 
-    // this code will get all items and join the user table
-    const userItems = await items.find({}).populate("user").exec((err, itemsData) => { // finds all items and automaticlly add user associated with item
-        if (err) throw err;                                                             // we want to be able to select all the items and find the user
-        if (itemsData) {
-            res.end(JSON.stringify(itemsData));
-        } else {
-            res.end();
-        }
-    }); // so when we query our tables and finds all of our items with will auto add user associated with that tweet
+    const inventory = Schemas.Items;
 
+    const items = await inventory.find({ user: userID });
 
+    if (!items) {
+        return res.json({ status: 'error', message: 'You currently have no items in your inventory' });
+    }
 
-    // const str = [{
-    //     "product": "Nintendo Gameboy Advance",
-    //     "channel": "Amazon",
-    //     "username": "tahmid_z"
-    // }];
-    // res.end(JSON.stringify(str));
+    return res.json({ items: items });
 });
 
 
 // .single will try to parse one file only, field name  = productImage
 router.post('/addItem', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
-    
+
     console.log(req.file);
 
     const itemName = req.body.itemName; // get item input field, name of field = itemInput
@@ -197,8 +220,8 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     console.log(imageData);
     console.log(itemName);
 
-    const user = Schemas.Users; //define user
-    const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+    //const user = Schemas.Users; //define user
+    //const userId = await user.findOne({ username: req.user.username }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
     // grab and wait till it gets it
     // findone = mongose function to find document in db
 
@@ -212,23 +235,31 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
             contentType: imageType,
             imagePath: imagePath
         },
-        user: userId._id // field to link user whose saving item
-        
+        user: req.user.id // field to link user whose saving item
+
     });
 
     try { // we try to add it now
         await newItem.save((err, newItemResults) => {
-            if (err) res.end('Error Saving.'); // if error
-            res.redirect('/inventory'); // else, redirect back to inventory page
-            res.end(); // make sure page ends after redirection
+            if (err) res.json({ status: 'error', message: 'Something went wrong. Item was not saved' }); // if error
+            res.json({ status: 'ok', message: 'Item saved successfully' }); // make sure page ends after redirection
         });
     } catch (err) { // catch any errors
         console.log(err); // console log any erros
-        res.redirect('/inventory'); // redirect page
-        res.end(); // end page
+        res.json({ status: 'error', message: 'Something went wrong. Please try again' }); // end page
     }
 });
 
+<<<<<<< HEAD
+=======
+// router.post(‘/addItem’, async(req,res,next) => {
+//     const newItem = new Schemas.Items({
+//     newItem.image.data = fs.readFileSync(req.file.path)
+//     newItem.image.contentType = file.mimetype;
+//     });
+// newItem.save()
+//   });
+>>>>>>> main
 
 // update items in mongodb
 router.post('/update', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
@@ -394,23 +425,13 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
   console.log("TEST");
-  res.header('Access-Control-Allow-Origin', '*'); //SD: GET BACK TO THIS!
-  // // Authorization Code Auth Flow
-  //res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Origin', '*');
   const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
 
   console.log(AuthUrl);
   //console.log(res.redirect(AuthUrl));
-  return res.redirect(AuthUrl);
-  //console.log("RESPONSE QUERY", res.query)
-  //console.log(res.query);
-  //return ("authurl");
-//  return res.end(JSON.stringify(AuthUrl));
+  return res.redirect(AuthUrl);;
 });
-
-// router.get('/profile', authenticateToken, (req, res) => {
-//     res.json({ status: 'ok', id: req.user.id, username: req.user.username, email: req.user.email });
-// });
 
 router.post('/login', async (req, res) => {
 
@@ -423,7 +444,6 @@ router.post('/login', async (req, res) => {
     }
 
     try {
-
         if (await bcrypt.compare(req.body.password, user.password)) {
 
             const accessToken = generateAccessToken(user);
@@ -449,7 +469,7 @@ router.post('/login', async (req, res) => {
 
         console.log(err);
     }
-    
+
     res.json({ status: 'error', error: 'Invalid email/password' });
 
 });
@@ -474,7 +494,14 @@ router.delete('/logout', authenticateToken, async (req, res) => {
 
 router.post('/register', async (req, res) => {
 
-  var hashedPassword = '';
+    var hashedPassword = '';
+
+    const User = Schemas.Users;
+    const existingUser = await User.findOne({ email: req.body.email }).lean();
+
+    if (existingUser) {
+        return res.json({ status: 'error', message: 'A user with that email already exists' });
+    }
 
     try {
         hashedPassword = await bcrypt.hash(req.body.password, 12);
@@ -557,5 +584,113 @@ async function getInventory(token) {
     return "GET INVENTORY";
 };
 
+async function getTaxonmyID () {
+  const requestOptions = {
+      'method': 'GET',
+      'headers': {
+          'x-api-key': etsyClientID,
+      },
+  };
+  axios.get('https://openapi.etsy.com/v3/application/taxonomy/seller/get',
+  requestOptions)
+  .then( response => {
+    const data = response.json().data;
+    console.log("taxonomyData", data)
+    return data;
+  })
+  .catch( err => {
+    console.log(err)
+  });
+};
+
+//TODO: add server end point for updating
+async function updateEtsyListing(auth, shop_id, listing_id, price) {
+//description, price, title, could add more parameters later
+var headers = new fetch.Headers();
+headers.append("Content-Type", "application/x-www-form-urlencoded");
+headers.append("x-api-key", etsyClientID);
+headers.append("Authorization", auth);
+
+var updateParams = new URLSearchParams();
+updateParams.append("price", price);
+// description ? : updateParams.append("description", description)
+console.log("PRICE", price)
+var requestUpdateOptions = {
+  method: 'PUT',
+  headers: headers,
+  body: updateParams,
+  redirect: 'follow'
+}
+fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}`, requestUpdateOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+
+};
+
+/* BEGIN ETSY POST */
+//TODO:
+//1) getTaxonmyID,
+//2)get the ShippingID for the user (and ask them to select which?)
+//3) or ask them to create one.
+//4) Redirect to....
+//5) Ask them whether they want to publish the draft
+
+async function createEtsyListing(auth, quantity, title, description, price,
+   who_made, is_supply,when_made, shop_id) {
+  const taxonomy_id = "1296"
+  //= await getTaxonmyID();
+  var headers = new fetch.Headers();
+  headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
+  headers.append("x-api-key", etsyClientID);
+  headers.append("Authorization", auth);
+
+  var shippingParams = new URLSearchParams();
+  shippingParams.append("title", "New profile six");
+  shippingParams.append("min_processing_time", 1);
+  shippingParams.append("title", "New profile five");
+  shippingParams.append("min_processing_time", 1);
+  shippingParams.append("max_processing_time", 9);
+  shippingParams.append("origin_country_iso", "BV");
+  shippingParams.append("primary_cost", 50.00);
+  shippingParams.append("secondary_cost", 35.00);
+  shippingParams.append("destination_country_iso", "BV");
+  shippingParams.append("min_delivery_days", 2);
+  shippingParams.append("max_delivery_days", 45);
+
+var requestShippingProfile = {
+    method: 'POST',
+    headers: headers,
+    body: shippingParams,
+    redirect: 'follow'
+};
+
+fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/shipping-profiles`, requestShippingProfile)
+    .then(result => console.log("RESULT",result))
+    .catch(error => console.log('error', error));
+
+  var urlencoded = new URLSearchParams();
+  urlencoded.append('quantity', quantity);
+  urlencoded.append('title',title);
+  urlencoded.append('description', description);
+  urlencoded.append('price', price);
+  urlencoded.append('taxonomy_id', taxonomy_id);
+  urlencoded.append('who_made', who_made);
+  urlencoded.append('is_supply', is_supply);
+  urlencoded.append('when_made', when_made);
+  urlencoded.append('shipping_profile_id',162052746338)
+
+  var requestOptions = {
+    method: 'POST',
+    headers: headers,
+    body: urlencoded,
+    redirect: 'follow'
+ };
+
+fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`, requestOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+}
 
 module.exports = router;
