@@ -2,14 +2,14 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
-import cartoon from './test.png';
+import cartoon from './logo.png';
 import Button from '@mui/material/Button';
 import ebay from './ebay.png';
 import etsy from './etsy.jpg';
 import PropTypes from 'prop-types';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import test from './test.jpg';
+import test from './test.gif';
 import "./profile.css";
 
 const useStyles = makeStyles((theme) => ({
