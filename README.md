@@ -2,9 +2,9 @@
 
 
 To run the app:
-cd into node_react_app/backend and run: npm run server
-cd into node_react_app/frontend and run : npm run start
-Go to localhost:3000
+-cd into node_react_app/backend and run: npm run server
+-cd into node_react_app/frontend and run : npm run start
+-Go to localhost:3000
 
 This is an application to connect multiselling platforms to provide comparison between seller fees and total earnings. 
 As of now the application connects with Etsy and Ebay's functionality is withheld as we wait for them to fix their API. 
