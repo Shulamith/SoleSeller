@@ -79,6 +79,7 @@ const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 var etsyAuthentication = "";
 var etsyUserID = "";
 var appUserID = "";
+var etsyImage = "";
 
 
 // Send a JSON response to a default get request
@@ -161,10 +162,10 @@ async function syncDatabase(etsyInventory){
   //Compare items in db with items from etsyInventory by listing_id
   etsyInventory.results.forEach((item, index) => {
     const duplicates = inventory.find({user:appUserID, etsyListingID:item.listing_id});
-    if(duplicates){
-       console.log("already in DB");
-     }
-     else {
+    // if(duplicates){
+    //    console.log("already in DB");
+    //  }
+
        console.log(item.listing_id);
        // console.log("Not in DB");
        // body = {
@@ -190,7 +191,7 @@ async function syncDatabase(etsyInventory){
            item: item.title,
            description: item.description,
            etsyPrice: price,
-           image: item.url,
+           image: etsyImage,
            etsyListingID: item.listing_id,
            user: appUserID // field to link user whose saving item
         });
@@ -204,8 +205,8 @@ async function syncDatabase(etsyInventory){
           console.log(err); // console log any erros
           console.log({ status: 'error', message: 'Something went wrong. Please try again' }); // end page
       }
-     }
-     return 
+
+     return
   });
 
 
@@ -228,7 +229,7 @@ async function getEtsyInventory () {
     axios.get(`https://openapi.etsy.com/v3/application/users/${etsyUserID}/shops`,requestOptions)
     .then(response => {
       const shop_id = response.data.shop_id;
-      //getEtsyImage(shop_id,"1113666128");
+      getEtsyImage(shop_id,"1113666128");
       //ploadEtsyImage(etsyAuthentication, shop_id, "1140102067", JSON.stringify(testImage));
       //updateEtsyListing(etsyAuthentication, shop_id, "1140102067", 0.70);
         // createEtsyListing(etsyAuthentication, "1", "TestWater", "testingetsyapi", "0.40",
@@ -290,7 +291,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     //const imagePath = req.file.path;
     //const imageType = req.file.mimetype;
     //const imageData = fs.readFileSync(req.file.path)
-    console.log(imageData);
+    //console.log(imageData);
     console.log(itemName);
 
     //const user = Schemas.Users; //define user
@@ -303,19 +304,19 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
         description: itemDescription,
         etsyPrice: etsyPrice,
         ebayPrice: ebayPrice,
-        image: {
-            data: imageData,
-            contentType: imageType,
-            imagePath: imagePath
-        },
-        user: req.user.id // field to link user whose saving item
+        // image: {
+        //     data: imageData,
+        //     contentType: imageType,
+        //     imagePath: imagePath
+        // },
+      //  user: req.user.id // field to link user whose saving item
 
     });
 
     try { // we try to add it now
         await newItem.save((err, newItemResults) => {
             if (err) res.json({ status: 'error', message: 'Something went wrong. Item was not saved' }); // if error
-            res.json({ status: 'ok', message: 'Item saved successfully' }); // make sure page ends after redirection
+            res.redirect("http://localhost:3000/inventory"); // make sure page ends after redirection
         });
     } catch (err) { // catch any errors
         console.log(err); // console log any erros
@@ -699,6 +700,7 @@ async function getEtsyImage(shop_id, listing_id){
   axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestOptions)
     .then (res => {
                   console.log(res.data)
+                  etsyImage = res.data.results[0].url_170x135
                   console.log(res.data.results[0].url_170x135)
                 })
     .catch(err => console.log(err));
@@ -736,7 +738,7 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
 //     headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
 //     headers.append("x-api-key", etsyClientID);
 //     headers.append("Authorization", auth);
-  
+
 // }
 
 /* BEGIN ETSY POST */

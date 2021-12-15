@@ -24,12 +24,13 @@ const itemSchema = new Schema ({
     ebayPrice:{type:String, required:false},
     etsyListingID:{type:String, required:false},
     etsyStatus:{type:String, required:false},
-    image: {
-        data: Buffer,
-        contentType: String,
-        imagePath: String,
-        required: false
-     },
+    image:{type:String, required:false},
+    // image: {
+    //     data: Buffer,
+    //     contentType: String,
+    //     imagePath: String,
+    //     required: false
+    //  },
     user:{type: Schema.Types.ObjectId, ref: 'users'} // references user table tru id
 },{timestamps:true});
 
