@@ -75,6 +75,7 @@ to the code_challenge sent with the initial authorization request
 const etsyClientID = process.env.ETSY_KEY;
 const etsyClientVerifier = process.env.ETSY_VERIFY;
 const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
+var etsyAuthentication = "";
 
 
 // Send a JSON response to a default get request
@@ -125,9 +126,11 @@ router.get('/oauth/redirect', async (req, res) => {
     // Extract the access token from the response access_token data field
     if (response.ok) {
         const tokenData = await response.json();
-        //console.log("Response okay");
-        const inventory = await getEtsyInventory(tokenData.access_token);
-        res.send(inventory);
+        // An Etsy access token includes your shop/user ID
+        // as a token prefix, so we can extract that too
+        const user_id = access_token.split('.')[0];
+        etsyAuthentication = 'Bearer ' + access_token;
+        res.redirect("./inventory");
     } else {
         res.send("Response was not okay");
     }
@@ -135,11 +138,7 @@ router.get('/oauth/redirect', async (req, res) => {
 
 async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
     //console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
-    // An Etsy access token includes your shop/user ID
-    // as a token prefix, so we can extract that too
-    const user_id = access_token.split('.')[0];
-    //console.log("USER ID:", user_id);
-    const authorization = 'Bearer ' + access_token;
+
     const requestOptions = {
         headers: {
             'x-api-key': etsyClientID
@@ -151,16 +150,16 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
     .then(response => {
       const shop_id = response.data.shop_id;
       getEtsyImage(shop_id,"1113666128");
-      uploadEtsyImage(authorization, shop_id, "1140102067", JSON.stringify(testImage));
-      //updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
-        // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
+      uploadEtsyImage(etsyAuthentication, shop_id, "1140102067", JSON.stringify(testImage));
+      //updateEtsyListing(etsyAuthentication, shop_id, "1140102067", 0.70);
+        // createEtsyListing(etsyAuthentication, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
         const shopRequestOptions = {
             method: 'GET',
             headers: {
                 'x-api-key': etsyClientID,
                 // Scoped endpoints require a bearer token
-                'Authorization': authorization
+                'Authorization': etsyAuthentication
             }
         }
         axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
@@ -286,6 +285,9 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
     //     //  console.log(result);
     //       client.close();
     //     });
+    //Calling createEtsyListing function
+        createEtsyListing(auth, quantity, item, description, etsyPrice,
+           who_made, is_supply,when_made, shop_id)
         try { // we try to add it now
         await db.collection('items').updateOne({"_id": objectId(o_id)}, // use to filter item
                                                 {$set: {"item":itemName, "description":itemDescription, "etsyPrice": etsyPrice, "ebayPrice": ebayPrice  }}, // update item
@@ -396,7 +398,7 @@ router.get('/get-data', function(req, res, next) {
 });
 
 
-
+//EBAY AUTH NOT IN USE
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
     'https://api.ebay.com/oauth/api_scope/sell.marketing.readonly',
@@ -408,12 +410,9 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly',
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
-  console.log("TEST");
   res.header('Access-Control-Allow-Origin', '*');
-  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
-
-  console.log(AuthUrl);
-  //console.log(res.redirect(AuthUrl));
+  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION',
+   scopes);
   return res.redirect(AuthUrl);;
 });
 
@@ -446,7 +445,8 @@ router.post('/login', async (req, res) => {
                 res.status(500).send();
             }
 
-            return res.json({ status: 'ok', message: 'User log in was successful', user: user.username, accessToken: accessToken });
+            return res.json({ status: 'ok', message: 'User log in was
+            successful', user: user.username, accessToken: accessToken });
         }
 
     } catch (err) {
@@ -662,7 +662,7 @@ async function createEtsyListing(auth, quantity, title, description, price,
   var headers = new fetch.Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
   headers.append("x-api-key", etsyClientID);
-  headers.append("Authorization", auth);
+  headers.append("Authorization", etsyAuthentication);
 
   var shippingParams = new URLSearchParams();
   shippingParams.append("title", "New profile six");
