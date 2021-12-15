@@ -20,7 +20,8 @@ As our first big project as a team, and not the cleanest of code, there are boun
 Functions that work on backend:
 1. CreateEtsyListing(pass in the corret parameters and it will appear in your drafts on Etsy!)
 2. EtsyModify (Modify a listing's price!)
-They sometimes are a bit finicky on the frontend ever since material ui update, but you can test the backend by calling the function in the  router.get('/inventory) function. 
+
+The modify and upload sometimes are a bit finicky on the frontend ever since material ui update, but you can test the backend by calling the function in the  router.get('/inventory) function. 
 
  
 
