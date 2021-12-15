@@ -95,9 +95,6 @@ export default function InventoryTwo() {
                             </Typography>
                             </CardContent>
                             <CardActions disableSpacing>
-                            <ThemeProvider theme={theme}>
-                                <Button size="small" color= "primary">Delete</Button>
-                                </ThemeProvider>
 
                             </CardActions>
                             </Card>
