@@ -8,17 +8,14 @@ const fetch = require('cross-fetch');
 //const fetch = require('node-fetch');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-<<<<<<< HEAD
 
 // mongodb depencencies
 const Schemas = require('../models/Schemas.js');
 var objectId = require('mongodb').ObjectId;
 var mongoClient = require('mongodb').MongoClient
 var assert = require('assert');
-=======
 const Schemas = require('../models/Schemas.js');
 const axios = require('axios');
->>>>>>> main
 require('dotenv/config');
 
 router.use(express.urlencoded({ extended: false }));
@@ -184,11 +181,6 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
 
 /* ------------------ END ETSY OAUTH ------------------ */
 
-<<<<<<< HEAD
-router.get('/inventory', async (req, res) => { // here we grab our items
-    const items = Schemas.Items;
-=======
->>>>>>> main
 
 router.get('/inventory', authenticateToken, async (req, res) => {
     const userID = req.user.id;
@@ -250,16 +242,6 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     }
 });
 
-<<<<<<< HEAD
-=======
-// router.post(‘/addItem’, async(req,res,next) => {
-//     const newItem = new Schemas.Items({
-//     newItem.image.data = fs.readFileSync(req.file.path)
-//     newItem.image.contentType = file.mimetype;
-//     });
-// newItem.save()
-//   });
->>>>>>> main
 
 // update items in mongodb
 router.post('/update', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
