@@ -13,10 +13,11 @@ import Box from '@mui/material/Box';
 import { createTheme,  ThemeProvider } from '@mui/material/styles';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { EditText } from 'react-edit-text';
 import 'react-edit-text/dist/index.css';
 import './InventoryTwo.css';
 
-function InventoryTwo() {
+export default function InventoryTwo() {
     const [expanded, setExpanded] = React.useState(false);
 
     const handleExpandClick = (key) => {
@@ -82,33 +83,20 @@ function InventoryTwo() {
                             <Typography gutterBottom variant="h5" component="div">
                             {val.item}
                             </Typography>
-                            <Typography gutterBottom variant="body2" color="text.secondary">
-                            {val.description}
+                              <Typography paragraph>
+                              Description: {val.description}
+                              <br></br>
+                              <Typography paragraph> Ebay Price: <EditText defaultValue={val.ebayPrice}/></Typography>
+                              <Typography paragraph> Etsy Price: <EditText defaultValue={val.etsyPrice}/></Typography>                              
+                              <Typography paragraph>Ebay Fees: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)}</Typography>
+                              <Typography paragraph>Ebay Profit: ${((val.ebayPrice)-((val.ebayPrice)*(.1255)-(.30)).toFixed(2))}</Typography>
+                              <Typography paragraph>Etsy Fees: ${((val.etsyPrice)*(.05)-(.20)).toFixed(2)}</Typography>
+                              <Typography paragraph>Etsy Profit: ${(val.etsyPrice-(((val.etsyPrice)*(.05)-(.20)).toFixed(2))).toFixed(2)}</Typography>
                             </Typography>
                             </CardContent>
                             <CardActions disableSpacing>
-                            <ThemeProvider theme={theme}>
-                                <Button size="small" color= "secondary">Edit</Button>
-                                <Button size="small" color= "primary">Delete</Button>
-                                </ThemeProvider>
-                                <ExpandMore
-                                onClick={() => handleExpandClick(key)}
-                                aria-expanded={expandedId === key}
-                                aria-label="show more"
-                                >
-                                <MoreVertIcon />
-                                </ExpandMore>
+
                             </CardActions>
-                            <Collapse in={expandedId === key} timeout="auto" unmountOnExit>
-                                <CardContent>
-                                <Typography paragraph>Ebay Price: ${val.ebayPrice}</Typography>
-                                <Typography paragraph>Ebay Fees: ${((val.ebayPrice)*(.1255)-(.30)).toFixed(2)}</Typography>
-                                <Typography paragraph>Ebay Profit: ${((val.ebayPrice)-((val.ebayPrice)*(.1255)-(.30)).toFixed(2))}</Typography>
-                                <Typography paragraph>Etsy Price: ${val.etsyPrice}</Typography>
-                                <Typography paragraph>Etsy Fees: ${((val.etsyPrice)*(.05)-(.20)).toFixed(2)}</Typography>
-                                <Typography paragraph>Etsy Profit: ${(val.etsyPrice-(((val.etsyPrice)*(.05)-(.20)).toFixed(2))).toFixed(2)}</Typography>
-                                </CardContent>
-                            </Collapse>
                             </Card>
                             </div>
                         );
@@ -129,6 +117,3 @@ function InventoryTwo() {
         </div>
     );
 }
-
-
-export default InventoryTwo;

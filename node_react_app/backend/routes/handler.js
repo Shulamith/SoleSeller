@@ -15,6 +15,7 @@ const Schemas = require('../models/Schemas.js');
 var objectId = require('mongodb').ObjectId;
 var mongoClient = require('mongodb').MongoClient
 var assert = require('assert');
+
 const axios = require('axios');
 require('dotenv/config');
 const fs = require('fs');
@@ -286,9 +287,9 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     const itemDescription = req.body.itemDescription;
     const ebayPrice = req.body.ebayPrice;
     const etsyPrice = req.body.etsyPrice;
-    const imagePath = req.file.path;
-    const imageType = req.file.mimetype;
-    const imageData = fs.readFileSync(req.file.path)
+    //const imagePath = req.file.path;
+    //const imageType = req.file.mimetype;
+    //const imageData = fs.readFileSync(req.file.path)
     console.log(imageData);
     console.log(itemName);
 
@@ -729,6 +730,14 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
   .catch(error => console.log('error', error));
 
 };
+
+// async function deleteEtsyListing (auth, listing_id)
+// {
+//     headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
+//     headers.append("x-api-key", etsyClientID);
+//     headers.append("Authorization", auth);
+  
+// }
 
 /* BEGIN ETSY POST */
 //TODO:
