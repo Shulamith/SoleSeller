@@ -610,13 +610,13 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
 
 };
 
-async function deleteEtsyListing (auth, listing_id)
-{
-    headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
-    headers.append("x-api-key", etsyClientID);
-    headers.append("Authorization", auth);
+// async function deleteEtsyListing (auth, listing_id)
+// {
+//     headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
+//     headers.append("x-api-key", etsyClientID);
+//     headers.append("Authorization", auth);
   
-}
+// }
 
 /* BEGIN ETSY POST */
 //TODO:
