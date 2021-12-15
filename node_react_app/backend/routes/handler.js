@@ -76,7 +76,8 @@ const etsyClientID = process.env.ETSY_KEY;
 const etsyClientVerifier = process.env.ETSY_VERIFY;
 const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 var etsyAuthentication = "";
-var etsyUserID = ""
+var etsyUserID = "";
+var appUserID = "";
 
 
 // Send a JSON response to a default get request
@@ -131,9 +132,9 @@ router.get('/oauth/redirect', async (req, res) => {
         const user_id = tokenData.access_token.split('.')[0];
         etsyAuthentication = 'Bearer ' + tokenData.access_token;
         etsyUserID = user_id;
-        //syncDatabase();
-        var inventory = await getEtsyInventory();
-        console.log("TEST500", inventory);
+        // //syncDatabase();
+        // var inventory = await getEtsyInventory();
+        // console.log("TEST500", inventory);
         //getEtsyInventory().then(res => {etsyInventory = res});
         //console.log("Etsy Inventory Test", etsyInventory);
         res.redirect('http://localhost:3000/inventory');
@@ -142,11 +143,75 @@ router.get('/oauth/redirect', async (req, res) => {
     }
 });
 
-async function syncDatabase(){
-  const etsyInventory = await getEtsyInventory();
-  const items = etsyInventory.result.map(item => item.listing_id, item.title, item.description,
-  item.state, item.url, item.quantity)
-  console.log("ITEMS", items);
+async function syncDatabase(etsyInventory){
+  console.log("dbFunction", etsyInventory);
+  //var itemsInDB = Schemas.Items.find({ user: appUserID })
+  const inventory = Schemas.Items;
+  const itemsInDB = await inventory.find({ user: appUserID });
+  console.log(itemsInDB);
+  if (itemsInDB) {
+    listing_IDS = itemsInDB.map(item => item.etsyListingID);
+    console.log(listing_IDS);
+  }
+  //console.log(itemsInDB);
+  //console.log(JSON.parse({ items: itemsInDB }));
+
+
+  //Compare items in db with items from etsyInventory by listing_id
+  etsyInventory.results.forEach((item, index) => {
+    const duplicates = inventory.find({user:appUserID, etsyListingID:item.listing_id});
+    if(duplicates){
+       console.log("already in DB");
+     }
+     else {
+       console.log(item.listing_id);
+       // console.log("Not in DB");
+       // body = {
+       //    item: item.title,
+       //    description: item.description,
+       //    etsyPrice: item.price,
+       //    image: item.url,
+       //    etsyListingID: item.listing_id,
+       //    user: appUserID // field to link user whose saving item
+       // };
+       // var requestOptions = {
+       //     method: 'POST',
+       //     body: body,
+       //     redirect: 'follow'
+       // };
+       // fetch("http://localhost:4000/addItem", requestOptions);
+       //Create new item
+       const price = parseInt(item.price.amount) / parseInt(item.price.divisor);
+       console.log(price);
+       console.log(item.price.amount);
+       console.log(parseInt(item.amount));
+       const newItem = new Schemas.Items({  // save the item
+           item: item.title,
+           description: item.description,
+           etsyPrice: price,
+           image: item.url,
+           etsyListingID: item.listing_id,
+           user: appUserID // field to link user whose saving item
+        });
+
+      try { // we try to add it now
+          newItem.save((err, newItemResults) => {
+              if (err) console.log(err); // if error
+              else console.log({ status: 'ok', message: 'Item saved successfully' }); // make sure page ends after redirection
+          });
+      } catch (err) { // catch any errors
+          console.log(err); // console log any erros
+          console.log({ status: 'error', message: 'Something went wrong. Please try again' }); // end page
+      }
+     }
+     return 
+  });
+
+
+
+
+  // const items = etsyInventory.results.map(item => {item.listing_id, item.title, item.description, item.state, item.url, item.quantity});
+  // console.log("ITEMS", items);
 }
 
 async function getEtsyInventory () {
@@ -156,6 +221,7 @@ async function getEtsyInventory () {
         }
     };
     var etsyInventory;
+    console.log("hit etsy inventory func");
     // testImage = fs.readFileSync("./uploads/kippah.jpeg");
     // console.log("test image", testImage);
     axios.get(`https://openapi.etsy.com/v3/application/users/${etsyUserID}/shops`,requestOptions)
@@ -177,6 +243,7 @@ async function getEtsyInventory () {
           .then(shopResponse => {
             etsyInventory = shopResponse.data;
             console.log(etsyInventory);
+            syncDatabase(etsyInventory);
             //console.log("Price", shopResponse.data.results[0].price);
           })
         .catch(error => {
@@ -195,11 +262,13 @@ async function getEtsyInventory () {
 
 router.get('/inventory', authenticateToken, async (req, res) => {
     const userID = req.user.id;
+    appUserID = userID;
 
     const inventory = Schemas.Items;
 
     const items = await inventory.find({ user: userID });
-
+    //CallGetEtsyInventory
+    getEtsyInventory();
     if (!items) {
         return res.json({ status: 'error', message: 'You currently have no items in your inventory' });
     }
