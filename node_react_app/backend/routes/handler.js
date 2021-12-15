@@ -9,6 +9,12 @@ const fetch = require('cross-fetch');
 //const fetch = require('node-fetch');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+
+// mongodb depencencies
+const Schemas = require('../models/Schemas.js');
+var objectId = require('mongodb').ObjectId;
+var mongoClient = require('mongodb').MongoClient
+var assert = require('assert');
 const Schemas = require('../models/Schemas.js');
 const axios = require('axios');
 require('dotenv/config');
@@ -39,6 +45,7 @@ const storage = multer.diskStorage({
     }
 });
 
+// filter user pictures with minetype
 const fileFilter = (req, file, cb) => {
 
     if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png' || file.mimetype === 'image/jpg') {
@@ -48,6 +55,7 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
+// upload image to server side storage, make sure image does not exceed limits
 const upload = multer({
     storage: storage,
     limits: {
@@ -205,6 +213,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     const imageType = req.file.mimetype;
     const imageData = fs.readFileSync(req.file.path)
     console.log(imageData);
+    console.log(itemName);
 
     //const user = Schemas.Users; //define user
     //const userId = await user.findOne({ username: req.user.username }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
@@ -236,13 +245,158 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
     }
 });
 
-// router.post(‘/addItem’, async(req,res,next) => {
-//     const newItem = new Schemas.Items({
-//     newItem.image.data = fs.readFileSync(req.file.path)
-//     newItem.image.contentType = file.mimetype;
-//     });
-// newItem.save()
-//   });
+
+// update items in mongodb
+router.post('/update', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
+
+    console.log(req.file);
+
+    const itemName = req.body.itemName; // get item input field, name of field = itemInput
+    const itemDescription = req.body.itemDescription;
+    const ebayPrice = req.body.ebayPrice;
+    const etsyPrice = req.body.etsyPrice;
+    const productName = req.body.name;
+    const id = req.body.id;
+    var o_id = new objectId(id);
+    // console.log(id);
+    // console.log(itemName);
+
+    const user = Schemas.Users; //define user
+    const userId = await user.findOne({ username: 'ramon' }).exec(); //need to create loginin to save userID for refrence, so now we manually add username
+    // grab and wait till it gets it
+    // findone = mongose function to find document in db
+
+    const updateItem = new Schemas.Items({  // save the item
+        item: itemName,
+        description: itemDescription,
+        etsyPrice: etsyPrice,
+        ebayPrice: ebayPrice,
+        user: userId._id // field to link user whose saving item
+
+    });
+    const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
+    // const client = new MongoClient(DB_URI);
+
+      mongoClient.connect(DB_URI, async function(err, client) {
+     if(err) throw err;
+     var db = client.db("node_soulseller")
+     assert.equal(null, err);
+    //     db.collection('items').updateOne({item: productName}, {$set: updateItem}, function(err, result) {
+    //       if(err) throw err;
+    //       console.log('Item updated');
+    //     //  console.log(result);
+    //       client.close();
+    //     });
+        try { // we try to add it now
+        await db.collection('items').updateOne({"_id": objectId(o_id)}, // use to filter item
+                                                {$set: {"item":itemName, "description":itemDescription, "etsyPrice": etsyPrice, "ebayPrice": ebayPrice  }}, // update item
+                                                { upsert: false }, (err, newItemResults) => {
+        //if (err) res.end('Error Updating.'); // if error
+        if (err) throw err;
+        res.redirect('/inventory'); // else, redirect back to inventory page
+        res.end(); }); // make sure page ends after redirection
+    } catch (err) { // catch any errors
+        console.log(err); // console log any erros
+        res.redirect('/inventory'); // redirect page
+        res.end(); // end page
+     } finally {
+        await client.close();
+        console.log("client closed");
+    }
+
+    });
+    // try { // we try to add it now
+    //     await  db.collection('items').updateOne({"_id": objectId(id)},{$set:updateItem}, (err, newItemResults) => {
+    //         if (err) res.end('Error Updating.'); // if error
+    //         res.redirect('/inventory'); // else, redirect back to inventory page
+    //         res.end(); // make sure page ends after redirection
+    //     });
+    // } catch (err) { // catch any errors
+    //     console.log(err); // console log any erros
+    //     res.redirect('/inventory'); // redirect page
+    //     res.end(); // end page
+    // }
+
+
+        // collection('orders').updateOne(
+        //     {"_id": objectId(id)},
+        //     {$set:updateItem})
+        //     .then((obj) => {
+        //         console.log('Updated - ' + obj);
+        //         res.redirect('orders')
+        //     })
+        //     .catch((err) => {
+        //         console.log('Error: ' + err);
+        //     })
+
+});
+
+// delete items in mongodb
+router.post('/delete', upload.single('productImage'), function(req, res) {
+    var id = req.body.id;
+    const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
+    console.log(id);
+
+    mongoClient.connect(DB_URI, async function(err, client) {
+        if(err) throw err;
+        var db = client.db("node_soulseller")
+        assert.equal(null, err);
+        try { // we try to add it now
+            await db.collection('items').deleteOne({"_id": objectId(id)}, (err, newItemResults) => {
+            //if (err) res.end('Error Updating.'); // if error
+            if (err) throw err;
+            console.log("Item deleted");
+            res.redirect('/inventory'); // else, redirect back to inventory page
+            res.end(); }); // make sure page ends after redirection
+        } catch (err) { // catch any errors
+            console.log(err); // console log any erros
+            res.redirect('/inventory'); // redirect page
+            res.end(); // end page
+         } finally {
+            await client.close();
+            console.log("client closed");
+        }
+
+    });
+});
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+    res.render('Home');
+  });
+
+router.get('/get-data', function(req, res, next) {
+    var resultArray = [];
+    const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
+
+    mongoClient.connect(DB_URI, async function(err, client) {
+        if(err) throw err;
+        var db = client.db("node_soulseller")
+        assert.equal(null, err);
+        try {
+            var cursor = db.collection('items').find();
+           await cursor.forEach((doc, err) => {
+                if(err) throw err;
+                console.log("error: "+ err);
+                assert.equal(null, err);
+                resultArray.push(doc);
+                console.log(doc);
+            });
+            //res.redirect('/inventory');
+            //res.end(); // make sure page ends after redirection
+        } catch (err) {
+            console.log(err); // console log any erros
+            res.redirect('/inventory'); // redirect page
+            res.end(); // end page
+        } finally {
+            await client.close();
+            //res.render('');
+        };
+    });
+
+});
+
+
 
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
