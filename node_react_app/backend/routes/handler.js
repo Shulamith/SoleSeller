@@ -1,4 +1,5 @@
 const express = require('express');
+var FormData = require('form-data');
 const router = express.Router();
 const EbayAuthToken = require('ebay-oauth-nodejs-client');
 const ebayAuthToken = new EbayAuthToken({
@@ -13,8 +14,7 @@ const axios = require('axios');
 require('dotenv/config');
 const fs = require('fs');
 const multer = require('multer') ;// multer will parse bodies that cannot be parse by bodyparser such as form data
-const myImage = 'PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ'
-
+const myImage = './uploads/waterbottle.jpeg';
 
 
 router.use(express.urlencoded({ extended: false }));
@@ -138,14 +138,14 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
             'x-api-key': etsyClientID
         }
     };
-    //testImage = fs.readFileSync("./uploads/waterbottle.jpeg");
-    //console.log(testImage);
+    testImage = fs.readFileSync("./uploads/kippah.jpeg");
+    console.log("test image", testImage);
     axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
     .then(response => {
       const shop_id = response.data.shop_id;
       getEtsyImage(shop_id,"1113666128");
-      uploadEtsyImage(authorization, shop_id, "1140102067", myImage);
-      updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
+      uploadEtsyImage(authorization, shop_id, "1140102067", JSON.stringify(testImage));
+      //updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
         // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
         const shopRequestOptions = {
@@ -439,8 +439,8 @@ async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
   headers.append("Content-Type", "multipart/form-data");
   headers.append("x-api-key", etsyClientID);
   headers.append("Authorization", auth);
-
-  var imageParams = new URLSearchParams();
+  //console.log(headers);
+  var imageParams = new FormData();
   imageParams.append("image", binaryImage);
 
   var requestImageOptions = {
