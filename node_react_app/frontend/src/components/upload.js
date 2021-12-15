@@ -8,6 +8,7 @@ import Grid from '@material-ui/core/Grid';
 import Form from "react-bootstrap/Form";
 import { Typography, TextField } from "@material-ui/core";
 import './upload.css';
+import axios from 'axios';
 
 class Upload extends Component {
   constructor(props) {
@@ -26,17 +27,18 @@ class Upload extends Component {
     this.onEbayChange = this.onEbayChange.bind(this);
     this.onEtsyChange = this.onEtsyChange.bind(this);
     this.handleChange = this.handleChange.bind(this)
+    this.onSubmit = this.onSubmit.bind(this);
   }
 
-  
+
   handleChange(event) {
     this.setState({
       file: URL.createObjectURL(event.target.files[0])
     })
   }
 
- 
-    
+
+
 // //App = () => {
 //     // stop from refreshing page
 //      onFormSubmit = (e) => {
@@ -57,12 +59,12 @@ class Upload extends Component {
 //         });
 //     };
 // //};
-  
+
 
 
   onImageChange = (e) => {
       this.setState({ image: e.target.value })
-    //   setfile(e.target.files[0]) 
+    //   setfile(e.target.files[0])
   }
 
   onItemChange(e) {
@@ -79,6 +81,21 @@ class Upload extends Component {
 
   onEtsyChange(e) {
     this.setState({ EtsyPrice: e.target.value })
+  }
+  onSubmit(e) {
+      e.preventDefault();
+      console.log("In the function");
+
+      axios.post('/addItem', {
+          etsyPrice: e.target.etsyPrice.value,
+      })
+          .then(function (response) {
+              if (response.data.status === "error") { window.alert("A user with that email already exists"); }
+              else { window.location.href = "/login"; }
+          })
+          .catch(function (error) {
+              console.log(error);
+          });
   }
 
   componentDidMount() {
@@ -133,7 +150,7 @@ class Upload extends Component {
           Upload Image
           <input
             type="file"
-            accept=".jpg, .jpeg, .png" 
+            accept=".jpg, .jpeg, .png"
             name="productImage"
             hidden
             onChange={this.handleChange}
@@ -153,11 +170,11 @@ class Upload extends Component {
           label="Item Name"
           variant="outlined"
           InputProps={{
-            inputProps: { 
-                minLength: 1 
+            inputProps: {
+                minLength: 1
             }
           }}
-          value={this.state.itemName} 
+          value={this.state.itemName}
           onChange={this.onItemChange}
         />
         <br />
@@ -169,7 +186,7 @@ class Upload extends Component {
           type="text"
           label="Item Description"
           variant="outlined"
-          value={this.state.itemDescription} 
+          value={this.state.itemDescription}
           onChange={this.onDescriptionChange}
         />
         <br />
@@ -177,13 +194,13 @@ class Upload extends Component {
           style={{ width: "200px", margin: "5px" }}
           type="number"
           InputProps={{
-            inputProps: { 
-                min: 0 
+            inputProps: {
+                min: 0
             }
           }}
           label="Ebay Price"
           variant="outlined"
-          value={this.state.EbayPrice} 
+          value={this.state.EbayPrice}
           onChange={this.onEbayChange}
         />
         <br />
@@ -191,17 +208,17 @@ class Upload extends Component {
           style={{ width: "200px", margin: "5px" }}
           type="number"
           InputProps={{
-            inputProps: { 
-                min: 0 
+            inputProps: {
+                min: 0
             }
           }}
           label="Etsy Price"
           variant="outlined"
-          value={this.state.EtsyPrice} 
+          value={this.state.EtsyPrice}
           onChange={this.onEtsyChange}
         />
         <br />
-        <Button variant="contained" color="primary" disabled={!isEnabled}>
+        <Button type='submit' variant="contained" color="primary" disabled={!isEnabled}>
           Upload
         </Button>
       </form>

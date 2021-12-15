@@ -22,9 +22,11 @@ const itemSchema = new Schema ({
     description: {type: String, required: false},
     etsyPrice: {type: String, required: false},
     ebayPrice:{type:String, required:false},
-    image: { 
-        data: Buffer, 
-        contentType: String, 
+    etsyListingID:{type:String, required:false},
+    etsyStatus:{type:String, required:false},
+    image: {
+        data: Buffer,
+        contentType: String,
         imagePath: String,
         required: false
      },
