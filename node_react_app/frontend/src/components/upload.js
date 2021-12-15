@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
+
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-
 import "./upload.css";
 
 class Upload extends Component {
@@ -22,17 +22,48 @@ class Upload extends Component {
     this.onDescriptionChange = this.onDescriptionChange.bind(this);
     this.onEbayChange = this.onEbayChange.bind(this);
     this.onEtsyChange = this.onEtsyChange.bind(this);
-
     this.uploadHandler = this.uploadHandler.bind(this);
   }
 
-//App = () => {
-    // stop from refreshing page
-     
-//};
 
   onImageChange(e) {
       this.setState({ image: e.target.value })
+    this.handleChange = this.handleChange.bind(this)
+    this.onSubmit = this.onSubmit.bind(this);
+  }
+
+
+  handleChange(event) {
+    this.setState({
+      file: URL.createObjectURL(event.target.files[0])
+    })
+  }
+
+// //App = () => {
+//     // stop from refreshing page
+//      onFormSubmit = (e) => {
+//         e.preventDefault();
+
+//         const formData = new FormData();
+//         formData.append('productImage', file); // photo same as one in backend
+//         const config = {
+//             headers: {
+//                 'content-type': 'multipart/form-data',
+//             },
+//         };
+//         const url = 'https://localhost:4000/addItem'
+//         axios.post('url, formData, config').then((response) => {
+//             alert('Image Uploaded Successfully!')
+//         }).catch((err) => {
+//             console.log('err', err);
+//         });
+//     };
+// //};
+
+  onImageChange = (e) => {
+      this.setState({ image: e.target.value })
+    //   setfile(e.target.files[0])
+
   }
 
   onItemChange(e) {
@@ -49,6 +80,21 @@ class Upload extends Component {
 
   onEtsyChange(e) {
     this.setState({ EtsyPrice: e.target.value })
+  }
+  onSubmit(e) {
+      e.preventDefault();
+      console.log("In the function");
+
+      axios.post('/addItem', {
+          etsyPrice: e.target.etsyPrice.value,
+      })
+          .then(function (response) {
+              if (response.data.status === "error") { window.alert("A user with that email already exists"); }
+              else { window.location.href = "/login"; }
+          })
+          .catch(function (error) {
+              console.log(error);
+          });
   }
 
   onFormSubmit = (e) => {
@@ -108,6 +154,7 @@ class Upload extends Component {
     render() {
         const { image, itemName, itemDescription, EbayPrice, EtsyPrice } = this.state;
         const isEnabled = itemName.length > 0 && itemDescription.length > 0 && EbayPrice > 0 && EtsyPrice > 0;
+      
         return (
             <div className="Upload">
                 <Form onSubmit={this.onSubmit}>
@@ -140,6 +187,7 @@ class Upload extends Component {
             </div>
         );
     }
+
 }
 
 export default Upload;

@@ -1,4 +1,5 @@
 const express = require('express');
+var FormData = require('form-data');
 const router = express.Router();
 const EbayAuthToken = require('ebay-oauth-nodejs-client');
 const ebayAuthToken = new EbayAuthToken({
@@ -14,9 +15,13 @@ const Schemas = require('../models/Schemas.js');
 var objectId = require('mongodb').ObjectId;
 var mongoClient = require('mongodb').MongoClient
 var assert = require('assert');
-// const Schemas = require('../models/Schemas.js');
+
 const axios = require('axios');
 require('dotenv/config');
+const fs = require('fs');
+const multer = require('multer') ;// multer will parse bodies that cannot be parse by bodyparser such as form data
+const myImage = './uploads/waterbottle.jpeg';
+
 
 router.use(express.urlencoded({ extended: false }));
 
@@ -30,11 +35,6 @@ router.use((req, res, next) => {
     next();
 });
 
-
-//  Create disk sotrage space and a folder where user image uploads on serverside, give image a new name
-const fs = require('fs')
-const multer = require('multer'); // multer will parse bodies that cannot be parse by bodyparser such as form data
-const { mongo } = require('mongoose');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -76,6 +76,9 @@ to the code_challenge sent with the initial authorization request
 const etsyClientID = process.env.ETSY_KEY;
 const etsyClientVerifier = process.env.ETSY_VERIFY;
 const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
+var etsyAuthentication = "";
+var etsyUserID = "";
+var appUserID = "";
 
 
 // Send a JSON response to a default get request
@@ -105,7 +108,6 @@ router.get('/oauth/redirect', async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
     // to this route. The authorization code is in the `code` param
     const authCode = req.query.code;
-    //console.log("Got to etsy redirect");
     const tokenUrl = 'https://api.etsy.com/v3/public/oauth/token';
     const requestOptions = {
         method: 'POST',
@@ -126,46 +128,124 @@ router.get('/oauth/redirect', async (req, res) => {
     // Extract the access token from the response access_token data field
     if (response.ok) {
         const tokenData = await response.json();
-        //console.log("Response okay");
-        const inventory = await getEtsyInventory(tokenData.access_token);
-        res.send(inventory);
+        // An Etsy access token includes your shop/user ID
+        // as a token prefix, so we can extract that too
+        const user_id = tokenData.access_token.split('.')[0];
+        etsyAuthentication = 'Bearer ' + tokenData.access_token;
+        etsyUserID = user_id;
+        // //syncDatabase();
+        // var inventory = await getEtsyInventory();
+        // console.log("TEST500", inventory);
+        //getEtsyInventory().then(res => {etsyInventory = res});
+        //console.log("Etsy Inventory Test", etsyInventory);
+        res.redirect('http://localhost:3000/inventory');
     } else {
         res.send("Response was not okay");
     }
 });
 
-async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
-    //console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
+async function syncDatabase(etsyInventory){
+  console.log("dbFunction", etsyInventory);
+  //var itemsInDB = Schemas.Items.find({ user: appUserID })
+  const inventory = Schemas.Items;
+  const itemsInDB = await inventory.find({ user: appUserID });
+  console.log(itemsInDB);
+  if (itemsInDB) {
+    listing_IDS = itemsInDB.map(item => item.etsyListingID);
+    console.log(listing_IDS);
+  }
+  //console.log(itemsInDB);
+  //console.log(JSON.parse({ items: itemsInDB }));
 
-    // An Etsy access token includes your shop/user ID
-    // as a token prefix, so we can extract that too
-    const user_id = access_token.split('.')[0];
-    //console.log("USER ID:", user_id);
-    const authorization = 'Bearer ' + access_token;
+
+  //Compare items in db with items from etsyInventory by listing_id
+  etsyInventory.results.forEach((item, index) => {
+    const duplicates = inventory.find({user:appUserID, etsyListingID:item.listing_id});
+    if(duplicates){
+       console.log("already in DB");
+     }
+     else {
+       console.log(item.listing_id);
+       // console.log("Not in DB");
+       // body = {
+       //    item: item.title,
+       //    description: item.description,
+       //    etsyPrice: item.price,
+       //    image: item.url,
+       //    etsyListingID: item.listing_id,
+       //    user: appUserID // field to link user whose saving item
+       // };
+       // var requestOptions = {
+       //     method: 'POST',
+       //     body: body,
+       //     redirect: 'follow'
+       // };
+       // fetch("http://localhost:4000/addItem", requestOptions);
+       //Create new item
+       const price = parseInt(item.price.amount) / parseInt(item.price.divisor);
+       console.log(price);
+       console.log(item.price.amount);
+       console.log(parseInt(item.amount));
+       const newItem = new Schemas.Items({  // save the item
+           item: item.title,
+           description: item.description,
+           etsyPrice: price,
+           image: item.url,
+           etsyListingID: item.listing_id,
+           user: appUserID // field to link user whose saving item
+        });
+
+      try { // we try to add it now
+          newItem.save((err, newItemResults) => {
+              if (err) console.log(err); // if error
+              else console.log({ status: 'ok', message: 'Item saved successfully' }); // make sure page ends after redirection
+          });
+      } catch (err) { // catch any errors
+          console.log(err); // console log any erros
+          console.log({ status: 'error', message: 'Something went wrong. Please try again' }); // end page
+      }
+     }
+     return 
+  });
+
+
+
+
+  // const items = etsyInventory.results.map(item => {item.listing_id, item.title, item.description, item.state, item.url, item.quantity});
+  // console.log("ITEMS", items);
+}
+
+async function getEtsyInventory () {
     const requestOptions = {
         headers: {
             'x-api-key': etsyClientID
         }
     };
-    axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
+    var etsyInventory;
+    console.log("hit etsy inventory func");
+    // testImage = fs.readFileSync("./uploads/kippah.jpeg");
+    // console.log("test image", testImage);
+    axios.get(`https://openapi.etsy.com/v3/application/users/${etsyUserID}/shops`,requestOptions)
     .then(response => {
       const shop_id = response.data.shop_id;
-      updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
-        // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
+      //getEtsyImage(shop_id,"1113666128");
+      //ploadEtsyImage(etsyAuthentication, shop_id, "1140102067", JSON.stringify(testImage));
+      //updateEtsyListing(etsyAuthentication, shop_id, "1140102067", 0.70);
+        // createEtsyListing(etsyAuthentication, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
         const shopRequestOptions = {
             method: 'GET',
             headers: {
                 'x-api-key': etsyClientID,
-                // Scoped endpoints require a bearer token
-                'Authorization': authorization
+                'Authorization': etsyAuthentication
             }
         }
         axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
           .then(shopResponse => {
+            etsyInventory = shopResponse.data;
+            console.log(etsyInventory);
+            syncDatabase(etsyInventory);
             //console.log("Price", shopResponse.data.results[0].price);
-            console.log(shopResponse.data);
-            return JSON.stringify(shopResponse.data);
           })
         .catch(error => {
           //console.log(error);
@@ -173,10 +253,9 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
         });
   })
     .catch(error => {
-      //console.log("ERROR");
-      //console.log(error);
       return "ERROR";
     });
+    return await etsyInventory;
 };
 
 /* ------------------ END ETSY OAUTH ------------------ */
@@ -184,11 +263,13 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
 
 router.get('/inventory', authenticateToken, async (req, res) => {
     const userID = req.user.id;
+    appUserID = userID;
 
     const inventory = Schemas.Items;
 
     const items = await inventory.find({ user: userID });
-
+    //CallGetEtsyInventory
+    getEtsyInventory();
     if (!items) {
         return res.json({ status: 'error', message: 'You currently have no items in your inventory' });
     }
@@ -245,7 +326,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
 
 // update items in mongodb
 router.post('/update', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
-    
+
     console.log(req.file);
 
     const itemName = req.body.itemName; // get item input field, name of field = itemInput
@@ -269,7 +350,7 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
         etsyPrice: etsyPrice,
         ebayPrice: ebayPrice,
         user: userId._id // field to link user whose saving item
-  
+
     });
     const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
     // const client = new MongoClient(DB_URI);
@@ -284,14 +365,18 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
     //     //  console.log(result);
     //       client.close();
     //     });
+    //Calling createEtsyListing function
+    //TO DO!!!!!!!!!!
+        createEtsyListing(quantity, item, description, etsyPrice,
+           who_made, is_supply,when_made, shop_id)
         try { // we try to add it now
         await db.collection('items').updateOne({"_id": objectId(o_id)}, // use to filter item
-                                                {$set: {"item":itemName, "description":itemDescription, "etsyPrice": etsyPrice, "ebayPrice": ebayPrice  }}, // update item 
+                                                {$set: {"item":itemName, "description":itemDescription, "etsyPrice": etsyPrice, "ebayPrice": ebayPrice  }}, // update item
                                                 { upsert: false }, (err, newItemResults) => {
         //if (err) res.end('Error Updating.'); // if error
         if (err) throw err;
         res.redirect('/inventory'); // else, redirect back to inventory page
-        res.end(); }); // make sure page ends after redirection 
+        res.end(); }); // make sure page ends after redirection
     } catch (err) { // catch any errors
         console.log(err); // console log any erros
         res.redirect('/inventory'); // redirect page
@@ -314,9 +399,9 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
     //     res.end(); // end page
     // }
 
-   
+
         // collection('orders').updateOne(
-        //     {"_id": objectId(id)}, 
+        //     {"_id": objectId(id)},
         //     {$set:updateItem})
         //     .then((obj) => {
         //         console.log('Updated - ' + obj);
@@ -325,7 +410,7 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
         //     .catch((err) => {
         //         console.log('Error: ' + err);
         //     })
-   
+
 });
 
 // delete items in mongodb
@@ -344,7 +429,7 @@ router.post('/delete', upload.single('productImage'), function(req, res) {
             if (err) throw err;
             console.log("Item deleted");
             res.redirect('/inventory'); // else, redirect back to inventory page
-            res.end(); }); // make sure page ends after redirection 
+            res.end(); }); // make sure page ends after redirection
         } catch (err) { // catch any errors
             console.log(err); // console log any erros
             res.redirect('/inventory'); // redirect page
@@ -353,7 +438,7 @@ router.post('/delete', upload.single('productImage'), function(req, res) {
             await client.close();
             console.log("client closed");
         }
-    
+
     });
 });
 
@@ -361,11 +446,11 @@ router.post('/delete', upload.single('productImage'), function(req, res) {
 router.get('/', function(req, res, next) {
     res.render('Home');
   });
-  
+
 router.get('/get-data', function(req, res, next) {
     var resultArray = [];
     const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
-    
+
     mongoClient.connect(DB_URI, async function(err, client) {
         if(err) throw err;
         var db = client.db("node_soulseller")
@@ -380,7 +465,7 @@ router.get('/get-data', function(req, res, next) {
                 console.log(doc);
             });
             //res.redirect('/inventory');
-            //res.end(); // make sure page ends after redirection 
+            //res.end(); // make sure page ends after redirection
         } catch (err) {
             console.log(err); // console log any erros
             res.redirect('/inventory'); // redirect page
@@ -392,9 +477,9 @@ router.get('/get-data', function(req, res, next) {
     });
 
 });
-  
-  
-  
+
+
+//EBAY AUTH NOT IN USE
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
     'https://api.ebay.com/oauth/api_scope/sell.marketing.readonly',
@@ -406,12 +491,9 @@ router.get('/ebayauth', (req, res) => {
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment.readonly',
     'https://api.ebay.com/oauth/api_scope/sell.fulfillment'
 ];
-  console.log("TEST");
   res.header('Access-Control-Allow-Origin', '*');
-  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION', scopes);
-
-  console.log(AuthUrl);
-  //console.log(res.redirect(AuthUrl));
+  const AuthUrl = ebayAuthToken.generateUserAuthorizationUrl('PRODUCTION',
+   scopes);
   return res.redirect(AuthUrl);;
 });
 
@@ -547,7 +629,8 @@ function generateAccessToken(user) {
     return jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.ACCESS_SECRET, { expiresIn: '1h' });
 };
 
-async function getInventory(token) {
+
+async function getEbayInventory(token) {
     auth = 'Bearer ' + token;
     axios.get('https://api.ebay.com/sell/inventory/v1/inventory_item?limit=2&offset=0', {
         headers: {
@@ -573,25 +656,63 @@ async function getTaxonmyID () {
           'x-api-key': etsyClientID,
       },
   };
-  axios.get('https://openapi.etsy.com/v3/application/taxonomy/seller/get',
+  axios.get('https://openapi.etsy.com/v3/application/seller-taxonomy/nodes',
   requestOptions)
   .then( response => {
-    const data = response.json().data;
-    console.log("taxonomyData", data)
+    const data = response.data;
+    console.log("taxonomyData", data);
     return data;
   })
   .catch( err => {
     console.log(err)
   });
 };
+//upload not currently functional
+// async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
+//   var headers = new fetch.Headers();
+//   headers.append("Content-Type", "multipart/form-data");
+//   headers.append("x-api-key", etsyClientID);
+//   headers.append("Authorization", auth);
+//   //console.log(headers);
+//   var imageParams = new FormData();
+//   imageParams.append("image", binaryImage);
+//
+//   var requestImageOptions = {
+//     method:'POST',
+//     headers: headers,
+//     body: imageParams,
+//     redirect: 'follow'
+//   }
+//   fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestImageOptions)
+//     .then(response => response.text())
+//     .then(result => console.log(result))
+//     .catch(error => console.log('error', error));
+//
+// };
 
+async function getEtsyImage(shop_id, listing_id){
+  const requestOptions = {
+      headers: {
+          'x-api-key': etsyClientID
+      }
+  };
+  axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestOptions)
+    .then (res => {
+                  console.log(res.data)
+                  console.log(res.data.results[0].url_170x135)
+                })
+    .catch(err => console.log(err));
+}''
 //TODO: add server end point for updating
-async function updateEtsyListing(auth, shop_id, listing_id, price) {
+async function updateEtsyListing(shop_id, listing_id, price) {
+  if (!etsyAuthentication) {
+    return "Error not authenticated with Etsy";
+  }
 //description, price, title, could add more parameters later
 var headers = new fetch.Headers();
 headers.append("Content-Type", "application/x-www-form-urlencoded");
 headers.append("x-api-key", etsyClientID);
-headers.append("Authorization", auth);
+headers.append("Authorization", etsyAuthentication);
 
 var updateParams = new URLSearchParams();
 updateParams.append("price", price);
@@ -626,14 +747,17 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
 //4) Redirect to....
 //5) Ask them whether they want to publish the draft
 
-async function createEtsyListing(auth, quantity, title, description, price,
+async function createEtsyListing(quantity, title, description, price,
    who_made, is_supply,when_made, shop_id) {
   const taxonomy_id = "1296"
-  //= await getTaxonmyID();
+  if (!etsyAuthentication) {
+    return "Error not authenticated with Etsy";
+  }
+
   var headers = new fetch.Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
   headers.append("x-api-key", etsyClientID);
-  headers.append("Authorization", auth);
+  headers.append("Authorization", etsyAuthentication);
 
   var shippingParams = new URLSearchParams();
   shippingParams.append("title", "New profile six");
