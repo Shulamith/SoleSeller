@@ -18,8 +18,8 @@ If running into issues try to clear the memory in your web developer tools
 As our first big project as a team, and not the cleanest of code, there are bound to be some bugs. 
 
 Functions that work on backend:
--CreateEtsyListing(pass in the corret parameters and it will appear in your drafts on Etsy!)
--EtsyModify (Modify a listing's price!)
+1. CreateEtsyListing(pass in the corret parameters and it will appear in your drafts on Etsy!)
+2. EtsyModify (Modify a listing's price!)
 They sometimes are a bit finicky on the frontend ever since material ui update, but you can test the backend by calling the function in the  router.get('/inventory) function. 
 
  
