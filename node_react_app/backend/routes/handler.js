@@ -1,4 +1,5 @@
 const express = require('express');
+var FormData = require('form-data');
 const router = express.Router();
 const EbayAuthToken = require('ebay-oauth-nodejs-client');
 const ebayAuthToken = new EbayAuthToken({
@@ -14,9 +15,12 @@ const Schemas = require('../models/Schemas.js');
 var objectId = require('mongodb').ObjectId;
 var mongoClient = require('mongodb').MongoClient
 var assert = require('assert');
-const Schemas = require('../models/Schemas.js');
 const axios = require('axios');
 require('dotenv/config');
+const fs = require('fs');
+const multer = require('multer') ;// multer will parse bodies that cannot be parse by bodyparser such as form data
+const myImage = './uploads/waterbottle.jpeg';
+
 
 router.use(express.urlencoded({ extended: false }));
 
@@ -30,11 +34,6 @@ router.use((req, res, next) => {
     next();
 });
 
-
-//  Create disk sotrage space and a folder where user image uploads on serverside, give image a new name
-const fs = require('fs')
-const multer = require('multer'); // multer will parse bodies that cannot be parse by bodyparser such as form data
-const { mongo } = require('mongoose');
 
 const storage = multer.diskStorage({
     destination: function(req, file, cb){
@@ -136,7 +135,6 @@ router.get('/oauth/redirect', async (req, res) => {
 
 async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
     //console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
-
     // An Etsy access token includes your shop/user ID
     // as a token prefix, so we can extract that too
     const user_id = access_token.split('.')[0];
@@ -147,10 +145,14 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
             'x-api-key': etsyClientID
         }
     };
+    testImage = fs.readFileSync("./uploads/kippah.jpeg");
+    console.log("test image", testImage);
     axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
     .then(response => {
       const shop_id = response.data.shop_id;
-      updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
+      getEtsyImage(shop_id,"1113666128");
+      uploadEtsyImage(authorization, shop_id, "1140102067", JSON.stringify(testImage));
+      //updateEtsyListing(authorization, shop_id, "1140102067", 0.70);
         // createEtsyListing(authorization, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
         const shopRequestOptions = {
@@ -245,7 +247,7 @@ router.post('/addItem', upload.single('productImage'), async (req, res, next) =>
 
 // update items in mongodb
 router.post('/update', upload.single('productImage'), async (req, res, next) => { // when user post items it gets sent to router to be added
-    
+
     console.log(req.file);
 
     const itemName = req.body.itemName; // get item input field, name of field = itemInput
@@ -269,7 +271,7 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
         etsyPrice: etsyPrice,
         ebayPrice: ebayPrice,
         user: userId._id // field to link user whose saving item
-  
+
     });
     const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
     // const client = new MongoClient(DB_URI);
@@ -286,12 +288,12 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
     //     });
         try { // we try to add it now
         await db.collection('items').updateOne({"_id": objectId(o_id)}, // use to filter item
-                                                {$set: {"item":itemName, "description":itemDescription, "etsyPrice": etsyPrice, "ebayPrice": ebayPrice  }}, // update item 
+                                                {$set: {"item":itemName, "description":itemDescription, "etsyPrice": etsyPrice, "ebayPrice": ebayPrice  }}, // update item
                                                 { upsert: false }, (err, newItemResults) => {
         //if (err) res.end('Error Updating.'); // if error
         if (err) throw err;
         res.redirect('/inventory'); // else, redirect back to inventory page
-        res.end(); }); // make sure page ends after redirection 
+        res.end(); }); // make sure page ends after redirection
     } catch (err) { // catch any errors
         console.log(err); // console log any erros
         res.redirect('/inventory'); // redirect page
@@ -314,9 +316,9 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
     //     res.end(); // end page
     // }
 
-   
+
         // collection('orders').updateOne(
-        //     {"_id": objectId(id)}, 
+        //     {"_id": objectId(id)},
         //     {$set:updateItem})
         //     .then((obj) => {
         //         console.log('Updated - ' + obj);
@@ -325,7 +327,7 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
         //     .catch((err) => {
         //         console.log('Error: ' + err);
         //     })
-   
+
 });
 
 // delete items in mongodb
@@ -344,7 +346,7 @@ router.post('/delete', upload.single('productImage'), function(req, res) {
             if (err) throw err;
             console.log("Item deleted");
             res.redirect('/inventory'); // else, redirect back to inventory page
-            res.end(); }); // make sure page ends after redirection 
+            res.end(); }); // make sure page ends after redirection
         } catch (err) { // catch any errors
             console.log(err); // console log any erros
             res.redirect('/inventory'); // redirect page
@@ -353,7 +355,7 @@ router.post('/delete', upload.single('productImage'), function(req, res) {
             await client.close();
             console.log("client closed");
         }
-    
+
     });
 });
 
@@ -361,11 +363,11 @@ router.post('/delete', upload.single('productImage'), function(req, res) {
 router.get('/', function(req, res, next) {
     res.render('Home');
   });
-  
+
 router.get('/get-data', function(req, res, next) {
     var resultArray = [];
     const DB_URI = "mongodb+srv://soul_sucker:soulsRus@cluster0.eulwe.mongodb.net/node_soulseller?retryWrites=true&w=majority";
-    
+
     mongoClient.connect(DB_URI, async function(err, client) {
         if(err) throw err;
         var db = client.db("node_soulseller")
@@ -380,7 +382,7 @@ router.get('/get-data', function(req, res, next) {
                 console.log(doc);
             });
             //res.redirect('/inventory');
-            //res.end(); // make sure page ends after redirection 
+            //res.end(); // make sure page ends after redirection
         } catch (err) {
             console.log(err); // console log any erros
             res.redirect('/inventory'); // redirect page
@@ -392,9 +394,9 @@ router.get('/get-data', function(req, res, next) {
     });
 
 });
-  
-  
-  
+
+
+
 router.get('/ebayauth', (req, res) => {
   const scopes = ['https://api.ebay.com/oauth/api_scope',
     'https://api.ebay.com/oauth/api_scope/sell.marketing.readonly',
@@ -573,11 +575,11 @@ async function getTaxonmyID () {
           'x-api-key': etsyClientID,
       },
   };
-  axios.get('https://openapi.etsy.com/v3/application/taxonomy/seller/get',
+  axios.get('https://openapi.etsy.com/v3/application/seller-taxonomy/nodes',
   requestOptions)
   .then( response => {
-    const data = response.json().data;
-    console.log("taxonomyData", data)
+    const data = response.data;
+    console.log("taxonomyData", data);
     return data;
   })
   .catch( err => {
@@ -585,6 +587,41 @@ async function getTaxonmyID () {
   });
 };
 
+async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
+  var headers = new fetch.Headers();
+  headers.append("Content-Type", "multipart/form-data");
+  headers.append("x-api-key", etsyClientID);
+  headers.append("Authorization", auth);
+  //console.log(headers);
+  var imageParams = new FormData();
+  imageParams.append("image", binaryImage);
+
+  var requestImageOptions = {
+    method:'POST',
+    headers: headers,
+    body: imageParams,
+    redirect: 'follow'
+  }
+  fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestImageOptions)
+    .then(response => response.text())
+    .then(result => console.log(result))
+    .catch(error => console.log('error', error));
+
+};
+
+async function getEtsyImage(shop_id, listing_id){
+  const requestOptions = {
+      headers: {
+          'x-api-key': etsyClientID
+      }
+  };
+  axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestOptions)
+    .then (res => {
+                  console.log(res.data)
+                  console.log(res.data.results[0].url_170x135)
+                })
+    .catch(err => console.log(err));
+}''
 //TODO: add server end point for updating
 async function updateEtsyListing(auth, shop_id, listing_id, price) {
 //description, price, title, could add more parameters later
@@ -621,7 +658,7 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
 async function createEtsyListing(auth, quantity, title, description, price,
    who_made, is_supply,when_made, shop_id) {
   const taxonomy_id = "1296"
-  //= await getTaxonmyID();
+
   var headers = new fetch.Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
   headers.append("x-api-key", etsyClientID);
