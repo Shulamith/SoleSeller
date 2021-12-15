@@ -21,10 +21,3 @@ when react is set up for frontend it uses 3000 port, for backend it needs to be 
 - **npm run start** will run front end using script found in package.json.(USE TO RUN FRONTEND)
 
 
-## Video Walkthrough
-Version 1.0:
-![Version 1.0](./images/Inital_Layout.gif)
-
-Resources:
-
-<!--https://www.youtube.com/watch?v=3isCTSUdXaQ>
