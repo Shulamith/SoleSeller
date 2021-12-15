@@ -132,8 +132,10 @@ router.get('/oauth/redirect', async (req, res) => {
         etsyAuthentication = 'Bearer ' + tokenData.access_token;
         etsyUserID = user_id;
         //syncDatabase();
-        const etsyInventory = await getEtsyInventory();
-        console.log("Etsy Inventory Test", getEtsyInventory);
+        var inventory = await getEtsyInventory();
+        console.log("TEST500", inventory);
+        //getEtsyInventory().then(res => {etsyInventory = res});
+        //console.log("Etsy Inventory Test", etsyInventory);
         res.redirect('http://localhost:3000/inventory');
     } else {
         res.send("Response was not okay");
@@ -153,6 +155,7 @@ async function getEtsyInventory () {
             'x-api-key': etsyClientID
         }
     };
+    var etsyInventory;
     // testImage = fs.readFileSync("./uploads/kippah.jpeg");
     // console.log("test image", testImage);
     axios.get(`https://openapi.etsy.com/v3/application/users/${etsyUserID}/shops`,requestOptions)
@@ -172,9 +175,9 @@ async function getEtsyInventory () {
         }
         axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
           .then(shopResponse => {
+            etsyInventory = shopResponse.data;
+            console.log(etsyInventory);
             //console.log("Price", shopResponse.data.results[0].price);
-            //console.log(shopResponse.data);
-            return JSON.stringify(shopResponse.data);
           })
         .catch(error => {
           //console.log(error);
@@ -184,6 +187,7 @@ async function getEtsyInventory () {
     .catch(error => {
       return "ERROR";
     });
+    return await etsyInventory;
 };
 
 /* ------------------ END ETSY OAUTH ------------------ */
