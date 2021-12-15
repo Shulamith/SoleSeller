@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+
 import "./upload.css";
 
 class Upload extends Component {
@@ -20,7 +22,14 @@ class Upload extends Component {
     this.onDescriptionChange = this.onDescriptionChange.bind(this);
     this.onEbayChange = this.onEbayChange.bind(this);
     this.onEtsyChange = this.onEtsyChange.bind(this);
+
+    this.uploadHandler = this.uploadHandler.bind(this);
   }
+
+//App = () => {
+    // stop from refreshing page
+     
+//};
 
   onImageChange(e) {
       this.setState({ image: e.target.value })
@@ -41,6 +50,33 @@ class Upload extends Component {
   onEtsyChange(e) {
     this.setState({ EtsyPrice: e.target.value })
   }
+
+  onFormSubmit = (e) => {
+    e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('productImage', e.target.files[0]); // photo same as one in backend
+    const config = {
+        headers: {
+            'content-type': 'multipart/form-data',
+        },
+    };
+    const url = 'https://localhost:4000/addItem'
+    axios.post('url, formData, config').then((response) => {
+        alert('Image Uploaded Successfully!')
+    }).catch((err) => {
+        console.log('err', err);
+    });
+    };
+
+    uploadHandler(e) {
+        const data = new FormData();
+        data.append('file', e.target.files[0]);
+        axios.post('/addItem', data)
+          .then((res) => {
+            this.setState({ photos: [res.data, ...this.state.photos] });
+          });
+      }
 
   componentDidMount() {
     this.userData = JSON.parse(localStorage.getItem('form'));
@@ -63,6 +99,7 @@ class Upload extends Component {
         })
     }
     }
+    
 
     componentWillUpdate(nextProps, nextState) {
         localStorage.setItem('form', JSON.stringify(nextState));
