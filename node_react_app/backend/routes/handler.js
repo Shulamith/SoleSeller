@@ -15,7 +15,6 @@ const Schemas = require('../models/Schemas.js');
 var objectId = require('mongodb').ObjectId;
 var mongoClient = require('mongodb').MongoClient
 var assert = require('assert');
-const Schemas = require('../models/Schemas.js');
 const axios = require('axios');
 require('dotenv/config');
 const fs = require('fs');
