@@ -76,6 +76,7 @@ const etsyClientID = process.env.ETSY_KEY;
 const etsyClientVerifier = process.env.ETSY_VERIFY;
 const etsyRedirectUri = 'http://localhost:4000/oauth/redirect';
 var etsyAuthentication = "";
+var etsyUserID = ""
 
 
 // Send a JSON response to a default get request
@@ -105,7 +106,6 @@ router.get('/oauth/redirect', async (req, res) => {
     // The req.query object has the query params that Etsy authentication sends
     // to this route. The authorization code is in the `code` param
     const authCode = req.query.code;
-    //console.log("Got to etsy redirect");
     const tokenUrl = 'https://api.etsy.com/v3/public/oauth/token';
     const requestOptions = {
         method: 'POST',
@@ -128,29 +128,38 @@ router.get('/oauth/redirect', async (req, res) => {
         const tokenData = await response.json();
         // An Etsy access token includes your shop/user ID
         // as a token prefix, so we can extract that too
-        const user_id = access_token.split('.')[0];
-        etsyAuthentication = 'Bearer ' + access_token;
-        res.redirect("./inventory");
+        const user_id = tokenData.access_token.split('.')[0];
+        etsyAuthentication = 'Bearer ' + tokenData.access_token;
+        etsyUserID = user_id;
+        //syncDatabase();
+        const etsyInventory = await getEtsyInventory();
+        console.log("Etsy Inventory Test", getEtsyInventory);
+        res.redirect('http://localhost:3000/inventory');
     } else {
         res.send("Response was not okay");
     }
 });
 
-async function getEtsyInventory (access_token) {    // We passed the access token in via the querystring
-    //console.log("AT RECIEVE INVENTORY ACCESS TOKEN");
+async function syncDatabase(){
+  const etsyInventory = await getEtsyInventory();
+  const items = etsyInventory.result.map(item => item.listing_id, item.title, item.description,
+  item.state, item.url, item.quantity)
+  console.log("ITEMS", items);
+}
 
+async function getEtsyInventory () {
     const requestOptions = {
         headers: {
             'x-api-key': etsyClientID
         }
     };
-    testImage = fs.readFileSync("./uploads/kippah.jpeg");
-    console.log("test image", testImage);
-    axios.get(`https://openapi.etsy.com/v3/application/users/${user_id}/shops`,requestOptions)
+    // testImage = fs.readFileSync("./uploads/kippah.jpeg");
+    // console.log("test image", testImage);
+    axios.get(`https://openapi.etsy.com/v3/application/users/${etsyUserID}/shops`,requestOptions)
     .then(response => {
       const shop_id = response.data.shop_id;
-      getEtsyImage(shop_id,"1113666128");
-      uploadEtsyImage(etsyAuthentication, shop_id, "1140102067", JSON.stringify(testImage));
+      //getEtsyImage(shop_id,"1113666128");
+      //ploadEtsyImage(etsyAuthentication, shop_id, "1140102067", JSON.stringify(testImage));
       //updateEtsyListing(etsyAuthentication, shop_id, "1140102067", 0.70);
         // createEtsyListing(etsyAuthentication, "1", "TestWater", "testingetsyapi", "0.40",
         //    "i_did", "true", "made_to_order", shop_id);
@@ -158,14 +167,13 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
             method: 'GET',
             headers: {
                 'x-api-key': etsyClientID,
-                // Scoped endpoints require a bearer token
                 'Authorization': etsyAuthentication
             }
         }
         axios.get(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings`,shopRequestOptions)
           .then(shopResponse => {
             //console.log("Price", shopResponse.data.results[0].price);
-            console.log(shopResponse.data);
+            //console.log(shopResponse.data);
             return JSON.stringify(shopResponse.data);
           })
         .catch(error => {
@@ -174,8 +182,6 @@ async function getEtsyInventory (access_token) {    // We passed the access toke
         });
   })
     .catch(error => {
-      //console.log("ERROR");
-      //console.log(error);
       return "ERROR";
     });
 };
@@ -286,7 +292,8 @@ router.post('/update', upload.single('productImage'), async (req, res, next) => 
     //       client.close();
     //     });
     //Calling createEtsyListing function
-        createEtsyListing(auth, quantity, item, description, etsyPrice,
+    //TO DO!!!!!!!!!!
+        createEtsyListing(quantity, item, description, etsyPrice,
            who_made, is_supply,when_made, shop_id)
         try { // we try to add it now
         await db.collection('items').updateOne({"_id": objectId(o_id)}, // use to filter item
@@ -445,8 +452,7 @@ router.post('/login', async (req, res) => {
                 res.status(500).send();
             }
 
-            return res.json({ status: 'ok', message: 'User log in was
-            successful', user: user.username, accessToken: accessToken });
+            return res.json({ status: 'ok', message: 'User log in was successful', user: user.username, accessToken: accessToken });
         }
 
     } catch (err) {
@@ -549,7 +555,8 @@ function generateAccessToken(user) {
     return jwt.sign({ id: user._id, username: user.username, email: user.email }, process.env.ACCESS_SECRET, { expiresIn: '1h' });
 };
 
-async function getInventory(token) {
+
+async function getEbayInventory(token) {
     auth = 'Bearer ' + token;
     axios.get('https://api.ebay.com/sell/inventory/v1/inventory_item?limit=2&offset=0', {
         headers: {
@@ -586,28 +593,28 @@ async function getTaxonmyID () {
     console.log(err)
   });
 };
-
-async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
-  var headers = new fetch.Headers();
-  headers.append("Content-Type", "multipart/form-data");
-  headers.append("x-api-key", etsyClientID);
-  headers.append("Authorization", auth);
-  //console.log(headers);
-  var imageParams = new FormData();
-  imageParams.append("image", binaryImage);
-
-  var requestImageOptions = {
-    method:'POST',
-    headers: headers,
-    body: imageParams,
-    redirect: 'follow'
-  }
-  fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestImageOptions)
-    .then(response => response.text())
-    .then(result => console.log(result))
-    .catch(error => console.log('error', error));
-
-};
+//upload not currently functional
+// async function uploadEtsyImage(auth, shop_id, listing_id, binaryImage){
+//   var headers = new fetch.Headers();
+//   headers.append("Content-Type", "multipart/form-data");
+//   headers.append("x-api-key", etsyClientID);
+//   headers.append("Authorization", auth);
+//   //console.log(headers);
+//   var imageParams = new FormData();
+//   imageParams.append("image", binaryImage);
+//
+//   var requestImageOptions = {
+//     method:'POST',
+//     headers: headers,
+//     body: imageParams,
+//     redirect: 'follow'
+//   }
+//   fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listing_id}/images`, requestImageOptions)
+//     .then(response => response.text())
+//     .then(result => console.log(result))
+//     .catch(error => console.log('error', error));
+//
+// };
 
 async function getEtsyImage(shop_id, listing_id){
   const requestOptions = {
@@ -623,12 +630,15 @@ async function getEtsyImage(shop_id, listing_id){
     .catch(err => console.log(err));
 }''
 //TODO: add server end point for updating
-async function updateEtsyListing(auth, shop_id, listing_id, price) {
+async function updateEtsyListing(shop_id, listing_id, price) {
+  if (!etsyAuthentication) {
+    return "Error not authenticated with Etsy";
+  }
 //description, price, title, could add more parameters later
 var headers = new fetch.Headers();
 headers.append("Content-Type", "application/x-www-form-urlencoded");
 headers.append("x-api-key", etsyClientID);
-headers.append("Authorization", auth);
+headers.append("Authorization", etsyAuthentication);
 
 var updateParams = new URLSearchParams();
 updateParams.append("price", price);
@@ -655,9 +665,12 @@ fetch(`https://openapi.etsy.com/v3/application/shops/${shop_id}/listings/${listi
 //4) Redirect to....
 //5) Ask them whether they want to publish the draft
 
-async function createEtsyListing(auth, quantity, title, description, price,
+async function createEtsyListing(quantity, title, description, price,
    who_made, is_supply,when_made, shop_id) {
   const taxonomy_id = "1296"
+  if (!etsyAuthentication) {
+    return "Error not authenticated with Etsy";
+  }
 
   var headers = new fetch.Headers();
   headers.append("Content-Type", "application/x-www-form-urlencoded");//x-www-form-urlencoded
