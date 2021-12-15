@@ -19,7 +19,7 @@ const channelSchema = new Schema({
 
 const itemSchema = new Schema ({
     item: {type: String, required: true},
-    description: {type: String, requierd: true},
+    description: {type: String, required: false},
     etsyPrice: {type: String, required: false},
     ebayPrice:{type:String, required:false},
     image: { 
