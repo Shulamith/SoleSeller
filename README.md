@@ -6,6 +6,13 @@ To run the app:
 2) cd into node_react_app/frontend and run : npm run start
 3) Go to localhost:3000 in your favorite browser
 
+This is an application to connect multiselling platforms to provide comparison between seller fees and total earnings. 
+As of now the application connects with Etsy and Ebay's functionality is withheld as we wait for them to fix their API. 
+
+The handler.js contains most of the backend logic including all the etsy api calls.
+Upon logging in to your etsy profile, we send you to the inventory, call the getEtsyInventoryFunction and sync that with the database.
+The inventory displays any current items with prices as well as calculates seller fees.
+
 If running into issues try to clear the memory in your web developer tools 
 
 As our first big project as a team, and not the cleanest of code, there are bound to be some bugs. 
@@ -13,14 +20,9 @@ As our first big project as a team, and not the cleanest of code, there are boun
 Functions that work on backend:
 -CreateEtsyListing(pass in the corret parameters and it will appear in your drafts on Etsy!)
 -EtsyModify (Modify a listing's price!)
+They sometimes are a bit finicky on the frontend ever since material ui update, but you can test the backend by calling the function in the  router.get('/inventory) function. 
 
-
-This is an application to connect multiselling platforms to provide comparison between seller fees and total earnings. 
-As of now the application connects with Etsy and Ebay's functionality is withheld as we wait for them to fix their API. 
-
-The handler.js contains most of the backend logic including all the etsy api calls.
-Upon logging in to your etsy profile, we send you to the inventory, call the getEtsyInventoryFunction and sync that with the database.
-The inventory displays any current items with prices as well as calculates seller fees. 
+ 
 
 Frontend uses ES6 for react
 Backend used NodeJS Express
