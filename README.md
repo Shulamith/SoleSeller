@@ -8,6 +8,13 @@ To run the app:
 
 If running into issues try to clear the memory in your web developer tools 
 
+As our first big project as a team, and not the cleanest of code, there are bound to be some bugs. 
+
+Functions that work on backend:
+-CreateEtsyListing(pass in the corret parameters and it will appear in your drafts on Etsy!)
+-EtsyModify (Modify a listing's price!)
+
+
 This is an application to connect multiselling platforms to provide comparison between seller fees and total earnings. 
 As of now the application connects with Etsy and Ebay's functionality is withheld as we wait for them to fix their API. 
 
